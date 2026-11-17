@@ -1,6 +1,9 @@
 {{ config(materialized='view') }}
 
-{# Open Food Facts category tags in their stored order (general to specific). #}
+{#
+  Open Food Facts category tags in their stored order (mostly general to specific).
+  en:undefined and en:null are placeholders, not categories.
+#}
 
 with tags as (
     select
@@ -13,4 +16,4 @@ with tags as (
 
 select code, position, category_tag
 from tags
-where category_tag <> 'en:undefined'
+where category_tag not in ('en:undefined', 'en:null')
