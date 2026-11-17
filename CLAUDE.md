@@ -21,6 +21,9 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - API locally: `uv run fastapi dev api/app/main.py`
 - Web: `pnpm -C web dev`, `pnpm -C web lint`, `pnpm -C web typecheck`, `pnpm -C web test`
 - An eval: `uv run python -m evals.runners.<name>` (results go to `evals/results/`)
+- Snapshot the source file: `uv run python -m pipeline.ingest.snapshot` (8 GB, resumable, into `data/raw/<date>/`)
+- Data profile: `uv run python -m pipeline.ingest.profile --us-filter "list_contains(countries_tags, 'en:united-states')"`
+- Label the gold set: `uv run python scripts/label.py` (resumes; `u` undo, `q` quit)
 
 ## Environment
 
