@@ -61,6 +61,14 @@ def test_samples_come_from_us_rows_only_and_skip_empties(parquet: Path) -> None:
     assert set(names) == {"Corn flakes", "Chips \\| salt"}
 
 
+def test_samples_are_most_common_first(parquet: Path) -> None:
+    profile = prof.build_profile(prof.connect(), parquet, US, sample_rows=100)
+    tags = next(c for c in profile.columns if c.name == "countries_tags").samples
+
+    # ['en:united-states'] appears twice among US rows, the two-country list once.
+    assert tags[0] == "['en:united-states']"
+
+
 def test_render_writes_header_and_one_row_per_column(parquet: Path) -> None:
     profile = prof.build_profile(prof.connect(), parquet, US, sample_rows=100)
     manifest = {"snapshot_date": "2026-11-17", "bytes": 1234, "dataset_commit": "abc"}

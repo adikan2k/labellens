@@ -176,8 +176,8 @@ def build_profile(
             i += 2
         not_empty = f"AND NOT ({empty})" if empty else ""
         samples = con.execute(
-            f"SELECT DISTINCT {q(name)}::VARCHAR AS v FROM us_sample "
-            f"WHERE {q(name)} IS NOT NULL {not_empty} ORDER BY v LIMIT 5"
+            f"SELECT {q(name)}::VARCHAR AS v, count(*) AS n FROM us_sample "
+            f"WHERE {q(name)} IS NOT NULL {not_empty} GROUP BY v ORDER BY n DESC, v LIMIT 5"
         ).fetchall()
         profile.columns.append(
             Column(
@@ -220,8 +220,8 @@ def render(profile: Profile, manifest: dict[str, Any], command: str) -> str:
         "## Columns",
         "",
         "Rates are percentages. Empty means an empty or blank string, or an empty list; "
-        "`n/a` where emptiness does not apply. Samples are up to five distinct non-empty values "
-        f"from a fixed-seed sample of {SAMPLE_ROWS:,} US rows, cut to {SAMPLE_WIDTH} characters.",
+        "`n/a` where emptiness does not apply. Samples are the five most common non-empty values "
+        f"in a fixed-seed sample of {SAMPLE_ROWS:,} US rows, cut to {SAMPLE_WIDTH} characters.",
         "",
         "| Column | Type | Null all | Null US | Empty all | Empty US | Sample values (US) |",
         "| --- | --- | ---: | ---: | ---: | ---: | --- |",
