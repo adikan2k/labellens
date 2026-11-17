@@ -17,9 +17,18 @@ dev = [
     "pyyaml",
     "ruff",
 ]
+pipeline = [
+    "dagster>=1.13.30",
+    "dagster-dbt>=0.29.30",
+    "dagster-webserver>=1.13.30",
+    "dbt-core>=1.12",
+    "dbt-duckdb>=1.11",
+]
 
 [tool.uv]
 package = false
+# The API image (phase 2) installs with --no-default-groups to skip dbt and Dagster.
+default-groups = ["dev", "pipeline"]
 
 [tool.ruff]
 line-length = 100

@@ -1,0 +1,38 @@
+name: labellens
+version: "0.1.0"
+config-version: 2
+profile: labellens
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+target-path: target
+clean-targets: [target, logs]
+
+flags:
+  send_anonymous_usage_stats: false
+
+# Paths are relative to the repo root: run dbt from there (see CLAUDE.md).
+vars:
+  raw_dir: data/raw
+  # Pin a snapshot folder here or with --vars; by default the newest under raw_dir is used.
+  snapshot_dir: ""
+  # From docs/data-profile.md.
+  us_filter: "list_contains(countries_tags, 'en:united-states')"
+  # Agreed thresholds (phase 1 plan).
+  max_unnamed_share: 0.03
+  min_products: 900000
+  max_products: 1200000
+
+models:
+  labellens:
+    +materialized: table
+    staging:
+      +tags: [staging]
+    marts:
+      +tags: [marts]
+
+seeds:
+  labellens:
+    +tags: [seeds]
