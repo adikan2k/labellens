@@ -10,7 +10,8 @@ from scripts import label as labeller
 
 ROWS = """
   ('001', [{'lang': 'main', 'text': 'Main name'}, {'lang': 'en', 'text': 'English name'}],
-   'Acme', [{'lang': 'main', 'text': 'corn, sugar'}], ['en:united-states'], 10),
+   'Acme', [{'lang': 'main', 'text': 'corn,' || chr(13) || chr(10) || ' sugar'}],
+   ['en:united-states'], 10),
   ('002', [{'lang': 'fr', 'text': 'Nom'}, {'lang': 'en', 'text': 'English only'}],
    NULL, [{'lang': 'en', 'text': 'water'}], ['en:united-states', 'en:canada'], 10),
   ('003', [{'lang': 'main', 'text': 'French product'}],
@@ -54,6 +55,7 @@ def test_text_prefers_main_then_english(parquet: Path, tmp_path: Path) -> None:
     rows = {r["code"]: r for r in _draw(parquet, tmp_path)}
 
     assert rows["001"]["name"] == "Main name"
+    assert rows["001"]["ingredients"] == "corn, sugar"  # line breaks collapsed
     assert rows["002"]["name"] == "English only"
     assert rows["002"]["brand"] == ""
     assert rows["001"]["snapshot_date"] == "2026-11-17"

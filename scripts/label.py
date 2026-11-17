@@ -93,7 +93,8 @@ def draw_sample(
         writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(SAMPLE_FIELDS)
         for code, name, brand, ingredients in rows:
-            writer.writerow([code, " ".join(name.split()), brand, ingredients, snapshot_date])
+            name, ingredients = " ".join(name.split()), " ".join(ingredients.split())
+            writer.writerow([code, name, brand, ingredients, snapshot_date])
     return len(rows)
 
 
