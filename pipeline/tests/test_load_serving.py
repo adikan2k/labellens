@@ -42,15 +42,21 @@ def test_every_named_product_is_loaded_in_rank_order(
     assert pg.execute("select count(*) from products where name is null").fetchone() == (0,)
 
 
-def test_english_products_rank_first_then_scans(
+def _us_barcode(code: str) -> bool:
+    """GS1 prefixes 000-139 are assigned to the US and Canada (UPC-A, or EAN-13 with a 0)."""
+    return len(code) in (12, 13) and int(code.zfill(13)[:3]) <= 139
+
+
+def test_us_barcodes_then_english_then_scans(
     pg: psycopg.Connection, marts: duckdb.DuckDBPyConnection
 ) -> None:
     lang = dict(marts.execute("select code, lang from dim_products").fetchall())
     ordered = pg.execute("select code, scans from products order by rank_pos").fetchall()
-    english = [lang[code] == "en" for code, _ in ordered]
-    assert english == sorted(english, reverse=True), "an English product ranks below a foreign one"
-    english_scans = [scans for (code, scans) in ordered if lang[code] == "en"]
-    assert english_scans == sorted(english_scans, reverse=True)
+    keys = [(_us_barcode(code), lang[code] == "en") for code, _ in ordered]
+    assert keys == sorted(keys, reverse=True), "a US barcode ranks below an imported one"
+    assert any(us for us, _ in keys) and not all(us for us, _ in keys), "fixture covers both"
+    top_group = [s for (code, s) in ordered if _us_barcode(code) and lang[code] == "en"]
+    assert top_group == sorted(top_group, reverse=True)
 
 
 def test_arrays_keep_label_and_e_number_order(

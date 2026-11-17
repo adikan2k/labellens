@@ -8,9 +8,11 @@ The API reads only what is loaded here, in schema `serving`:
 
 - products: one row per named US product (unnamed ones cannot be searched or shown). Nutrition
   is inline; additive and ingredient ids are ordered arrays instead of 4.6 million bridge rows;
-  the image is stored as its path tail. rank_pos orders search results: English-language
-  products first (scan counts are global, so a heavily scanned foreign product would otherwise
-  outrank US ones), then scans, then completeness. Rows are written in rank order.
+  the image is stored as its path tail. rank_pos orders search results: products with a
+  US/Canada barcode (GS1 prefix 000-139) first, then English-language ones, then scans, then
+  completeness. Scan counts are global, and imports tagged as sold in the US (Moroccan milk,
+  French water) are often heavily scanned and recorded as English, so the barcode prefix is
+  the signal that keeps US products on top. Rows are written in rank order.
 - additives, ingredients, categories: lookups. stats: the dashboard document. meta: snapshot.
 
 Safety: the size is estimated from DuckDB before connecting, and the load stops above 800 MB
@@ -137,7 +139,10 @@ select
     coalesce(a.ids, []::varchar[]) as additive_ids,
     coalesce(i.ids, []::varchar[]) as ingredient_ids,
     row_number() over (
-        order by (p.lang = 'en') desc, p.scans desc, p.completeness desc nulls last, p.code
+        order by
+            (length(p.code) between 12 and 13
+             and try_cast(left(lpad(p.code, 13, '0'), 3) as integer) between 0 and 139) desc,
+            (p.lang = 'en') desc, p.scans desc, p.completeness desc nulls last, p.code
     ) as rank_pos
 from dim_products as p
 join fct_nutrition as f using (code)
