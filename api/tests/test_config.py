@@ -27,6 +27,7 @@ def test_defaults_without_env_file() -> None:
 
     assert settings.model_default == "claude-haiku-5-5"
     assert settings.model_eval == "claude-sonnet-5-5"
+    assert settings.embeddings_model == "voyage-4-lite"
     assert settings.anthropic_api_key is None
     assert settings.ask_rate_limit_per_hour == 10
     assert settings.ask_daily_spend_cap_usd == 0.50

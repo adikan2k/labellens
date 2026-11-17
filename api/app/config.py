@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     # Embeddings (see docs/decisions/0001-embeddings.md)
     embeddings_api_key: SecretStr | None = None
-    embeddings_model: str = ""
+    embeddings_model: str = "voyage-4-lite"
 
     # Neon Postgres
     database_url: SecretStr | None = None
