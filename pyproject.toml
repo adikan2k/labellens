@@ -50,3 +50,5 @@ typeCheckingMode = "standard"
 testpaths = ["api/tests", "pipeline/tests", "scripts/tests"]
 pythonpath = ["."]
 addopts = "--import-mode=importlib -q"
+# Third-party notice from a transitive dependency of Dagster; nothing to act on here.
+filterwarnings = ["ignore:sqlglotrs is deprecated:DeprecationWarning"]

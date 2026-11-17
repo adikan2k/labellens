@@ -1,0 +1,225 @@
+"""dbt build on the committed fixture: every model and data test, plus behaviour on known rows.
+
+dbt runs as a subprocess, exactly as a person runs it, from the repo root (dbt paths are
+relative to it) into a temporary DuckDB file. In-process dbt keeps its DuckDB connection open,
+which would stop the tests from reading the file. The fixture is cut by
+scripts/make_fixture.py and contains each cleaning case.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+from collections.abc import Iterator
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+import duckdb
+import pytest
+
+ROOT = Path(__file__).resolve().parents[2]
+DBT_DIR = ROOT / "pipeline" / "dbt"
+FIXTURE_RAW = ROOT / "pipeline" / "tests" / "fixtures" / "raw"
+FIXTURE_PARQUET = FIXTURE_RAW / "2026-11-17" / "food.parquet"
+# The fixture is small and deliberately over-represents unnamed products.
+FIXTURE_VARS = {
+    "raw_dir": "pipeline/tests/fixtures/raw",
+    "min_products": 100,
+    "max_products": 1000,
+    "max_unnamed_share": 0.1,
+}
+US = "list_contains(countries_tags, 'en:united-states')"
+
+
+def _dbt_executable() -> str:
+    found = shutil.which("dbt", path=str(Path(sys.executable).parent))
+    assert found, "dbt is not installed in this environment (uv sync installs the pipeline group)"
+    return found
+
+
+@dataclass
+class Run:
+    returncode: int
+    output: str
+    results: list[dict[str, Any]]
+
+
+def run_dbt(command: str, tmp: Path, vars_: dict[str, object], *select: str) -> Run:
+    target = tmp / f"target-{command}"
+    args = [
+        _dbt_executable(), command,
+        "--project-dir", str(DBT_DIR),
+        "--profiles-dir", str(DBT_DIR),
+        "--target-path", str(target),
+        "--log-path", str(tmp / "logs"),
+        "--vars", json.dumps(vars_),
+    ]  # fmt: skip
+    if select:
+        args += ["--select", *select]
+    env = {
+        **os.environ,
+        "LABELLENS_DUCKDB": str(tmp / "fixture.duckdb"),
+        "LABELLENS_DUCKDB_TMP": str(tmp / "spill"),
+    }
+    done = subprocess.run(
+        args, cwd=ROOT, env=env, capture_output=True, text=True, encoding="utf-8",
+        errors="replace", timeout=600, check=False,
+    )  # fmt: skip
+    results_file = target / "run_results.json"
+    results = (
+        json.loads(results_file.read_text("utf-8"))["results"] if results_file.exists() else []
+    )
+    return Run(done.returncode, done.stdout + done.stderr, results)
+
+
+@dataclass
+class Build:
+    run: Run
+    db: Path
+    tmp: Path
+
+
+@pytest.fixture(scope="module")
+def build(tmp_path_factory: pytest.TempPathFactory) -> Build:
+    tmp = tmp_path_factory.mktemp("dbt")
+    return Build(run_dbt("build", tmp, FIXTURE_VARS), tmp / "fixture.duckdb", tmp)
+
+
+@pytest.fixture(scope="module")
+def con(build: Build) -> Iterator[duckdb.DuckDBPyConnection]:
+    assert build.run.returncode == 0, build.run.output[-3000:]
+    connection = duckdb.connect(str(build.db), read_only=True)
+    yield connection
+    connection.close()
+
+
+def _one(con: duckdb.DuckDBPyConnection, sql: str) -> object:
+    row = con.execute(sql).fetchone()
+    assert row is not None
+    return row[0]
+
+
+def test_build_passes_with_at_least_30_tests(build: Build) -> None:
+    assert build.run.returncode == 0, build.run.output[-3000:]
+    tests = [r for r in build.run.results if r["unique_id"].startswith("test.")]
+    assert len(tests) >= 30
+    assert {r["status"] for r in tests} == {"pass"}
+
+
+def test_one_row_per_us_barcode(con: duckdb.DuckDBPyConnection) -> None:
+    raw = duckdb.connect()
+    us_codes = _one(
+        raw,
+        f"select count(distinct code) from read_parquet('{FIXTURE_PARQUET.as_posix()}') where {US}",
+    )
+    assert _one(con, "select count(*) from dim_products") == us_codes
+    non_us = raw.execute(
+        f"select code from read_parquet('{FIXTURE_PARQUET.as_posix()}') where not {US}"
+    ).fetchall()
+    assert not con.execute(
+        "select code from dim_products where code in (select unnest($1))",
+        [[c for (c,) in non_us]],
+    ).fetchall()
+
+
+def test_duplicate_barcode_keeps_latest_row(con: duckdb.DuckDBPyConnection) -> None:
+    raw = duckdb.connect()
+    latest = raw.execute(
+        f"""select code, max(last_modified_t) from read_parquet('{FIXTURE_PARQUET.as_posix()}')
+            where {US} group by code having count(*) > 1"""
+    ).fetchall()
+    assert latest, "fixture should contain duplicate barcodes"
+    for code, modified in latest:
+        kept = _one(con, f"select epoch(last_modified_at) from dim_products where code = '{code}'")
+        assert kept == modified
+
+
+def test_impossible_nutrients_are_blanked_not_dropped(con: duckdb.DuckDBPyConnection) -> None:
+    blanked = _one(
+        con,
+        """select count(*) from fct_nutrition f join stg_off__nutrition s using (code)
+           where s.energy_kcal_100g > 900 and f.energy_kcal_100g is null""",
+    )
+    assert isinstance(blanked, int) and blanked > 0
+    kept = _one(
+        con,
+        """select count(f.fat_100g) from fct_nutrition f join stg_off__nutrition s using (code)
+           where s.energy_kcal_100g > 900 and s.fat_100g between 0 and 100""",
+    )
+    assert isinstance(kept, int) and kept > 0  # other values on the same product survive
+
+
+def test_pseudo_grades_become_null(con: duckdb.DuckDBPyConnection) -> None:
+    raw_unknown = _one(
+        con,
+        "select count(*) from stg_off__products "
+        "where nutriscore_grade_raw in ('unknown', 'not-applicable')",
+    )
+    assert isinstance(raw_unknown, int) and raw_unknown > 0
+    assert (
+        _one(
+            con,
+            "select count(*) from dim_products where nutriscore_grade not in ('a','b','c','d','e')",
+        )
+        == 0
+    )
+
+
+def test_additives_outside_taxonomy_keep_a_row(con: duckdb.DuckDBPyConnection) -> None:
+    rows = con.execute(
+        "select additive_id, e_number, name from dim_additives where not in_taxonomy"
+    ).fetchall()
+    assert rows
+    assert all(name for _, _, name in rows)
+
+
+def test_names_are_clean(con: duckdb.DuckDBPyConnection) -> None:
+    assert (
+        _one(
+            con, "select count(*) from dim_products where name like '%&quot;%' or name like '%  %'"
+        )
+        == 0
+    )
+    low_comma = chr(0x201A)  # OFF's chemical comma, restored to ',' in names
+    assert _one(con, f"select count(*) from dim_ingredients where name like '%{low_comma}%'") == 0
+    assert (
+        _one(con, "select name from dim_additives where additive_id = 'en:e330'") == "Citric acid"
+    )
+
+
+def test_image_urls_follow_off_folder_rule(con: duckdb.DuckDBPyConnection) -> None:
+    urls = con.execute(
+        "select code, image_url from dim_products where image_url is not null"
+    ).fetchall()
+    assert urls
+    for code, url in urls:
+        folder = url.removeprefix("https://images.openfoodfacts.org/images/products/").rsplit(
+            "/", 1
+        )[0]
+        digits = folder.replace("/", "")
+        if len(code) <= 8:
+            assert folder == code
+        else:
+            assert digits.lstrip("0") == code.lstrip("0")
+            assert len(digits) == max(len(code), 13)
+
+
+def test_a_tighter_threshold_fails_the_build(
+    build: Build, tmp_path: Path, con: duckdb.DuckDBPyConnection
+) -> None:
+    """The data tests bite: demanding names on 99.9% of products must fail on the fixture.
+
+    Runs on a copy of the built database, since this module holds the original open.
+    """
+    shutil.copy(build.db, tmp_path / "fixture.duckdb")
+    strict = {**FIXTURE_VARS, "max_unnamed_share": 0.001}
+    run = run_dbt("test", tmp_path, strict, "dim_products")
+    assert run.returncode != 0
+    statuses = {r["unique_id"].split(".")[2]: r["status"] for r in run.results}
+    assert statuses["max_null_share_dim_products_name___var_max_unnamed_share_"] == "fail"
+    others = {name: status for name, status in statuses.items() if "max_null_share" not in name}
+    assert set(others.values()) == {"pass"}

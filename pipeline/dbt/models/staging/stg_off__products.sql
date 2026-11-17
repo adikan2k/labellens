@@ -19,7 +19,10 @@ select
         as nutriscore_grade,
     nutriscore_grade as nutriscore_grade_raw,
     case when nova_group between 1 and 4 then nova_group end as nova_group,
-    completeness,
+    -- 51 products score 1.06 to 1.10 (more fields filled than the score expects): capped
+    -- at 1, not blanked. Float32 noise removed the same way as nutrients.
+    least(completeness::varchar::double, 1.0) as completeness,
+    completeness::varchar::double as completeness_raw,
     case
         when front_image is not null then
             'https://images.openfoodfacts.org/images/products/'
