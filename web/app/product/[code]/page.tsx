@@ -6,7 +6,7 @@ import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SettleChip } from "@/components/product/settle-chip";
-import { ApiError, type Product } from "@/lib/api";
+import type { Product } from "@/lib/api";
 import { cachedProduct } from "@/lib/cached";
 import { WAKING_UP } from "@/lib/copy";
 import { NOVA_LABELS } from "@/lib/format";
@@ -23,14 +23,15 @@ export default function ProductPage({ params }: PageProps<"/product/[code]">) {
 }
 
 async function ProductView({ code }: { code: string }) {
-  let product: Product;
+  let found: Awaited<ReturnType<typeof cachedProduct>>;
   try {
-    product = (await cachedProduct(code)).product;
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 404) notFound();
+    found = await cachedProduct(code);
+  } catch {
+    // Errors from a cached function arrive without their class; any of them means unavailable.
     return <Unavailable code={code} />;
   }
-  return <ProductLayout product={product} />;
+  if (!found) notFound();
+  return <ProductLayout product={found.product} />;
 }
 
 function ProductLayout({ product }: { product: Product }) {
