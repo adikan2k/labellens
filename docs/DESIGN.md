@@ -32,7 +32,7 @@ Rules for colour:
 
 - Never use a Nutri-Score colour for anything except a Nutri-Score grade.
 - Never show a grade by colour alone; the letter is always present.
-- Text on grade chips: white on A, D and E; black on B and C. Check contrast with a tool before shipping.
+- Text on grade chips: white on A; black on B, C, D and E. Checked 2026-11-17 against WCAG AA (4.5:1): white on A is 5.0:1, black on B 9.1, C 13.8, D 7.8, E 5.1. White on D (2.7) and E (4.2) fails, so the earlier "white on D and E" was changed. `web/components/label/grade-chip.test.tsx` recomputes these from the tokens.
 - No gradients, no tinted backgrounds, no shadows. Depth comes from rules.
 
 ### Type
@@ -96,6 +96,7 @@ Animate only `transform`, `opacity` and `clip-path`. Hold 60 frames a second on 
 | Radius 2 px | `rounded-control`; panels and inputs use `rounded-none` |
 | Panel border | `panel` |
 | Body line length | `max-w-measure` (68ch) |
+| Page width (header, footer, product page, dashboard) | `max-w-page` (72rem) |
 | Motion | `ease-out`, `ease-in-out`, `--dur-fast`, `--dur-base`, `--dur-slow` |
 
 ---

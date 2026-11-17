@@ -63,6 +63,8 @@
 
   /* Reading width: body under 70 characters */
   --container-measure: 68ch;
+  /* Page width: header, footer, product page, dashboard */
+  --container-page: 72rem;
 }
 
 /* Type roles: size / line height, weight, width */
