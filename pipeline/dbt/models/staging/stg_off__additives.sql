@@ -28,7 +28,9 @@ select
     json_extract_string(e, '$.name.en') as name_raw,
     nullif(trim(regexp_replace(json_extract_string(e, '$.name.en'), '^E\s?\d+[a-z]*\s*-\s*', '', 'i')), '')
         as name,
-    'E' || upper(json_extract_string(e, '$.e_number.en')) as e_number,
+    -- From the id, which keeps sub-variants apart (en:e322i -> E322i); the taxonomy's
+    -- e_number field holds only the base number.
+    nullif('E' || regexp_extract(additive_id, ':e(\d+[a-z]*)$', 1), 'E') as e_number,
     json_extract_string(e, '$.additives_classes.en') as classes,
     json_extract_string(e, '$.vegan.en') as vegan,
     json_extract_string(e, '$.vegetarian.en') as vegetarian,

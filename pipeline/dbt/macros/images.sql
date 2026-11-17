@@ -1,11 +1,16 @@
 {#
   Open Food Facts image folder for a barcode: codes of 8 digits or fewer are used as they are;
-  longer codes are left-padded to 13 digits and split 3/3/3/rest (0000159487776 -> 000/015/948/7776).
+  9 to 12 digits are left-padded to 13; then the code is split 3/3/3/rest
+  (0000159487776 -> 000/015/948/7776). Codes longer than 13 are split without padding:
+  DuckDB's lpad truncates strings longer than the width, so it is only applied below 13.
 #}
 {% macro off_image_folder(code) -%}
   case
     when length({{ code }}) <= 8 then {{ code }}
-    else regexp_replace(lpad({{ code }}, 13, '0'), '^(\d{3})(\d{3})(\d{3})(\d+)$', '\1/\2/\3/\4')
+    else regexp_replace(
+        case when length({{ code }}) < 13 then lpad({{ code }}, 13, '0') else {{ code }} end,
+        '^(\d{3})(\d{3})(\d{3})(\d+)$', '\1/\2/\3/\4'
+    )
   end
 {%- endmacro %}
 

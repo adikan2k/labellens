@@ -13,6 +13,20 @@
     '')
 {%- endmacro %}
 
+{#
+  Display form of a name: first letter upper-case, the rest unchanged (DuckDB has no initcap).
+  Open Food Facts writes chemical commas as U+201A so names never split on them
+  (1‚2-hexanediol); they are turned back into commas here.
+#}
+{% macro capitalise(expr) -%}
+  replace(upper(left({{ expr }}, 1)) || substr({{ expr }}, 2), '‚', ',')
+{%- endmacro %}
+
+{# Readable name from a taxonomy id: 'en:sea-salt' -> 'Sea salt'. #}
+{% macro name_from_id(id_expr) -%}
+  {{ capitalise("replace(split_part(" ~ id_expr ~ ", ':', 2), '-', ' ')") }}
+{%- endmacro %}
+
 {% macro pick_text(column) -%}
   {%- set nonblank = "list_filter(" ~ column ~ ", lambda x: trim(coalesce(x.text, '')) <> '')" -%}
   {{ clean_text(
