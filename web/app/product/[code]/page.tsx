@@ -1,0 +1,136 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense, ViewTransition } from "react";
+
+import { Rule } from "@/components/label/primitives";
+import { AdditiveList } from "@/components/product/additive-list";
+import { NutritionPanel } from "@/components/product/nutrition-panel";
+import { SettleChip } from "@/components/product/settle-chip";
+import { ApiError, type Product } from "@/lib/api";
+import { cachedProduct } from "@/lib/cached";
+import { WAKING_UP } from "@/lib/copy";
+import { NOVA_LABELS } from "@/lib/format";
+
+/** Not async: params are awaited inside the Suspense boundary, so the shell prerenders. */
+export default function ProductPage({ params }: PageProps<"/product/[code]">) {
+  return (
+    <Suspense fallback={<ProductSkeleton />}>
+      {params.then(({ code }) => (
+        <ProductView code={code} />
+      ))}
+    </Suspense>
+  );
+}
+
+async function ProductView({ code }: { code: string }) {
+  let product: Product;
+  try {
+    product = (await cachedProduct(code)).product;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) notFound();
+    return <Unavailable code={code} />;
+  }
+  return <ProductLayout product={product} />;
+}
+
+function ProductLayout({ product }: { product: Product }) {
+  const meta = [product.brand, product.category_name].filter(Boolean).join(", ");
+  return (
+    // One panel, placed by the grid: after the name on phones, a sticky right column on desktop.
+    <article className="mx-auto grid w-full max-w-page grid-cols-1 gap-y-8 px-4 pt-8 pb-16 lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-[auto_1fr] lg:gap-x-16 lg:gap-y-12">
+      <header className="min-w-0 lg:col-start-1 lg:row-start-1">
+        <ViewTransition name={`name-${product.code}`} share="morph" default="none">
+          <h1 className="type-display break-words">{product.name}</h1>
+        </ViewTransition>
+        <p className="type-body pt-3 text-ink-muted">{meta || "Brand not listed"}</p>
+
+        <dl className="pt-8">
+          <div className="flex items-center gap-4 pb-3">
+            <dt className="type-data-label">Nutri-Score</dt>
+            <dd>
+              <SettleChip code={product.code} grade={product.nutriscore_grade} />
+            </dd>
+          </div>
+          <div className="flex items-baseline gap-4">
+            <dt className="type-data-label">Processing</dt>
+            <dd className="type-data-value">
+              {product.nova_group
+                ? `NOVA ${product.nova_group}: ${NOVA_LABELS[product.nova_group]}`
+                : "Open Food Facts has no NOVA group for this product."}
+            </dd>
+          </div>
+        </dl>
+      </header>
+
+      <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <div className="lg:sticky lg:top-8">
+          <NutritionPanel nutrition={product.nutrition} />
+        </div>
+      </aside>
+
+      <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+        <section aria-labelledby="additives">
+          <h2 id="additives" className="type-heading pb-2">
+            Additives ({product.additives.length})
+          </h2>
+          <Rule weight="thin" />
+          {product.additives.length > 0 ? (
+            <AdditiveList additives={product.additives} />
+          ) : (
+            <p className="type-body pt-3">Open Food Facts lists no additives for this product.</p>
+          )}
+        </section>
+
+        <section aria-labelledby="ingredients" className="pt-12">
+          <h2 id="ingredients" className="type-heading pb-2">
+            Ingredients ({product.ingredients.length})
+          </h2>
+          <Rule weight="thin" />
+          {product.ingredients.length > 0 ? (
+            <ol className="type-body max-w-measure pt-3">
+              {product.ingredients.map((ingredient) => (
+                <li key={ingredient.ingredient_id} className="flex gap-3 py-0.5">
+                  <span className="type-data-value w-6 shrink-0 text-right text-ink-muted">
+                    {ingredient.rank}
+                  </span>
+                  <span>{ingredient.name}</span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="type-body pt-3">Open Food Facts has no ingredient list for this product.</p>
+          )}
+          <p className="type-small pt-3 text-ink-muted">
+            In label order. Only ingredients Open Food Facts recognises are listed.
+          </p>
+        </section>
+
+        <p className="pt-12">
+          <a href={product.off_url} className="type-data-value">
+            Open in Open Food Facts
+          </a>
+        </p>
+      </div>
+    </article>
+  );
+}
+
+function ProductSkeleton() {
+  return (
+    <div aria-busy="true" className="mx-auto w-full max-w-page px-4 pt-8 pb-16">
+      <p className="type-body text-ink-muted">Reading the label…</p>
+    </div>
+  );
+}
+
+function Unavailable({ code }: { code: string }) {
+  return (
+    <div className="mx-auto w-full max-w-measure px-4 pt-16 pb-16">
+      <h1 className="type-title pb-4">This label is not ready</h1>
+      <p className="type-body">{WAKING_UP}</p>
+      <p className="type-body pt-4">
+        <Link href={`/product/${code}`}>Try again</Link> or <Link href="/">search again</Link>.
+      </p>
+    </div>
+  );
+}
