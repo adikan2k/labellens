@@ -58,6 +58,14 @@ models:
               arguments:
                 min_value: 0
                 max_value: 1
+      - name: scans
+        description: Distinct people who scanned it in Open Food Facts' apps (0 when unknown).
+        data_tests:
+          - not_null
+          - in_range:
+              arguments:
+                min_value: 0
+                max_value: 10000000
 
   - name: fct_nutrition
     description: Per-100 g nutrition, one row per product. Impossible values are blanked.
@@ -108,6 +116,8 @@ models:
       - name: name
         description: English name from the taxonomy, else the E-number.
         data_tests: [not_null]
+      - name: function
+        description: What it does, from the taxonomy classes ("Antioxidant, sequestrant").
       - name: explainer
         description: Plain-English note, written once per additive in phase 3.
 

@@ -36,6 +36,14 @@ select
     {{ capitalise("coalesce(taxonomy_name, nullif(e_number, ''), " ~ name_from_id('additive_id') ~ ")") }}
         as name,
     classes,
+    -- Readable function from the taxonomy classes: 'en:antioxidant, en:sequestrant' ->
+    -- 'Antioxidant, sequestrant'. Shown on product pages until phase 3 writes explainers.
+    -- US spelling, matching the US labels the ingredient names come from (colour -> color).
+    nullif({{ capitalise(
+        "replace(replace(replace(array_to_string(list_transform(string_split(classes, ','), "
+        ~ "lambda c: replace(split_part(trim(c), ':', 2), '-', ' ')), ', '), "
+        ~ "'colour', 'color'), 'flavour', 'flavor'), 'stabiliser', 'stabilizer')"
+    ) }}, '') as function,
     vegan,
     vegetarian,
     efsa_evaluation_date,

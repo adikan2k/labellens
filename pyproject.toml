@@ -5,8 +5,8 @@ description = "Open Food Facts as a tested pipeline, knowledge graph, web app an
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "duckdb",
     "fastapi[standard]",
+    "psycopg[binary,pool]>=3.3.9",
     "pydantic-settings",
 ]
 
@@ -23,6 +23,7 @@ pipeline = [
     "dagster-webserver>=1.13.30",
     "dbt-core>=1.12",
     "dbt-duckdb>=1.11",
+    "duckdb>=2.0.0",
 ]
 
 [tool.uv]
@@ -47,7 +48,7 @@ venv = ".venv"
 typeCheckingMode = "standard"
 
 [tool.pytest.ini_options]
-testpaths = ["api/tests", "pipeline/tests", "scripts/tests"]
+testpaths = ["api/tests", "pipeline/tests", "scripts/tests", "evals/tests"]
 pythonpath = ["."]
 addopts = "--import-mode=importlib -q"
 # Third-party notice from a transitive dependency of Dagster; nothing to act on here.

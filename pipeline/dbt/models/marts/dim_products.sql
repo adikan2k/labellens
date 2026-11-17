@@ -32,6 +32,7 @@ select
     p.image_url,
     p.off_url,
     p.completeness,
+    p.scans,
     p.lang,
     p.last_modified_at
 from products as p

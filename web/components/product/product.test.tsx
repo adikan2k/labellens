@@ -1,0 +1,137 @@
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, test, vi } from "vitest";
+
+import type { Additive, Nutrition } from "@/lib/api";
+import { formatEnergy, formatGrams, formatShare } from "@/lib/format";
+
+// motion reads prefers-reduced-motion once at load, so the hook is mocked to switch it per test.
+const motionPreference = vi.hoisted(() => ({ reduced: false }));
+vi.mock("motion/react", async (original) => ({
+  ...(await original<typeof import("motion/react")>()),
+  useReducedMotion: () => motionPreference.reduced,
+}));
+
+const { AdditiveList } = await import("./additive-list");
+const { NutritionPanel, PIECES, PRINT_END, startOf } = await import("./nutrition-panel");
+
+afterEach(() => {
+  cleanup();
+  motionPreference.reduced = false;
+});
+
+const full: Nutrition = {
+  energy_kcal_100g: 376,
+  sugars_100g: 4.4,
+  salt_100g: 1.2,
+  fat_100g: 6.7,
+  saturated_fat_100g: 1.2,
+  fiber_100g: 10,
+  proteins_100g: 12.4,
+};
+
+describe("NutritionPanel", () => {
+  test("rows follow US label order with formatted values", () => {
+    render(<NutritionPanel nutrition={full} />);
+    const panel = screen.getByRole("region", { name: "Nutrition Facts" });
+    const labels = Array.from(panel.querySelectorAll("[data-row] > span:first-child")).map(
+      (el) => el.textContent,
+    );
+    expect(labels).toEqual(["Energy", "Fat", "Saturated fat", "Salt", "Fiber", "Sugars", "Protein"]);
+    expect(within(panel).getByText("376 kcal")).toBeTruthy();
+    expect(within(panel).getByText("4.4 g")).toBeTruthy();
+    expect(within(panel).getByText("10 g")).toBeTruthy();
+  });
+
+  test("missing values say so, in a row and in a sentence", () => {
+    render(<NutritionPanel nutrition={{ ...full, sugars_100g: null, fiber_100g: null }} />);
+    expect(screen.getAllByText("Not listed")).toHaveLength(2);
+    expect(
+      screen.getByText("Open Food Facts has no fiber or sugar value for this product."),
+    ).toBeTruthy();
+  });
+
+  test("rules open and close the panel heavy, medium between groups", () => {
+    const rules = PIECES.filter((p) => p.kind === "rule").map((p) => (p.kind === "rule" ? p.weight : ""));
+    expect(rules[0]).toBe("heavy");
+    expect(rules[rules.length - 1]).toBe("heavy");
+    expect(rules.filter((w) => w === "medium")).toHaveLength(4);
+  });
+
+  test("the print finishes inside DESIGN.md's 900 ms", () => {
+    const last = startOf(PIECES.length - 1) + 0.24;
+    const chipSettles = 0.45 + 0.42;
+    expect(Math.max(last, chipSettles)).toBeLessThanOrEqual(PRINT_END);
+    // Rows wipe in 30 ms apart.
+    expect(startOf(3) - startOf(2)).toBeCloseTo(0.03);
+  });
+
+  test("animates by default and is complete and still under reduced motion", () => {
+    const { unmount } = render(<NutritionPanel nutrition={full} />);
+    expect(screen.getByRole("region").getAttribute("data-print")).toBe("animated");
+    unmount();
+    motionPreference.reduced = true;
+    render(<NutritionPanel nutrition={full} />);
+    const panel = screen.getByRole("region");
+    expect(panel.getAttribute("data-print")).toBe("static");
+    expect(panel.innerHTML).not.toContain("clip-path");
+    expect(within(panel).getByText("376 kcal")).toBeTruthy();
+  });
+});
+
+describe("AdditiveList", () => {
+  const additives: Additive[] = [
+    {
+      additive_id: "en:e330",
+      e_number: "E330",
+      name: "Citric acid",
+      function: "Antioxidant, sequestrant",
+      explainer: null,
+    },
+    { additive_id: "en:e999", e_number: "E999", name: "Quillaia extract", function: null, explainer: null },
+  ];
+
+  test("rows expand to show what the additive does", () => {
+    render(<AdditiveList additives={additives} />);
+    const button = screen.getByRole("button", { name: /E330\s*Citric acid/ });
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(button);
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText("Used as: antioxidant, sequestrant.")).toBeTruthy();
+  });
+
+  test("an additive with no listed function says so", () => {
+    render(<AdditiveList additives={additives} />);
+    fireEvent.click(screen.getByRole("button", { name: /Quillaia extract/ }));
+    expect(screen.getByText("Open Food Facts does not list what it is used for.")).toBeTruthy();
+  });
+
+  test("AI explainers carry the AI note", () => {
+    render(
+      <AdditiveList
+        additives={[{ ...additives[0], explainer: { text: "An acid from citrus.", ai_generated: true } }]}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button"));
+    expect(screen.getByText("An acid from citrus.")).toBeTruthy();
+    expect(screen.getByText("Written by AI from Open Food Facts data.")).toBeTruthy();
+  });
+});
+
+describe("format", () => {
+  test.each([
+    [0, "0 g"],
+    [0.01, "<0.1 g"],
+    [0.06, "0.1 g"],
+    [2.5, "2.5 g"],
+    [3, "3 g"],
+    [12.4, "12 g"],
+  ])("formatGrams(%s) is %s", (value, text) => {
+    expect(formatGrams(value)).toBe(text);
+  });
+
+  test("energy and shares", () => {
+    expect(formatEnergy(375.6)).toBe("376 kcal");
+    expect(formatShare(1, 3)).toBe("33%");
+    expect(formatShare(1, 1000)).toBe("<1%");
+  });
+});

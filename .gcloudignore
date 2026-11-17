@@ -1,0 +1,9 @@
+# Upload only what the API image needs to Cloud Build (mirrors .dockerignore).
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!api/
+!api/**
+api/tests/
+**/__pycache__/

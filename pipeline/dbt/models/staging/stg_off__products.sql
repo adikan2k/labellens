@@ -30,6 +30,9 @@ select
             || front_image.key || '.' || front_image.rev || '.400.jpg'
     end as image_url,
     'https://world.openfoodfacts.org/product/' || code as off_url,
+    -- Distinct people who scanned it in Open Food Facts' apps; missing for 83% of US
+    -- products, read as 0. Used to rank search results.
+    coalesce(unique_scans_n, 0) as scans,
     to_timestamp(last_modified_t) as last_modified_at,
     copies
 from front

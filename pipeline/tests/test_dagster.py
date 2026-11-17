@@ -18,7 +18,9 @@ FIXTURE_RAW = ROOT / "pipeline" / "tests" / "fixtures" / "raw"
 SCRIPT = r"""
 import json
 import dagster as dg
-from pipeline.dagster.definitions import defs, labellens_dbt, raw_snapshot, run_report
+from pipeline.dagster.definitions import (
+    defs, labellens_dbt, pipeline_job, publish_job, raw_snapshot, run_report,
+)
 
 graph = defs.get_repository_def().asset_graph
 keys = {k.to_user_string() for k in graph.get_all_asset_keys()}
@@ -38,6 +40,8 @@ print("RESULT " + json.dumps({
     "materialized": sorted(e.asset_key.to_user_string() for e in events),
     "checks": len(checks),
     "checks_passed": sum(1 for c in checks if c.passed),
+    "pipeline_job": sorted(k.to_user_string() for k in pipeline_job.selection.resolve(graph)),
+    "publish_job": sorted(k.to_user_string() for k in publish_job.selection.resolve(graph)),
 }))
 """
 
@@ -66,11 +70,15 @@ def test_definitions_load_and_materialise_on_the_fixture(tmp_path: Path) -> None
     assert lines, (done.stdout + done.stderr)[-4000:]
     out = json.loads(lines[-1].removeprefix("RESULT "))
 
-    assert {"raw_snapshot", "run_report", "dim_products", "fct_nutrition"} <= set(out["keys"])
-    assert out["groups"] == ["ingest", "marts", "report", "seeds", "staging"]
+    assert {"raw_snapshot", "run_report", "dim_products", "serving_tables"} <= set(out["keys"])
+    assert out["groups"] == ["ingest", "marts", "publish", "report", "seeds", "staging"]
     assert out["base_deps"] == ["raw_snapshot"]
     assert out["success"], (done.stdout + done.stderr)[-4000:]
-    assert set(out["materialized"]) == set(out["keys"])
+    built = set(out["keys"]) - {"serving_tables"}
+    assert set(out["materialized"]) == built
+    # Building never publishes: only the publish job loads the live database.
+    assert set(out["pipeline_job"]) == built
+    assert out["publish_job"] == ["serving_tables"]
     assert out["checks"] >= 30
     assert out["checks_passed"] == out["checks"]
 

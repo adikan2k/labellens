@@ -18,6 +18,19 @@ jobs:
     name: Python (ruff, pyright, pytest)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Same image and port as docker-compose.yml; database tests fail (not skip) in CI.
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: labellens
+          POSTGRES_PASSWORD: labellens
+          POSTGRES_DB: labellens
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U labellens -d labellens"
+          --health-interval 2s --health-timeout 3s --health-retries 30
     steps:
       - uses: actions/checkout@v7
       # setup-uv publishes exact tags only (no floating v10), so pin the commit.

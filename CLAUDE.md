@@ -21,7 +21,12 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - Pipeline in Dagster: `uv run dagster dev -m pipeline.dagster.definitions` (set `DAGSTER_HOME` to keep run history)
 - Run report after a build: `uv run python -m pipeline.report` (writes `pipeline/reports/<date>.md`)
 - Rebuild the test fixture: `uv run python scripts/make_fixture.py`
-- API locally: `uv run fastapi dev api/app/main.py`
+- Local Postgres for tests and dev (Docker Desktop running): `docker compose up -d postgres`
+- Load the serving tables: `uv run python -m pipeline.load.serving --dry-run` (size only), then without `--dry-run` (reads `DATABASE_URL`; `--database-url postgresql://labellens:labellens@localhost:54329/labellens` for local)
+- API locally: `uv run fastapi dev api/app/main.py` (set `DATABASE_URL`)
+- Deploy the API: `uv run python scripts/deploy_api.py --project <id> --web-origin <vercel url>` prints the commands; add `--yes` to run them
+- Search latency eval: `uv run python -m evals.runners.search_latency --base-url <api url> --label public`
+- Regenerate web API types after changing `docs/openapi.yaml`: `pnpm -C web gen:api`
 - Web: `pnpm -C web dev`, `pnpm -C web lint`, `pnpm -C web typecheck`, `pnpm -C web test`
 - An eval: `uv run python -m evals.runners.<name>` (results go to `evals/results/`)
 - Snapshot the source file: `uv run python -m pipeline.ingest.snapshot` (8 GB, resumable, into `data/raw/<date>/`, plus `additives.json`; `--taxonomy-only` adds just the taxonomy)

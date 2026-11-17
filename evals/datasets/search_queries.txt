@@ -1,0 +1,70 @@
+# Search latency queries: what people type into the home page search.
+# Brands, everyday words, half-typed words (sent while typing), and barcodes.
+# One per line; the runner cycles through them to make 200 requests.
+
+# Brands
+cheerios
+oreo
+coca cola
+doritos
+cheetos
+kraft
+heinz ketchup
+campbell soup
+pringles
+nutella
+kellogg
+general mills
+great value
+kirkland
+chobani
+fairlife
+jif
+skippy
+lays
+ben jerry
+
+# Everyday words
+milk
+bread
+chocolate
+cheese
+chicken
+yogurt
+coffee
+peanut butter
+pasta
+rice
+orange juice
+ice cream
+cereal
+water
+cookies
+crackers
+granola bar
+pizza
+salsa
+tortilla chips
+
+# Half-typed, as sent while typing
+chee
+choc
+yog
+coc
+pea
+gra
+oat
+bre
+spa
+sal
+
+# Barcodes: full EAN-13, 12-digit UPC, and prefixes
+0016000275263
+016000275263
+0078742040370
+078742040370
+0898999000503
+5449000054227
+0013764027053
+001600
+0078742
