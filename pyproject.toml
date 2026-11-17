@@ -7,6 +7,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "duckdb",
     "fastapi[standard]",
+    "psycopg[binary,pool]>=3.3.9",
     "pydantic-settings",
 ]
 

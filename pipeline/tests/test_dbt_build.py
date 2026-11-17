@@ -1,92 +1,27 @@
 """dbt build on the committed fixture: every model and data test, plus behaviour on known rows.
 
-dbt runs as a subprocess, exactly as a person runs it, from the repo root (dbt paths are
-relative to it) into a temporary DuckDB file. In-process dbt keeps its DuckDB connection open,
-which would stop the tests from reading the file. The fixture is cut by
+dbt runs once per session as a subprocess (see conftest.py and pipeline/tests/support.py),
+exactly as a person runs it, into a temporary DuckDB file. The fixture is cut by
 scripts/make_fixture.py and contains each cleaning case.
 """
 
 from __future__ import annotations
 
-import json
-import os
 import shutil
-import subprocess
-import sys
 from collections.abc import Iterator
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import duckdb
 import pytest
 
-ROOT = Path(__file__).resolve().parents[2]
-DBT_DIR = ROOT / "pipeline" / "dbt"
-FIXTURE_RAW = ROOT / "pipeline" / "tests" / "fixtures" / "raw"
-FIXTURE_PARQUET = FIXTURE_RAW / "2026-11-17" / "food.parquet"
-# The fixture is small and deliberately over-represents unnamed products.
-FIXTURE_VARS = {
-    "raw_dir": "pipeline/tests/fixtures/raw",
-    "min_products": 100,
-    "max_products": 1000,
-    "max_unnamed_share": 0.1,
-}
+from pipeline.tests.support import FIXTURE_PARQUET, FIXTURE_VARS, Build, run_dbt
+
 US = "list_contains(countries_tags, 'en:united-states')"
 
 
-def _dbt_executable() -> str:
-    found = shutil.which("dbt", path=str(Path(sys.executable).parent))
-    assert found, "dbt is not installed in this environment (uv sync installs the pipeline group)"
-    return found
-
-
-@dataclass
-class Run:
-    returncode: int
-    output: str
-    results: list[dict[str, Any]]
-
-
-def run_dbt(command: str, tmp: Path, vars_: dict[str, object], *select: str) -> Run:
-    target = tmp / f"target-{command}"
-    args = [
-        _dbt_executable(), command,
-        "--project-dir", str(DBT_DIR),
-        "--profiles-dir", str(DBT_DIR),
-        "--target-path", str(target),
-        "--log-path", str(tmp / "logs"),
-        "--vars", json.dumps(vars_),
-    ]  # fmt: skip
-    if select:
-        args += ["--select", *select]
-    env = {
-        **os.environ,
-        "LABELLENS_DUCKDB": str(tmp / "fixture.duckdb"),
-        "LABELLENS_DUCKDB_TMP": str(tmp / "spill"),
-    }
-    done = subprocess.run(
-        args, cwd=ROOT, env=env, capture_output=True, text=True, encoding="utf-8",
-        errors="replace", timeout=600, check=False,
-    )  # fmt: skip
-    results_file = target / "run_results.json"
-    results = (
-        json.loads(results_file.read_text("utf-8"))["results"] if results_file.exists() else []
-    )
-    return Run(done.returncode, done.stdout + done.stderr, results)
-
-
-@dataclass
-class Build:
-    run: Run
-    db: Path
-    tmp: Path
-
-
 @pytest.fixture(scope="module")
-def build(tmp_path_factory: pytest.TempPathFactory) -> Build:
-    tmp = tmp_path_factory.mktemp("dbt")
-    return Build(run_dbt("build", tmp, FIXTURE_VARS), tmp / "fixture.duckdb", tmp)
+def build(dbt_fixture: Build) -> Build:
+    return dbt_fixture
 
 
 @pytest.fixture(scope="module")
