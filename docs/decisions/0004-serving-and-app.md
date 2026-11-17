@@ -43,7 +43,9 @@ White text on the Nutri-Score D and E chips fails WCAG AA (2.7:1 and 4.2:1), so 
 ## Deploy
 
 **Chosen:** the API on Cloud Run in `us-east4` (near Neon's `us-east-1`), minimum 0 and maximum 2 instances, `DATABASE_URL` from Secret Manager, Artifact Registry keeping the two newest images. The web is on Vercel. `scripts/deploy_api.py` prints every command and runs them only with `--yes`.
-**Why:** both stay inside free tiers at demo traffic. The spend guardrails are in the commands themselves, and tests pin them.
+**Why:** both stay inside free tiers at demo traffic. The spend guardrails are in the commands themselves, and tests pin them. A $5 monthly spend cap on Cloud Run in the project backs them up.
+**Measured:** 200 searches from a home connection to the public API: p50 102 ms, p95 193 ms, p99 302 ms, no errors (`evals/results/search_latency_public.md`).
+**Considered when billing was blocked:** running the API as Vercel Python functions. It works, but Vercel's builder runs `uv sync --no-dev`, which still installs the `pipeline` group (Dagster, dbt, DuckDB) unless `UV_NO_DEFAULT_GROUPS=1` is set on the project. Cloud Run kept the tested container and a pool that stays open while an instance is warm.
 
 ## Weekly pipeline
 
