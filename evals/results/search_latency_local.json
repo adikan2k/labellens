@@ -1,0 +1,36 @@
+{
+  "label": "local",
+  "base_url": "http://127.0.0.1:8000",
+  "measured_at": "2026-11-17T20:10:19+00:00",
+  "requests": 200,
+  "errors": 0,
+  "cold_first_ms": 66.2,
+  "p50_ms": 11.8,
+  "p95_ms": 38.1,
+  "p99_ms": 128.0,
+  "max_ms": 553.5,
+  "target_p95_ms": 300.0,
+  "meets_target": true,
+  "slowest": [
+    [
+      "peanut butter",
+      553.5
+    ],
+    [
+      "ice cream",
+      363.9
+    ],
+    [
+      "great value",
+      128.0
+    ],
+    [
+      "orange juice",
+      127.4
+    ],
+    [
+      "tortilla chips",
+      116.6
+    ]
+  ]
+}

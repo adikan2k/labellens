@@ -48,7 +48,7 @@ venv = ".venv"
 typeCheckingMode = "standard"
 
 [tool.pytest.ini_options]
-testpaths = ["api/tests", "pipeline/tests", "scripts/tests"]
+testpaths = ["api/tests", "pipeline/tests", "scripts/tests", "evals/tests"]
 pythonpath = ["."]
 addopts = "--import-mode=importlib -q"
 # Third-party notice from a transitive dependency of Dagster; nothing to act on here.
