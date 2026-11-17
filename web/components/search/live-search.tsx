@@ -54,10 +54,11 @@ export function LiveSearch({ productCount }: { productCount: number | null }) {
       ? { kind: "error" as const, message: current.error }
       : { kind: loading ? ("loading" as const) : ("done" as const) };
 
+  // Short enough to fit the box at 375 px; how to search goes in the line below it.
   const placeholder =
     productCount === null
-      ? "Search US products by name, brand or barcode"
-      : `Search ${productCount.toLocaleString("en-US")} US products by name, brand or barcode`;
+      ? "Search US products"
+      : `Search ${productCount.toLocaleString("en-US")} US products`;
 
   return (
     <div>
@@ -77,7 +78,7 @@ export function LiveSearch({ productCount }: { productCount: number | null }) {
         className="panel type-heading block w-full rounded-none px-4 py-3 placeholder:text-ink-muted"
       />
       <p className="type-small pt-3 text-ink-muted">
-        Try:{" "}
+        Name, brand or barcode. Try:{" "}
         {EXAMPLES.map((example, i) => (
           <span key={example}>
             <button

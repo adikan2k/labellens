@@ -53,11 +53,13 @@ async function type(text: string) {
 }
 
 describe("LiveSearch", () => {
-  test("puts the live product count in the placeholder", () => {
+  test("puts the live product count in a placeholder short enough for a phone", () => {
     render(<LiveSearch productCount={985260} />);
     expect(screen.getByRole("searchbox").getAttribute("placeholder")).toBe(
-      "Search 985,260 US products by name, brand or barcode",
+      "Search 985,260 US products",
     );
+    // How to search sits under the box, where it is never cut off.
+    expect(screen.getByText(/Name, brand or barcode\. Try:/)).toBeTruthy();
   });
 
   test("shows results as label rows linking to the product", async () => {

@@ -90,7 +90,7 @@ function ProductLayout({ product }: { product: Product }) {
           {product.ingredients.length > 0 ? (
             <ol className="type-body max-w-measure pt-3">
               {product.ingredients.map((ingredient) => (
-                <li key={ingredient.ingredient_id} className="flex gap-3 py-0.5">
+                <li key={ingredient.ingredient_id} className="flex gap-3 py-1">
                   <span className="type-data-value w-6 shrink-0 text-right text-ink-muted">
                     {ingredient.rank}
                   </span>

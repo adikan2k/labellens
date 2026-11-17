@@ -89,7 +89,7 @@ export default function AboutPage() {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="pt-10">
+    <section className="pt-12">
       <h2 className="type-heading pb-2">{title}</h2>
       <Rule weight="thin" className="mb-3" />
       {children}
