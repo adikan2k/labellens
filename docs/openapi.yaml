@@ -325,10 +325,15 @@ components:
 
     Additive:
       type: object
-      required: [additive_id, name, explainer]
+      required: [additive_id, e_number, name, function, explainer]
       properties:
         additive_id: { type: string, example: "en:e330" }
-        name: { type: [string, "null"], example: Citric acid }
+        e_number: { type: [string, "null"], example: E330 }
+        name: { type: string, example: Citric acid }
+        function:
+          type: [string, "null"]
+          description: What it does, from Open Food Facts' additives taxonomy.
+          example: Antioxidant, sequestrant
         explainer: { $ref: "#/components/schemas/Explainer" }
 
     Ingredient:
@@ -395,13 +400,49 @@ components:
         label: { type: string }
         count: { type: integer, minimum: 0 }
 
+    CategoryGrades:
+      type: object
+      description: Nutri-Score spread within one category, graded products only.
+      required: [category_id, name, graded_count, grades]
+      properties:
+        category_id: { type: string }
+        name: { type: string }
+        graded_count: { type: integer, minimum: 0 }
+        grades:
+          type: object
+          required: [a, b, c, d, e]
+          properties:
+            a: { type: integer, minimum: 0 }
+            b: { type: integer, minimum: 0 }
+            c: { type: integer, minimum: 0 }
+            d: { type: integer, minimum: 0 }
+            e: { type: integer, minimum: 0 }
+
+    CategoryMedian:
+      type: object
+      description: Median of one nutrient per 100 g within a category.
+      required: [category_id, name, median, product_count]
+      properties:
+        category_id: { type: string }
+        name: { type: string }
+        median: { type: number, minimum: 0 }
+        product_count:
+          type: integer
+          minimum: 0
+          description: Products in the category with a value for the nutrient.
+
     StatsOverview:
       type: object
       required:
-        [product_count, brand_count, category_count, additive_count, nutriscore, nova,
-         categories, top_additives, source]
+        [product_count, named_product_count, brand_count, category_count, additive_count,
+         nutriscore, nova, categories, top_additives, nutriscore_by_category,
+         median_sugars_by_category, source]
       properties:
         product_count: { type: integer, minimum: 0 }
+        named_product_count:
+          type: integer
+          minimum: 0
+          description: Products with a name, which is what search can find.
         brand_count: { type: integer, minimum: 0 }
         category_count: { type: integer, minimum: 0 }
         additive_count: { type: integer, minimum: 0 }
@@ -421,6 +462,14 @@ components:
           type: array
           description: Most common additives by number of products.
           items: { $ref: "#/components/schemas/CountByKey" }
+        nutriscore_by_category:
+          type: array
+          description: Nutri-Score spread per category, categories with enough graded products.
+          items: { $ref: "#/components/schemas/CategoryGrades" }
+        median_sugars_by_category:
+          type: array
+          description: Median sugars per 100 g per category.
+          items: { $ref: "#/components/schemas/CategoryMedian" }
         source: { $ref: "#/components/schemas/Source" }
 
     GraphNode:

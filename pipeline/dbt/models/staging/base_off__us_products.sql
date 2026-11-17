@@ -20,6 +20,7 @@ with us as (
         ingredients,
         nutriments,
         images,
+        unique_scans_n,
         last_modified_t
     from {{ food_parquet() }}
     where {{ var('us_filter') }}

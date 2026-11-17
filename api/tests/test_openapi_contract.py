@@ -99,3 +99,15 @@ def test_implemented_routes_are_in_the_contract() -> None:
     }
     documented = {(m, p) for p, item in SPEC["paths"].items() for m in item}
     assert implemented <= documented
+
+
+def test_additive_carries_number_and_function() -> None:
+    additive = SPEC["components"]["schemas"]["Additive"]
+    assert {"e_number", "function"} <= set(additive["required"])
+
+
+def test_stats_overview_has_dashboard_figures() -> None:
+    stats = SPEC["components"]["schemas"]["StatsOverview"]
+    for field in ("named_product_count", "nutriscore_by_category", "median_sugars_by_category"):
+        assert field in stats["required"]
+        assert field in stats["properties"]
