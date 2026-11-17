@@ -1,0 +1,12 @@
+{
+  "source_url": "https://huggingface.co/datasets/openfoodfacts/product-database/resolve/main/food.parquet",
+  "pinned_url": "https://huggingface.co/datasets/openfoodfacts/product-database/resolve/05a8391172ff01006b98d911dbf553463e527057/food.parquet",
+  "dataset_commit": "05a8391172ff01006b98d911dbf553463e527057",
+  "bytes": 8053916172,
+  "sha256": "68c8bf1ef6270745f7772ad95b11516196a9083d6b89f991e83489c2c7535c6a",
+  "remote_etag": "68c8bf1ef6270745f7772ad95b11516196a9083d6b89f991e83489c2c7535c6a",
+  "sha256_matches_remote_etag": true,
+  "snapshot_date": "2026-11-17",
+  "downloaded_at": "2026-11-17T11:49:10+00:00",
+  "fixture": "Rows cut by scripts/make_fixture.py with seed labellens-fixture-v1; not the full file."
+}

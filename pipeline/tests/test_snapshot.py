@@ -21,6 +21,7 @@ from pipeline.ingest import snapshot as snap
 
 PAYLOAD = bytes(range(256)) * 400  # 102,400 bytes
 COMMIT = "abc123def4567890"
+TAXONOMY = json.dumps({"en:e330": {"name": {"en": "Citric acid"}}}).encode()
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -32,6 +33,12 @@ class _Handler(BaseHTTPRequestHandler):
 
     def do_HEAD(self) -> None:
         self.requests.append(("HEAD", self.path, None))
+        if self.path.endswith("additives.json"):  # static host: plain 200, no commit
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(TAXONOMY)))
+            self.send_header("ETag", '"static-etag"')
+            self.end_headers()
+            return
         self.send_response(302)
         self.send_header("Location", f"/resolve/{COMMIT}/food.parquet")
         self.send_header("X-Repo-Commit", COMMIT)
@@ -42,6 +49,12 @@ class _Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         range_header = self.headers.get("Range")
         self.requests.append(("GET", self.path, range_header))
+        if self.path.endswith("additives.json"):
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(TAXONOMY)))
+            self.end_headers()
+            self.wfile.write(TAXONOMY)
+            return
         start = 0
         if range_header and not self.ignore_range:
             start = int(range_header.removeprefix("bytes=").split("-")[0])
@@ -129,3 +142,58 @@ def test_snapshot_refuses_to_overwrite(server: str, tmp_path: Path) -> None:
 
     assert existing.read_bytes() == b"old"
     assert _Handler.requests == []
+
+
+def _taxonomy_url(server: str) -> str:
+    return server.split("/resolve/")[0] + "/data/taxonomies/additives.json"
+
+
+def test_taxonomy_is_added_beside_the_parquet_without_touching_it(
+    server: str, tmp_path: Path
+) -> None:
+    folder = tmp_path / "2026-11-17"
+    folder.mkdir()
+    (folder / "manifest.json").write_text('{"keep": "me"}', "utf-8")
+
+    path = snap.snapshot_taxonomy(folder, url=_taxonomy_url(server))
+
+    assert path.read_bytes() == TAXONOMY
+    assert not os.access(path, os.W_OK)
+    assert (folder / "manifest.json").read_text("utf-8") == '{"keep": "me"}'
+    manifest = json.loads((folder / "additives.manifest.json").read_text("utf-8"))
+    assert manifest["bytes"] == len(TAXONOMY)
+    assert manifest["sha256"] == hashlib.sha256(TAXONOMY).hexdigest()
+    assert manifest["remote_etag"] == "static-etag"
+    assert not list(folder.glob("*.part"))
+    _make_writable(path)
+
+
+def test_taxonomy_refuses_to_overwrite(server: str, tmp_path: Path) -> None:
+    (tmp_path / "additives.json").write_bytes(b"old")
+
+    with pytest.raises(snap.SnapshotExistsError):
+        snap.snapshot_taxonomy(tmp_path, url=_taxonomy_url(server))
+
+    assert (tmp_path / "additives.json").read_bytes() == b"old"
+
+
+def test_taxonomy_only_needs_an_existing_snapshot(tmp_path: Path) -> None:
+    code = snap.main(["--data-dir", str(tmp_path), "--date", "2026-11-17", "--taxonomy-only"])
+    assert code == 1
+
+
+def test_taxonomy_only_adds_to_existing_snapshot(
+    server: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(snap, "ADDITIVES_URL", _taxonomy_url(server))
+    folder = tmp_path / "2026-11-17"
+    folder.mkdir()
+    (folder / "food.parquet").write_bytes(b"parquet")
+
+    code = snap.main(["--data-dir", str(tmp_path), "--date", "2026-11-17", "--taxonomy-only"])
+
+    assert code == 0
+    assert (folder / "food.parquet").read_bytes() == b"parquet"
+    assert (folder / "additives.json").read_bytes() == TAXONOMY
+    assert [r for r in _Handler.requests if "food.parquet" in r[1]] == []
+    _make_writable(folder / "additives.json")

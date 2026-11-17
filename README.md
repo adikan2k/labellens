@@ -23,6 +23,10 @@ Requires [uv](https://docs.astral.sh/uv/), Node 22 and pnpm.
 uv sync                                  # Python environment
 pnpm -C web install                      # web dependencies
 uv run python scripts/check.py           # every check: lint, types, tests, Python and web
+uv run python -m pipeline.ingest.snapshot   # download the Open Food Facts export (8 GB)
+uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt   # models and 46 data tests
+uv run python -m pipeline.report         # run report in pipeline/reports/
+uv run dagster dev -m pipeline.dagster.definitions   # the same pipeline in Dagster
 uv run fastapi dev api/app/main.py       # API on http://localhost:8000
 pnpm -C web dev                          # web on http://localhost:3000
 ```
@@ -33,6 +37,6 @@ Copy `.env.example` to `.env` and fill it in. `.env` is never committed.
 
 Contains data from [Open Food Facts](https://world.openfoodfacts.org), available under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/). Individual contents are under the Database Contents License, and product images under CC BY-SA. Images are linked from Open Food Facts, not re-hosted.
 
-Tables this project publishes that are derived from the Open Food Facts database (the dbt marts, the serving tables, the graph and the evaluation datasets built from them) remain under the ODbL.
+Tables this project publishes that are derived from the Open Food Facts database (the dbt marts, the serving tables, the graph, the evaluation datasets and the 284-row test fixture in `pipeline/tests/fixtures/`) remain under the ODbL.
 
 Source: the `food.parquet` export of the Hugging Face dataset `openfoodfacts/product-database`. The bulk file is used; the live API is not crawled.

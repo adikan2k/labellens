@@ -6,6 +6,10 @@ so a resume never stitches two revisions together. A finished snapshot is made r
 never overwritten.
 
     uv run python -m pipeline.ingest.snapshot [--date YYYY-MM-DD] [--data-dir data/raw]
+    uv run python -m pipeline.ingest.snapshot --date 2026-11-17 --taxonomy-only
+
+Each run also saves Open Food Facts' additives taxonomy (additives.json, under 1 MB) beside
+the Parquet, with its own additives.manifest.json.
 """
 
 from __future__ import annotations
@@ -27,6 +31,9 @@ DEFAULT_URL = (
     "https://huggingface.co/datasets/openfoodfacts/product-database/resolve/main/food.parquet"
 )
 FILE_NAME = "food.parquet"
+# Static taxonomy export (not the live API): gives additive names and facts.
+ADDITIVES_URL = "https://static.openfoodfacts.org/data/taxonomies/additives.json"
+ADDITIVES_FILE = "additives.json"
 CHUNK_SIZE = 1024 * 1024
 PROGRESS_EVERY = 512 * 1024 * 1024
 
@@ -155,6 +162,36 @@ def snapshot(
     return target
 
 
+def snapshot_taxonomy(target_dir: Path, *, url: str | None = None) -> Path:
+    """Add Open Food Facts' additives taxonomy to a snapshot folder.
+
+    Writes additives.json and its own additives.manifest.json; never touches existing files.
+    """
+    url = url or ADDITIVES_URL
+    target = target_dir / ADDITIVES_FILE
+    if target.exists():
+        raise SnapshotExistsError(f"{target} already exists; snapshots are never overwritten.")
+
+    remote = fetch_metadata(url)
+    part = target_dir / f"{ADDITIVES_FILE}.part"
+    download(remote.url, part, remote.size)
+    digest = sha256_of(part)
+    part.rename(target)
+    os.chmod(target, stat.S_IREAD | stat.S_IRGRP | stat.S_IROTH)
+
+    manifest = {
+        "source_url": url,
+        "bytes": remote.size,
+        "sha256": digest,
+        "remote_etag": remote.etag,
+        "downloaded_at": datetime.now(UTC).isoformat(timespec="seconds"),
+    }
+    (target_dir / "additives.manifest.json").write_text(
+        json.dumps(manifest, indent=2) + "\n", "utf-8"
+    )
+    return target
+
+
 def _print_progress(have: int, total: int) -> None:
     print(f"  {have / 1e9:5.2f} / {total / 1e9:.2f} GB ({have / total:.0%})", flush=True)
 
@@ -164,18 +201,31 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--date", type=date.fromisoformat, default=date.today())
     parser.add_argument("--data-dir", type=Path, default=Path("data/raw"))
     parser.add_argument("--url", default=DEFAULT_URL)
+    parser.add_argument(
+        "--taxonomy-only",
+        action="store_true",
+        help="add additives.json to an existing snapshot folder without touching the Parquet",
+    )
     args = parser.parse_args(argv)
+    target_dir = args.data_dir / args.date.isoformat()
 
     try:
-        path = snapshot(args.data_dir, args.date, url=args.url, progress=_print_progress)
+        if not args.taxonomy_only:
+            path = snapshot(args.data_dir, args.date, url=args.url, progress=_print_progress)
+            manifest = json.loads((path.parent / "manifest.json").read_text("utf-8"))
+            print(f"Snapshot written: {path}")
+            print(json.dumps(manifest, indent=2))
+            if manifest["sha256_matches_remote_etag"] is False:
+                print("Note: SHA-256 differs from the remote ETag; check before relying on it.")
+        elif not (target_dir / FILE_NAME).exists():
+            print(f"No snapshot in {target_dir}; --taxonomy-only adds to one.", file=sys.stderr)
+            return 1
+        taxonomy = snapshot_taxonomy(target_dir)
     except SnapshotExistsError as error:
         print(error, file=sys.stderr)
         return 1
-    manifest = json.loads((path.parent / "manifest.json").read_text("utf-8"))
-    print(f"Snapshot written: {path}")
-    print(json.dumps(manifest, indent=2))
-    if manifest["sha256_matches_remote_etag"] is False:
-        print("Note: SHA-256 differs from the remote ETag; check before relying on it.")
+    print(f"Taxonomy written: {taxonomy}")
+    print((target_dir / "additives.manifest.json").read_text("utf-8"))
     return 0
 
 

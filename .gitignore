@@ -20,6 +20,8 @@ __pycache__/
 pipeline/dbt/target/
 pipeline/dbt/dbt_packages/
 pipeline/dbt/logs/
+pipeline/dbt/.user.yml
+logs/
 
 # Dagster
 .dagster/

@@ -1,0 +1,43 @@
+version: 2
+
+seeds:
+  - name: dim_categories
+    description: >
+      The fixed category taxonomy (approved 2026-11-17, frozen for the gold labels):
+      26 categories under 6 groups. Groups have no parent_id.
+    config:
+      column_types: {category_id: varchar, name: varchar, parent_id: varchar}
+    columns:
+      - name: category_id
+        data_tests: [unique, not_null]
+      - name: name
+        data_tests: [not_null]
+      - name: parent_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_categories')
+                field: category_id
+
+  - name: category_map
+    description: >
+      Open Food Facts category tag to our category. Priority 2 (specific) beats
+      priority 1 (umbrella); see dim_products.
+    config:
+      column_types: {off_tag: varchar, category_id: varchar, priority: integer}
+    columns:
+      - name: off_tag
+        data_tests: [unique, not_null]
+      - name: category_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_categories')
+                field: category_id
+      - name: priority
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [1, 2]
+                quote: false
