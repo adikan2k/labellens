@@ -19,6 +19,11 @@ Safety: the size is estimated from DuckDB before connecting, and the load stops 
 (Neon's free plan blocks writes past 1 GB). Tables are built in `serving_next` and swapped in
 with one transaction, so readers never see a half-loaded table. If old plus new would pass
 1 GB, it refuses unless --replace.
+
+Neon's pooled endpoint (PgBouncer, transaction mode) keeps no session state, so settings are
+`set local` inside the transaction they guard, and statements are never auto-prepared. The
+schema renames do not wait for readers; dropping the old tables does, so that drop gives up
+after SWAP_LOCK_TIMEOUT and leaves `serving_old` for the next load to remove.
 """
 
 from __future__ import annotations
@@ -42,6 +47,7 @@ DUCKDB_PATH = ROOT / "data" / "labellens.duckdb"
 SCHEMA, NEXT, OLD = "serving", "serving_next", "serving_old"
 MAX_LOAD_BYTES = 800_000_000
 MAX_DATABASE_BYTES = 1_000_000_000
+SWAP_LOCK_TIMEOUT = "30s"
 BATCH = 20_000
 NUTRIENTS = [
     "energy_kcal_100g",
@@ -349,6 +355,23 @@ def _schema_exists(pg: psycopg.Connection, name: str) -> bool:
     return row is not None
 
 
+def _lock_timeout(pg: psycopg.Connection) -> None:
+    # `set local`: scoped to this transaction, which the pooler keeps on one server connection.
+    pg.execute(cast("LiteralString", f"set local lock_timeout = '{SWAP_LOCK_TIMEOUT}'"))
+
+
+def _drop_old(pg: psycopg.Connection, log=print) -> bool:
+    """Drop the previous tables. False if a reader still holds them past the lock timeout."""
+    try:
+        with pg.transaction():
+            _lock_timeout(pg)
+            pg.execute(f"drop schema if exists {OLD} cascade")
+        return True
+    except psycopg.errors.LockNotAvailable:
+        log(f"{OLD} is still being read; leaving it for the next load to drop.")
+        return False
+
+
 def load(
     duckdb_path: Path, database_url: str, *, replace: bool = False, log=print
 ) -> dict[str, int]:
@@ -366,7 +389,8 @@ def load(
             )
 
         stats, meta = _stats(con), _meta(con)
-        with psycopg.connect(database_url, autocommit=True) as pg:
+        with psycopg.connect(database_url, autocommit=True, prepare_threshold=None) as pg:
+            _drop_old(pg, log)  # a leftover from a load that found readers on it
             current = pg.execute("select pg_database_size(current_database())").fetchone()[0]  # type: ignore[index]
             live = _schema_exists(pg, SCHEMA)
             if live and current + est.total > MAX_DATABASE_BYTES:
@@ -399,15 +423,14 @@ def load(
             pg.execute(f"analyze {NEXT}.products")
             log(f"Loaded and indexed in {time.perf_counter() - started:.0f} s")
 
-            # The swap needs brief exclusive locks; fail loudly rather than wait forever behind
-            # a reader that left a transaction open.
-            pg.execute("set lock_timeout = '30s'")
+            if not _drop_old(pg, log):
+                raise SystemExit(f"{OLD} is still in use; cannot swap. Try again shortly.")
             with pg.transaction():
-                pg.execute(f"drop schema if exists {OLD} cascade")
+                _lock_timeout(pg)
                 if live:
                     pg.execute(f"alter schema {SCHEMA} rename to {OLD}")
                 pg.execute(f"alter schema {NEXT} rename to {SCHEMA}")
-            pg.execute(f"drop schema if exists {OLD} cascade")
+            _drop_old(pg, log)
 
             sizes = {
                 name: size

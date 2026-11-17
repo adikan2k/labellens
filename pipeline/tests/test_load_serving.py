@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -133,6 +134,25 @@ def test_reload_swaps_in_place(serving_url: str, dbt_fixture: Build) -> None:
     assert not {serving.NEXT, serving.OLD} & schemas
 
 
+def test_a_reader_on_the_old_tables_does_not_block_the_swap(
+    serving_url: str, dbt_fixture: Build, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(serving, "SWAP_LOCK_TIMEOUT", "1s")
+    messages: list[str] = []
+    with psycopg.connect(serving_url) as reader:  # not autocommit: holds its lock until rollback
+        reader.execute("select 1 from serving.products limit 1").fetchall()
+        started = time.perf_counter()
+        serving.load(dbt_fixture.db, serving_url, log=messages.append)
+        assert time.perf_counter() - started < 60
+        reader.rollback()
+    assert any("still being read" in m for m in messages)
+    assert _count(serving_url) > 0  # the new tables are live
+    assert serving.OLD in _schemas(serving_url)
+
+    serving.load(dbt_fixture.db, serving_url, log=lambda *_: None)  # cleans up the leftover
+    assert serving.OLD not in _schemas(serving_url)
+
+
 def test_size_guard_stops_before_connecting(
     dbt_fixture: Build, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -161,6 +181,11 @@ def test_estimate_is_an_upper_bound(serving_url: str, dbt_fixture: Build) -> Non
     assert actual
     product_estimate = sum(v for k, v in est.tables.items() if k.startswith("products"))
     assert product_estimate >= actual[0]
+
+
+def _schemas(url: str) -> set[str]:
+    with psycopg.connect(url) as pg:
+        return {s for (s,) in pg.execute("select nspname from pg_namespace").fetchall()}
 
 
 def _count(url: str) -> int:
