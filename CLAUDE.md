@@ -17,11 +17,14 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - All checks (lint, types, tests, Python and web): `uv run python scripts/check.py`
 - Python tests: `uv run pytest` · one file: `uv run pytest api/tests/test_search.py`
 - Python lint and types: `uv run ruff check .` and `uv run pyright`
-- dbt: `uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt`
+- dbt (run from the repo root; builds the newest snapshot under `data/raw/`): `uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt`
+- Pipeline in Dagster: `uv run dagster dev -m pipeline.dagster.definitions` (set `DAGSTER_HOME` to keep run history)
+- Run report after a build: `uv run python -m pipeline.report` (writes `pipeline/reports/<date>.md`)
+- Rebuild the test fixture: `uv run python scripts/make_fixture.py`
 - API locally: `uv run fastapi dev api/app/main.py`
 - Web: `pnpm -C web dev`, `pnpm -C web lint`, `pnpm -C web typecheck`, `pnpm -C web test`
 - An eval: `uv run python -m evals.runners.<name>` (results go to `evals/results/`)
-- Snapshot the source file: `uv run python -m pipeline.ingest.snapshot` (8 GB, resumable, into `data/raw/<date>/`)
+- Snapshot the source file: `uv run python -m pipeline.ingest.snapshot` (8 GB, resumable, into `data/raw/<date>/`, plus `additives.json`; `--taxonomy-only` adds just the taxonomy)
 - Data profile: `uv run python -m pipeline.ingest.profile --us-filter "list_contains(countries_tags, 'en:united-states')"`
 - Label the gold set: `uv run python scripts/label.py` (resumes; `u` undo, `q` quit)
 
