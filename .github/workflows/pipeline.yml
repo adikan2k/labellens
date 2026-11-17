@@ -1,0 +1,62 @@
+name: Pipeline
+
+# The full pipeline, weekly and on demand: snapshot the Open Food Facts export, build and
+# test the marts, write the run report, then load the serving tables into Neon.
+# Needs the repository secret DATABASE_URL (Neon's pooled connection string) to publish.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Load the new tables into Neon"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pipeline
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      # setup-uv publishes exact tags only (no floating v10), so pin the commit.
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+
+      - name: Snapshot the export (about 8 GB)
+        run: uv run python -m pipeline.ingest.snapshot
+
+      - name: Build and test the marts
+        run: uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt
+
+      - name: Run report
+        run: uv run python -m pipeline.report
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: run-report
+          path: |
+            pipeline/reports/*.md
+            data/raw/*/manifest.json
+            data/raw/*/additives.manifest.json
+
+      - name: Load into Neon
+        if: github.event_name == 'schedule' || inputs.publish
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::The DATABASE_URL secret is not set; nothing was published."
+            exit 1
+          fi
+          uv run python -m pipeline.load.serving

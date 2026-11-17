@@ -130,12 +130,41 @@ def run_report(context: dg.AssetExecutionContext) -> dg.MaterializeResult:
     )
 
 
+@dg.asset(group_name="publish", deps=[run_report], kinds={"postgres"})
+def serving_tables(context: dg.AssetExecutionContext) -> dg.MaterializeResult:
+    """The API's tables in Postgres (Neon), loaded and swapped in by pipeline/load/serving.py.
+
+    Only the `publish` job runs this, never `pipeline`, so building never writes to the live
+    database by accident. It waits for the run report, so a failed build cannot publish.
+    """
+    from api.app.config import get_settings
+    from pipeline.load import serving
+
+    secret = get_settings().database_url
+    if secret is None:
+        raise dg.Failure("DATABASE_URL is not set; nothing to publish to.")
+    sizes = serving.load(DUCKDB_PATH, secret.get_secret_value(), log=context.log.info)
+    return dg.MaterializeResult(
+        metadata={
+            "database_mb": round(sizes["_database"] / 1e6, 1),
+            "products_mb": round(sizes.get("products", 0) / 1e6, 1),
+        }
+    )
+
+
+PUBLISH = dg.AssetSelection.assets(serving_tables)
+
 pipeline_job = dg.define_asset_job(
-    "pipeline", selection=dg.AssetSelection.all(), description="Snapshot, dbt build, run report."
+    "pipeline",
+    selection=dg.AssetSelection.all() - PUBLISH,
+    description="Snapshot, dbt build, run report. Never writes to the live database.",
+)
+publish_job = dg.define_asset_job(
+    "publish", selection=PUBLISH, description="Load the built marts into Postgres (Neon)."
 )
 
 defs = dg.Definitions(
-    assets=[raw_snapshot, labellens_dbt, run_report],
-    jobs=[pipeline_job],
+    assets=[raw_snapshot, labellens_dbt, run_report, serving_tables],
+    jobs=[pipeline_job, publish_job],
     resources={"dbt": DbtCliResource(project_dir=dbt_project)},
 )
