@@ -352,15 +352,21 @@ components:
       properties:
         ingredient_id: { type: string }
         name: { type: string }
-        rank: { type: integer, minimum: 1, description: Position on the label, 1 first. }
+        rank:
+          type: integer
+          minimum: 1
+          description: Order on the label among recognised ingredients, 1 first.
         explainer: { $ref: "#/components/schemas/Explainer" }
 
     Product:
       allOf:
         - $ref: "#/components/schemas/ProductSummary"
         - type: object
-          required: [completeness, nutrition, additives, ingredients, off_url]
+          required: [category_name, completeness, nutrition, additives, ingredients, off_url]
           properties:
+            category_name:
+              type: [string, "null"]
+              description: Display name of category_main.
             completeness: { type: [number, "null"], minimum: 0, maximum: 1 }
             nutrition: { $ref: "#/components/schemas/Nutrition" }
             additives:

@@ -12,16 +12,25 @@ from collections.abc import Iterator
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Query, Request, Response
+from fastapi import Depends, FastAPI, Path, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
+from api.app import products
 from api.app import search as search_module
 from api.app.config import Settings, get_settings
 from api.app.db import UNAVAILABLE, Database, DatabaseNotConfigured, DictConnection
-from api.app.schemas import Error, Health, SearchResponse, Source, Versions
+from api.app.schemas import (
+    Error,
+    Health,
+    ProductResponse,
+    SearchResponse,
+    Source,
+    StatsOverview,
+    Versions,
+)
 
 API_VERSION = "0.2.0"
 WAKING_UP = "Search is waking up. Try again in a few seconds."
@@ -102,6 +111,30 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         results = search_module.search(conn, q, limit)
         response.headers["Cache-Control"] = "public, max-age=60"
         return SearchResponse(query=q, results=results, source=source(request))  # type: ignore[arg-type]
+
+    @app.get(
+        "/products/{code}",
+        responses={404: {"model": Error}, 422: {"model": Error}, 503: {"model": Error}},
+    )
+    def product(
+        request: Request,
+        response: Response,
+        conn: Conn,
+        code: Annotated[str, Path(min_length=1, max_length=32)],
+    ) -> ProductResponse:
+        found = products.get_product(conn, code)
+        if found is None:
+            raise HTTPException(404, f"No product with barcode {code} in this snapshot.")
+        response.headers["Cache-Control"] = "public, max-age=3600"
+        return ProductResponse(product=found, source=source(request))  # type: ignore[arg-type]
+
+    @app.get("/stats/overview", responses={503: {"model": Error}})
+    def stats(request: Request, response: Response, conn: Conn) -> StatsOverview:
+        doc = products.get_stats(conn)
+        if doc is None:
+            raise HTTPException(503, "Dashboard figures are not loaded yet.")
+        response.headers["Cache-Control"] = "public, max-age=3600"
+        return StatsOverview(**doc, source=source(request))
 
     return app
 
