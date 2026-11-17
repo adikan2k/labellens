@@ -237,8 +237,8 @@ def build_report(db_path: Path = DB_PATH, run_results: Path = RUN_RESULTS) -> tu
         body = [
             f"# Pipeline run report: {date}",
             "",
-            f"Generated {datetime.now(UTC):%Y-%m-%d %H:%M} UTC by "
-            "`uv run python -m pipeline.report`. "
+            f"Generated {datetime.now(UTC):%Y-%m-%d %H:%M} UTC by `pipeline/report.py` "
+            f"from `{run_results.parent.name}/run_results.json`. "
             "Contains data from Open Food Facts, available under the Open Database License.",
             "",
             *snapshot,

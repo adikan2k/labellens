@@ -11,8 +11,10 @@ Assets:
 
 dbt runs with its working directory set to pipeline/dbt, so every path is passed absolute.
 These environment variables override the defaults (the tests use them to run on the fixture):
-LABELLENS_RAW_DIR, LABELLENS_DUCKDB, LABELLENS_DUCKDB_TMP, LABELLENS_REPORTS_DIR, and
-LABELLENS_DBT_VARS (JSON merged into the dbt vars).
+LABELLENS_RAW_DIR, LABELLENS_DUCKDB, LABELLENS_DUCKDB_TMP, LABELLENS_REPORTS_DIR,
+LABELLENS_DBT_TARGET (where dbt writes run_results.json for the report), and
+LABELLENS_DBT_VARS (JSON merged into the dbt vars). A run pointed elsewhere must override all
+of them, or it overwrites the real run's files.
 """
 
 # No `from __future__ import annotations`: Dagster reads config classes from real annotations.
@@ -38,7 +40,7 @@ DUCKDB_PATH = Path(
 )
 os.environ.setdefault("LABELLENS_DUCKDB_TMP", str(ROOT / "data" / "tmp"))
 REPORTS_DIR = Path(os.environ.get("LABELLENS_REPORTS_DIR", str(report.REPORTS_DIR)))
-RUN_TARGET = DBT_DIR / "target" / "dagster"
+RUN_TARGET = Path(os.environ.get("LABELLENS_DBT_TARGET", str(DBT_DIR / "target" / "dagster")))
 DBT_VARS = {"raw_dir": RAW_DIR.as_posix(), **json.loads(os.environ.get("LABELLENS_DBT_VARS", "{}"))}
 
 RAW_SNAPSHOT = dg.AssetKey("raw_snapshot")

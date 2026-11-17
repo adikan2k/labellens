@@ -49,6 +49,8 @@ def test_definitions_load_and_materialise_on_the_fixture(tmp_path: Path) -> None
         "LABELLENS_DUCKDB": str(tmp_path / "fixture.duckdb"),
         "LABELLENS_DUCKDB_TMP": str(tmp_path / "spill"),
         "LABELLENS_REPORTS_DIR": str(tmp_path / "reports"),
+        # Without this the fixture run overwrote the real run's run_results.json.
+        "LABELLENS_DBT_TARGET": str(tmp_path / "dbt-target"),
         "LABELLENS_DBT_VARS": json.dumps(
             {"min_products": 100, "max_products": 1000, "max_unnamed_share": 0.1}
         ),
@@ -75,3 +77,17 @@ def test_definitions_load_and_materialise_on_the_fixture(tmp_path: Path) -> None
     report = (tmp_path / "reports" / "2026-11-17.md").read_text("utf-8")
     assert report.startswith("# Pipeline run report: 2026-11-17")
     assert "Not passing" not in report
+    assert (tmp_path / "dbt-target" / "run_results.json").exists()
+
+
+def test_fixture_run_leaves_real_files_alone() -> None:
+    """Every path the definitions write to can be redirected; the test above redirects all."""
+    source = (ROOT / "pipeline" / "dagster" / "definitions.py").read_text("utf-8")
+    test = Path(__file__).read_text("utf-8")
+    overridable = {
+        name for name in ("LABELLENS_RAW_DIR", "LABELLENS_DUCKDB", "LABELLENS_DUCKDB_TMP",
+                          "LABELLENS_REPORTS_DIR", "LABELLENS_DBT_TARGET", "LABELLENS_DBT_VARS")
+        if f'"{name}"' in source
+    }  # fmt: skip
+    assert len(overridable) == 6
+    assert all(f'"{name}"' in test for name in overridable)
