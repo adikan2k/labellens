@@ -25,6 +25,15 @@ class Settings(BaseSettings):
     # Neon Postgres
     database_url: SecretStr | None = None
     database_url_readonly: SecretStr | None = None
+    # Seconds to wait for a pooled connection. Neon wakes from idle in about a second.
+    db_pool_timeout: float = 8.0
+
+    # API: comma-separated browser origins allowed to call it
+    cors_origins: str = "http://localhost:3000"
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
     # Neo4j AuraDB Free
     neo4j_uri: str | None = None
