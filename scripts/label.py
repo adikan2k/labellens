@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import os
 import sys
 import textwrap
@@ -30,6 +31,70 @@ CATEGORIES_PATH = ROOT / "pipeline" / "dbt" / "seeds" / "dim_categories.csv"
 SAMPLE_FIELDS = ["code", "name", "brand", "ingredients", "snapshot_date"]
 GOLD_FIELDS = ["code", "category_id", "labelled_at"]
 WIDTH = 88
+
+# From docs/data-profile.md; a test keeps the two in step.
+US_FILTER = "list_contains(countries_tags, 'en:united-states')"
+SAMPLE_SIZE = 200
+SAMPLE_SEED = "labellens-gold-v1"
+
+
+def _pick_text(column: str) -> str:
+    """First non-blank text from a list of {lang, text}, preferring 'main', then 'en'."""
+    nonblank = f"list_filter({column}, lambda x: trim(coalesce(x.text, '')) <> '')"
+    return (
+        f"coalesce(list_filter({nonblank}, lambda x: x.lang = 'main')[1].text, "
+        f"list_filter({nonblank}, lambda x: x.lang = 'en')[1].text, "
+        f"{nonblank}[1].text)"
+    )
+
+
+def draw_sample(
+    parquet: Path,
+    out_path: Path,
+    snapshot_date: str,
+    *,
+    size: int = SAMPLE_SIZE,
+    seed: str = SAMPLE_SEED,
+) -> int:
+    """Write `size` US products with a name and ingredients, ordered by md5(code, seed).
+
+    The hash order does not depend on threads or file layout, so every machine draws the
+    same products. Duplicate barcodes keep their most recently modified row.
+    """
+    import duckdb
+
+    query = f"""
+        WITH us AS (
+            SELECT code,
+                   {_pick_text("product_name")} AS name,
+                   coalesce(trim(brands), '') AS brand,
+                   {_pick_text("ingredients_text")} AS ingredients,
+                   last_modified_t
+            FROM read_parquet($parquet)
+            WHERE {US_FILTER}
+        ),
+        one_per_code AS (
+            SELECT * FROM us
+            QUALIFY row_number() OVER (PARTITION BY code ORDER BY last_modified_t DESC) = 1
+        )
+        SELECT code, trim(name), brand, trim(ingredients)
+        FROM one_per_code
+        WHERE name IS NOT NULL AND ingredients IS NOT NULL
+        ORDER BY md5(code || ':' || $seed), code
+        LIMIT $size
+    """
+    con = duckdb.connect()
+    rows = con.execute(
+        query, {"parquet": parquet.as_posix(), "seed": seed, "size": size}
+    ).fetchall()
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with out_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle, lineterminator="\n")
+        writer.writerow(SAMPLE_FIELDS)
+        for code, name, brand, ingredients in rows:
+            writer.writerow([code, " ".join(name.split()), brand, ingredients, snapshot_date])
+    return len(rows)
 
 
 @dataclass(frozen=True)
@@ -168,11 +233,21 @@ def label(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Label the category gold set.")
     parser.add_argument("command", nargs="?", choices=["label", "sample"], default="label")
+    parser.add_argument("--snapshot", type=Path, help="food.parquet (default: latest)")
+    parser.add_argument("--force", action="store_true", help="redraw an existing sample")
     args = parser.parse_args(argv)
-    if args.command == "sample":
-        print("The sample step is added once docs/data-profile.md exists.", file=sys.stderr)
+    if args.command == "label":
+        return label()
+
+    if SAMPLE_PATH.exists() and not args.force:
+        print(f"{SAMPLE_PATH} exists; labels depend on it. Use --force to redraw.", file=sys.stderr)
         return 1
-    return label()
+    snapshot: Path = args.snapshot or max((ROOT / "data" / "raw").glob("*/food.parquet"))
+    manifest = snapshot.parent / "manifest.json"
+    snapshot_date = json.loads(manifest.read_text("utf-8"))["snapshot_date"]
+    n = draw_sample(snapshot, SAMPLE_PATH, snapshot_date)
+    print(f"Wrote {n} products to {SAMPLE_PATH} (snapshot {snapshot_date}).")
+    return 0
 
 
 if __name__ == "__main__":
