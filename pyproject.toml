@@ -5,7 +5,6 @@ description = "Open Food Facts as a tested pipeline, knowledge graph, web app an
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "duckdb",
     "fastapi[standard]",
     "psycopg[binary,pool]>=3.3.9",
     "pydantic-settings",
@@ -24,6 +23,7 @@ pipeline = [
     "dagster-webserver>=1.13.30",
     "dbt-core>=1.12",
     "dbt-duckdb>=1.11",
+    "duckdb>=2.0.0",
 ]
 
 [tool.uv]

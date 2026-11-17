@@ -959,7 +959,6 @@ version = "0.1.0"
 source = { virtual = "." }
 default-groups = ["dev", "pipeline"]
 dependencies = [
-    { name = "duckdb" },
     { name = "fastapi", extra = ["standard"] },
     { name = "psycopg", extra = ["binary", "pool"] },
     { name = "pydantic-settings" },
@@ -978,11 +977,11 @@ pipeline = [
     { name = "dagster-webserver" },
     { name = "dbt-core" },
     { name = "dbt-duckdb" },
+    { name = "duckdb" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "duckdb" },
     { name = "fastapi", extras = ["standard"] },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.9" },
     { name = "pydantic-settings" },
@@ -1001,6 +1000,7 @@ pipeline = [
     { name = "dagster-webserver", specifier = ">=1.13.30" },
     { name = "dbt-core", specifier = ">=1.12" },
     { name = "dbt-duckdb", specifier = ">=1.11" },
+    { name = "duckdb", specifier = ">=2.0.0" },
 ]
 
 [[package]]
