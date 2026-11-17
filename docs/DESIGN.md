@@ -82,6 +82,22 @@ Rules are structure, never decoration. If a rule does not separate two groups of
 
 Animate only `transform`, `opacity` and `clip-path`. Hold 60 frames a second on a mid-range laptop.
 
+### Token names in code
+
+`web/app/globals.css` defines these tokens and clears Tailwind's defaults, so nothing else is available.
+
+| In this file | In code |
+| --- | --- |
+| Colours | `paper`, `ink`, `ink-muted`, `rule-light`, `focus` (e.g. `text-ink-muted`) |
+| Nutri-Score A to E | `grade-a` … `grade-e` |
+| Type roles | `type-display`, `type-title`, `type-heading`, `type-body`, `type-data-label`, `type-data-value`, `type-small` |
+| Rules | `rule-heavy`, `rule-medium`, `rule-thin`, `rule-hair` (block elements, so they can scale in) |
+| Spacing 4 … 96 px | `1`, `2`, `3`, `4`, `6`, `8`, `12`, `16`, `24` (e.g. `p-4` is 16 px) |
+| Radius 2 px | `rounded-control`; panels and inputs use `rounded-none` |
+| Panel border | `panel` |
+| Body line length | `max-w-measure` (68ch) |
+| Motion | `ease-out`, `ease-in-out`, `--dur-fast`, `--dur-base`, `--dur-slow` |
+
 ---
 
 ## 2. Layout
