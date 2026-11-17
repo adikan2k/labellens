@@ -223,3 +223,48 @@ def test_a_tighter_threshold_fails_the_build(
     assert statuses["max_null_share_dim_products_name___var_max_unnamed_share_"] == "fail"
     others = {name: status for name, status in statuses.items() if "max_null_share" not in name}
     assert set(others.values()) == {"pass"}
+
+
+def test_run_report_covers_marts_tests_and_cleaning(
+    build: Build, con: duckdb.DuckDBPyConnection, tmp_path: Path
+) -> None:
+    from pipeline import report
+
+    date, text = report.build_report(build.db, build.tmp / "target-build" / "run_results.json")
+
+    assert date == "2026-11-17"
+    assert "| Dataset commit | `05a8391172ff01006b98d911dbf553463e527057` |" in text
+    for mart in report.MARTS:
+        assert f"| `{mart}` |" in text
+    products = _one(con, "select count(*) from dim_products")
+    assert f"| `dim_products` | {products:,} |" in text
+    assert "Data tests: " in text and "(pass " in text
+    assert "duplicate rows dropped" in text and "3 duplicate rows dropped" in text
+    assert "| `energy_kcal_100g` |" in text
+    assert "Not passing" not in text
+    assert "Open Database License" in text
+
+    code = report.main(
+        [
+            "--db", str(build.db),
+            "--run-results", str(build.tmp / "target-build" / "run_results.json"),
+            "--out-dir", str(tmp_path),
+        ]
+    )  # fmt: skip
+    assert code == 0
+    assert (
+        (tmp_path / "2026-11-17.md")
+        .read_text("utf-8")
+        .startswith("# Pipeline run report: 2026-11-17")
+    )
+
+
+def test_report_formats_small_shares_and_plurals() -> None:
+    from pipeline import report
+
+    assert report._pct(0, 10) == "0.0%"
+    assert report._pct(1, 10_000) == "<0.1%"
+    assert report._pct(1, 4) == "25.0%"
+    assert report._pct(1, 0) == "n/a"
+    assert report._products(1) == "1 product"
+    assert report._products(2_000) == "2,000 products"
