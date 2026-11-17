@@ -1,0 +1,46 @@
+"""Runtime settings.
+
+Every secret, endpoint and model name comes from environment variables (see `.env.example`).
+Model names live here and nowhere else in the code.
+"""
+
+from functools import lru_cache
+
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+    # Models
+    anthropic_api_key: SecretStr | None = None
+    model_default: str = "claude-haiku-5-5"
+    model_eval: str = "claude-sonnet-5-5"
+
+    # Embeddings (see docs/decisions/0001-embeddings.md)
+    embeddings_api_key: SecretStr | None = None
+    embeddings_model: str = "voyage-4-lite"
+
+    # Neon Postgres
+    database_url: SecretStr | None = None
+    database_url_readonly: SecretStr | None = None
+
+    # Neo4j AuraDB Free
+    neo4j_uri: str | None = None
+    neo4j_user: str | None = None
+    neo4j_password: SecretStr | None = None
+
+    # Langfuse
+    langfuse_public_key: str | None = None
+    langfuse_secret_key: SecretStr | None = None
+    langfuse_host: str | None = None
+
+    # Public demo limits
+    ask_rate_limit_per_hour: int = 10
+    ask_daily_spend_cap_usd: float = 0.50
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

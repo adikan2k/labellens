@@ -1,0 +1,33 @@
+category_id,name,parent_id
+drinks,Drinks,
+snacks,Snacks and sweets,
+dairy,Dairy and alternatives,
+protein,"Meat, fish, eggs and alternatives",
+grains,"Bread, cereals and grains",
+pantry,Pantry and meals,
+sodas,Sodas and soft drinks,drinks
+juices,Juices and fruit drinks,drinks
+water-coffee-tea,"Water, coffee and tea",drinks
+salty-snacks,"Chips, crackers and salty snacks",snacks
+cookies-cakes,"Cookies, cakes and pastries",snacks
+candy-chocolate,Candy and chocolate,snacks
+frozen-desserts,Ice cream and frozen desserts,snacks
+nuts-bars,"Nuts, seeds and snack bars",snacks
+milk,"Milk, cream and plant milks",dairy
+cheese,Cheese,dairy
+yogurt,Yogurt and dairy desserts,dairy
+meat,Fresh meat and poultry,protein
+deli-meats,"Deli meats, sausages and bacon",protein
+seafood,Fish and seafood,protein
+eggs-alternatives,"Eggs, tofu and meat alternatives",protein
+bread,Bread and tortillas,grains
+breakfast-cereals,Breakfast cereals and oats,grains
+pasta-rice,"Pasta, rice and grains",grains
+sauces-condiments,"Sauces, dressings and condiments",pantry
+spreads,"Spreads, jams and nut butters",pantry
+cooking-baking,"Oils, baking and sweeteners",pantry
+canned-soups,Canned goods and soups,pantry
+fruit-veg,Fruits and vegetables,pantry
+prepared-meals,Prepared meals and pizza,pantry
+supplements,Supplements and protein powders,
+other,Other or unclear,

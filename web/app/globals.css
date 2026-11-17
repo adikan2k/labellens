@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens from docs/DESIGN.md. Tailwind's defaults are cleared so only these exist.
+ * A new token goes into docs/DESIGN.md first, then here.
+ */
+@theme {
+  /* Colour */
+  --color-*: initial;
+  --color-paper: #ffffff;
+  --color-ink: #000000;
+  --color-ink-muted: #6b6b6b;
+  --color-rule-light: #d9d9d9;
+  --color-focus: #1a4bff;
+
+  /* Nutri-Score scale: only for Nutri-Score grades */
+  --color-grade-a: #038141;
+  --color-grade-b: #85bb2f;
+  --color-grade-c: #fecb02;
+  --color-grade-d: #ee8100;
+  --color-grade-e: #e63e11;
+
+  /* Type: one family */
+  --font-*: initial;
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
+  --text-*: initial;
+
+  /* Space: 4 px base, 4 8 12 16 24 32 48 64 96 */
+  --spacing-*: initial;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-24: 96px;
+
+  /* Shape: 0 for panels and inputs (rounded-none), 2 px for buttons and chips */
+  --radius-*: initial;
+  --radius-control: 2px;
+
+  /* Depth comes from rules, never shadows */
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+
+  /* Motion */
+  --ease-*: initial;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+
+  /* Rules */
+  --rule-heavy: 10px;
+  --rule-medium: 5px;
+  --rule-thin: 1px;
+  --rule-hair: 1px;
+
+  /* Reading width: body under 70 characters */
+  --container-measure: 68ch;
+}
+
+/* Type roles: size / line height, weight, width */
+@utility type-display {
+  font-size: 60px;
+  line-height: 60px;
+  font-weight: 900;
+  font-stretch: 75%;
+}
+@utility type-title {
+  font-size: 36px;
+  line-height: 40px;
+  font-weight: 800;
+  font-stretch: 85%;
+}
+@utility type-heading {
+  font-size: 21px;
+  line-height: 26px;
+  font-weight: 700;
+  font-stretch: 100%;
+}
+@utility type-body {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  font-stretch: 100%;
+}
+@utility type-data-label {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  font-stretch: 85%;
+  font-variant-numeric: tabular-nums;
+}
+@utility type-data-value {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  font-stretch: 85%;
+  font-variant-numeric: tabular-nums;
+}
+@utility type-small {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  font-stretch: 100%;
+}
+
+/* Rules: structure, never decoration. Drawn as blocks so they can scale in. */
+@utility rule-heavy {
+  display: block;
+  height: var(--rule-heavy);
+  background-color: var(--color-ink);
+}
+@utility rule-medium {
+  display: block;
+  height: var(--rule-medium);
+  background-color: var(--color-ink);
+}
+@utility rule-thin {
+  display: block;
+  height: var(--rule-thin);
+  background-color: var(--color-ink);
+}
+@utility rule-hair {
+  display: block;
+  height: var(--rule-hair);
+  background-color: var(--color-rule-light);
+}
+
+/* The one panel border and the one popover border */
+@utility panel {
+  border: 2px solid var(--color-ink);
+  border-radius: 0;
+  background-color: var(--color-paper);
+}
+
+@layer base {
+  html {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  a {
+    text-decoration-line: underline;
+    text-underline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
