@@ -1,0 +1,500 @@
+openapi: 3.1.0
+info:
+  title: LabelLens API
+  version: 0.1.0
+  summary: Search, explain and compare US packaged foods from Open Food Facts.
+  description: |
+    The contract between `api/` and `web/` (docs/SPEC.md section 6). Both sides build against
+    this file; a change here comes first.
+
+    Every JSON response carries a `source` block naming the Open Food Facts snapshot. Field names
+    follow the dbt marts in docs/SPEC.md section 5. Missing values are `null`, never omitted.
+  license:
+    name: ODbL-1.0 (data); code licence in the repository
+    url: https://opendatacommons.org/licenses/odbl/1-0/
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+
+tags:
+  - name: products
+  - name: stats
+  - name: graph
+  - name: ask
+  - name: meta
+
+paths:
+  /health:
+    get:
+      tags: [meta]
+      operationId: getHealth
+      summary: Status and versions
+      responses:
+        "200":
+          description: The API is up.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+
+  /search:
+    get:
+      tags: [products]
+      operationId: searchProducts
+      summary: Products ranked by name, brand and barcode match
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Product name, brand or barcode.
+          schema: { type: string, minLength: 1, maxLength: 200 }
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Matching products, best first. An empty list when nothing matches.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SearchResponse" }
+        "422": { $ref: "#/components/responses/InvalidRequest" }
+
+  /products/{code}:
+    get:
+      tags: [products]
+      operationId: getProduct
+      summary: Full product with nutrition, additives and ingredients
+      parameters:
+        - $ref: "#/components/parameters/Code"
+      responses:
+        "200":
+          description: The product.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProductResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /products/{code}/swaps:
+    get:
+      tags: [products]
+      operationId: getSwaps
+      summary: Better products in the same category, each with a data-built reason
+      parameters:
+        - $ref: "#/components/parameters/Code"
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 20, default: 5 }
+      responses:
+        "200":
+          description: Swaps ranked by Nutri-Score, then fewest additives. May be empty.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SwapsResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /stats/overview:
+    get:
+      tags: [stats]
+      operationId: getStatsOverview
+      summary: Counts and distributions for the dashboard
+      responses:
+        "200":
+          description: Dashboard figures.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StatsOverview" }
+
+  /graph/neighborhood:
+    get:
+      tags: [graph]
+      operationId: getGraphNeighborhood
+      summary: Nodes and edges around a product
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema: { $ref: "#/components/schemas/Barcode" }
+        - name: depth
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 2, default: 1 }
+      responses:
+        "200":
+          description: The neighbourhood, capped in size; `truncated` says whether it was cut.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GraphNeighborhood" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /ask:
+    post:
+      tags: [ask]
+      operationId: ask
+      summary: Ask a question; agent steps stream as server-sent events
+      description: |
+        Streams `text/event-stream`. Event names and payloads:
+
+        - `step`: one per tool call, as it happens (schema `AskStep`). At most 6.
+        - `answer`: once, last (schema `AskAnswer`). `refused` is true for medical or dietary
+          advice; `replay` is true when the daily spend cap is reached and a cached example run
+          is served instead.
+        - `error`: once, last, instead of `answer` (schema `AskError`).
+
+        The rate limit (10 questions per IP per hour) is checked before the stream opens and
+        answers 429 as JSON.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AskRequest" }
+      responses:
+        "200":
+          description: Event stream.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: Server-sent events named `step`, `answer` or `error`.
+          x-sse-events:
+            step: { $ref: "#/components/schemas/AskStep" }
+            answer: { $ref: "#/components/schemas/AskAnswer" }
+            error: { $ref: "#/components/schemas/AskError" }
+        "422": { $ref: "#/components/responses/InvalidRequest" }
+        "429":
+          description: Rate limit reached for this IP.
+          headers:
+            Retry-After:
+              schema: { type: integer }
+              description: Seconds until another question is accepted.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /mcp:
+    post:
+      tags: [meta]
+      operationId: mcp
+      summary: MCP endpoint (streamable HTTP)
+      description: |
+        Model Context Protocol server, stateless streamable HTTP per the MCP 2026-07-28
+        specification. Public, read-only, unauthenticated and rate-limited per IP. Tools:
+        `search_products`, `get_product`, `find_swaps`, `explain_additive`. `get_product` and
+        `find_swaps` declare a `ui://` resource under the MCP Apps extension. Requests and
+        responses are JSON-RPC as defined by MCP, not by this file.
+      x-mcp: true
+      responses:
+        "200":
+          description: JSON-RPC response, or an event stream, as MCP defines.
+
+components:
+  parameters:
+    Code:
+      name: code
+      in: path
+      required: true
+      description: Product barcode as recorded by Open Food Facts.
+      schema: { $ref: "#/components/schemas/Barcode" }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 50, default: 10 }
+
+  responses:
+    NotFound:
+      description: No product with this barcode in the snapshot.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    InvalidRequest:
+      description: A parameter is missing or out of range.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Source:
+      type: object
+      description: Attribution carried by every response.
+      required: [name, url, licence, licence_url, snapshot_date]
+      properties:
+        name: { type: string, const: Open Food Facts }
+        url: { type: string, format: uri, example: "https://world.openfoodfacts.org" }
+        licence: { type: string, const: ODbL-1.0 }
+        licence_url:
+          type: string
+          format: uri
+          example: "https://opendatacommons.org/licenses/odbl/1-0/"
+        snapshot_date:
+          type: [string, "null"]
+          format: date
+          description: Date of the Open Food Facts snapshot the data comes from.
+
+    Error:
+      type: object
+      required: [detail, source]
+      properties:
+        detail: { type: string, description: What failed and what to do. }
+        source: { $ref: "#/components/schemas/Source" }
+
+    Versions:
+      type: object
+      required: [api, python]
+      properties:
+        api: { type: string }
+        python: { type: string }
+
+    Health:
+      type: object
+      required: [status, versions, source]
+      properties:
+        status: { type: string, const: ok }
+        versions: { $ref: "#/components/schemas/Versions" }
+        source: { $ref: "#/components/schemas/Source" }
+
+    Barcode:
+      type: string
+      minLength: 1
+      maxLength: 32
+      description: Open Food Facts `code`. Kept as a string; leading zeros matter.
+
+    NutriscoreGrade:
+      type: [string, "null"]
+      enum: [a, b, c, d, e, null]
+
+    NovaGroup:
+      type: [integer, "null"]
+      enum: [1, 2, 3, 4, null]
+
+    ProductSummary:
+      type: object
+      required:
+        [code, name, brand, category_main, nutriscore_grade, nova_group, image_url]
+      properties:
+        code: { $ref: "#/components/schemas/Barcode" }
+        name: { type: [string, "null"] }
+        brand: { type: [string, "null"] }
+        category_main: { type: [string, "null"], description: "`category_id` from dim_categories." }
+        nutriscore_grade: { $ref: "#/components/schemas/NutriscoreGrade" }
+        nova_group: { $ref: "#/components/schemas/NovaGroup" }
+        image_url:
+          type: [string, "null"]
+          format: uri
+          description: Linked from Open Food Facts, never re-hosted.
+
+    SearchResult:
+      allOf:
+        - $ref: "#/components/schemas/ProductSummary"
+        - type: object
+          required: [match]
+          properties:
+            match:
+              type: string
+              enum: [barcode, name, brand]
+              description: Which field matched best.
+
+    SearchResponse:
+      type: object
+      required: [query, results, source]
+      properties:
+        query: { type: string }
+        results:
+          type: array
+          items: { $ref: "#/components/schemas/SearchResult" }
+        source: { $ref: "#/components/schemas/Source" }
+
+    Nutrition:
+      type: object
+      description: Per 100 g. `null` where Open Food Facts has no value.
+      required:
+        [energy_kcal_100g, sugars_100g, salt_100g, fat_100g, saturated_fat_100g, fiber_100g,
+         proteins_100g]
+      properties:
+        energy_kcal_100g: { type: [number, "null"], minimum: 0, maximum: 900 }
+        sugars_100g: { type: [number, "null"], minimum: 0, maximum: 100 }
+        salt_100g: { type: [number, "null"], minimum: 0, maximum: 100 }
+        fat_100g: { type: [number, "null"], minimum: 0, maximum: 100 }
+        saturated_fat_100g: { type: [number, "null"], minimum: 0, maximum: 100 }
+        fiber_100g: { type: [number, "null"], minimum: 0, maximum: 100 }
+        proteins_100g: { type: [number, "null"], minimum: 0, maximum: 100 }
+
+    Explainer:
+      type: [object, "null"]
+      required: [text, ai_generated]
+      properties:
+        text: { type: string }
+        ai_generated:
+          type: boolean
+          description: When true, the UI shows "Written by AI from Open Food Facts data."
+
+    Additive:
+      type: object
+      required: [additive_id, name, explainer]
+      properties:
+        additive_id: { type: string, example: "en:e330" }
+        name: { type: [string, "null"], example: Citric acid }
+        explainer: { $ref: "#/components/schemas/Explainer" }
+
+    Ingredient:
+      type: object
+      required: [ingredient_id, name, rank, explainer]
+      properties:
+        ingredient_id: { type: string }
+        name: { type: string }
+        rank: { type: integer, minimum: 1, description: Position on the label, 1 first. }
+        explainer: { $ref: "#/components/schemas/Explainer" }
+
+    Product:
+      allOf:
+        - $ref: "#/components/schemas/ProductSummary"
+        - type: object
+          required: [completeness, nutrition, additives, ingredients, off_url]
+          properties:
+            completeness: { type: [number, "null"], minimum: 0, maximum: 1 }
+            nutrition: { $ref: "#/components/schemas/Nutrition" }
+            additives:
+              type: array
+              items: { $ref: "#/components/schemas/Additive" }
+            ingredients:
+              type: array
+              items: { $ref: "#/components/schemas/Ingredient" }
+            off_url:
+              type: string
+              format: uri
+              description: The product's page on Open Food Facts.
+
+    ProductResponse:
+      type: object
+      required: [product, source]
+      properties:
+        product: { $ref: "#/components/schemas/Product" }
+        source: { $ref: "#/components/schemas/Source" }
+
+    Swap:
+      type: object
+      required: [product, reason, additive_count]
+      properties:
+        product: { $ref: "#/components/schemas/ProductSummary" }
+        reason:
+          type: string
+          description: One line built from the data, not from a model.
+          example: Same category, Nutri-Score A instead of C, no flagged additives.
+        additive_count: { type: integer, minimum: 0 }
+
+    SwapsResponse:
+      type: object
+      required: [code, swaps, source]
+      properties:
+        code: { $ref: "#/components/schemas/Barcode" }
+        swaps:
+          type: array
+          items: { $ref: "#/components/schemas/Swap" }
+        source: { $ref: "#/components/schemas/Source" }
+
+    CountByKey:
+      type: object
+      required: [key, label, count]
+      properties:
+        key: { type: [string, "null"], description: "Grade, NOVA group or id; `null` for unknown." }
+        label: { type: string }
+        count: { type: integer, minimum: 0 }
+
+    StatsOverview:
+      type: object
+      required:
+        [product_count, brand_count, category_count, additive_count, nutriscore, nova,
+         categories, top_additives, source]
+      properties:
+        product_count: { type: integer, minimum: 0 }
+        brand_count: { type: integer, minimum: 0 }
+        category_count: { type: integer, minimum: 0 }
+        additive_count: { type: integer, minimum: 0 }
+        nutriscore:
+          type: array
+          description: Products per Nutri-Score grade, a to e, then unknown.
+          items: { $ref: "#/components/schemas/CountByKey" }
+        nova:
+          type: array
+          description: Products per NOVA group, 1 to 4, then unknown.
+          items: { $ref: "#/components/schemas/CountByKey" }
+        categories:
+          type: array
+          description: Products per category in our taxonomy.
+          items: { $ref: "#/components/schemas/CountByKey" }
+        top_additives:
+          type: array
+          description: Most common additives by number of products.
+          items: { $ref: "#/components/schemas/CountByKey" }
+        source: { $ref: "#/components/schemas/Source" }
+
+    GraphNode:
+      type: object
+      required: [id, kind, name]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [Product, Brand, Category, Additive, Ingredient] }
+        name: { type: string }
+        nutriscore_grade: { $ref: "#/components/schemas/NutriscoreGrade" }
+
+    GraphEdge:
+      type: object
+      required: [from, to, type]
+      properties:
+        from: { type: string, description: Node id. }
+        to: { type: string, description: Node id. }
+        type: { type: string, enum: [MADE_BY, IN, CONTAINS, HAS_INGREDIENT, CHILD_OF] }
+
+    GraphNeighborhood:
+      type: object
+      required: [center, nodes, edges, truncated, source]
+      properties:
+        center: { type: string, description: Node id of the product. }
+        nodes:
+          type: array
+          items: { $ref: "#/components/schemas/GraphNode" }
+        edges:
+          type: array
+          items: { $ref: "#/components/schemas/GraphEdge" }
+        truncated: { type: boolean }
+        source: { $ref: "#/components/schemas/Source" }
+
+    AskRequest:
+      type: object
+      required: [question]
+      properties:
+        question: { type: string, minLength: 3, maxLength: 500 }
+
+    AskStep:
+      type: object
+      required: [index, tool, summary, row_count, duration_ms]
+      properties:
+        index: { type: integer, minimum: 1, maximum: 6 }
+        tool: { type: string, enum: [query_sql, query_graph, search_explainers] }
+        summary: { type: string, description: What it looked up, in plain words. }
+        row_count: { type: integer, minimum: 0 }
+        duration_ms: { type: integer, minimum: 0 }
+
+    Citation:
+      type: object
+      required: [n, kind, ref, label, url]
+      properties:
+        n: { type: integer, minimum: 1, description: The number shown in the answer. }
+        kind: { type: string, enum: [row, node, explainer] }
+        ref: { type: string, description: Barcode, node id or additive/ingredient id. }
+        label: { type: string }
+        url: { type: [string, "null"], description: App link for the citation. }
+
+    AskAnswer:
+      type: object
+      required: [text, citations, refused, replay, source]
+      properties:
+        text: { type: string }
+        citations:
+          type: array
+          items: { $ref: "#/components/schemas/Citation" }
+        refused: { type: boolean }
+        replay: { type: boolean }
+        source: { $ref: "#/components/schemas/Source" }
+
+    AskError:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, enum: [timeout, tool_failed, internal] }
+        message: { type: string }
