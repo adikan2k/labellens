@@ -77,7 +77,7 @@ export function LiveSearch({ productCount }: { productCount: number | null }) {
         onChange={(event) => setQuery(event.target.value)}
         placeholder={placeholder}
         aria-describedby={statusId}
-        className="panel type-heading block w-full rounded-none px-4 py-3 placeholder:text-ink-muted"
+        className="panel type-heading block w-full rounded-none px-4 py-3 placeholder:text-ink-muted lg:py-4"
       />
       <p className="type-small pt-3 text-ink-muted">
         Name, brand or barcode. Try:{" "}

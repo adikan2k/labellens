@@ -147,7 +147,7 @@ async function Dashboard() {
 
 function ChartPanel({ id, finding, children }: { id: string; finding: string; children: ReactNode }) {
   return (
-    <section aria-labelledby={`${id}-finding`} className="min-w-0">
+    <section id={id} aria-labelledby={`${id}-finding`} className="min-w-0 scroll-mt-8">
       <Rule weight="heavy" />
       <h2 id={`${id}-finding`} className="type-heading pt-3 pb-4">
         {finding}

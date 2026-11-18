@@ -41,7 +41,8 @@ One family: **Archivo** (variable, with weight and width axes), from Google Font
 
 | Role | Size / line height | Weight | Width | Notes |
 | --- | --- | --- | --- | --- |
-| Display | 60 / 60 | 900 | 75 | Product name on the product page; home headline |
+| Hero | 88 / 88 | 900 | 75 | Home headline at 1024 px wide and up (Display below that) |
+| Display | 60 / 60 | 900 | 75 | Product name on the product page; home headline on phones and tablets |
 | Title | 36 / 40 | 800 | 85 | Page titles, "Nutrition Facts" panel heading |
 | Heading | 21 / 26 | 700 | 100 | Section headings |
 | Body | 16 / 24 | 400 | 100 | Paragraphs, explainers |
@@ -51,6 +52,16 @@ One family: **Archivo** (variable, with weight and width axes), from Google Font
 - Turn on tabular figures (`font-variant-numeric: tabular-nums`) wherever numbers line up.
 - Sentence case everywhere. No all-caps labels, no letter-spaced eyebrows.
 - Body line length under 70 characters.
+
+**Scale on large screens.** Every size in this file is given at the base size (16 px). In code, type, spacing and the heavy and medium rules are in `rem`, so the whole interface grows together when the base does:
+
+| Window width | Base | So Body is |
+| --- | --- | --- |
+| up to 1599 px | 16 px (100%) | 16 px |
+| 1600 to 2199 px | 18 px (112.5%) | 18 px |
+| 2200 px and up | 20 px (125%) | 20 px |
+
+Hairlines (`rule-thin`, `rule-hair`), the 2 px panel border, the 2 px radius and the focus ring stay in px: they are lines, not sizes. A reader who sets a larger default font in their browser gets a larger interface too.
 
 ### Rules (the signature structural device)
 
@@ -90,13 +101,14 @@ Animate only `transform`, `opacity` and `clip-path`. Hold 60 frames a second on 
 | --- | --- |
 | Colours | `paper`, `ink`, `ink-muted`, `rule-light`, `focus` (e.g. `text-ink-muted`) |
 | Nutri-Score A to E | `grade-a` … `grade-e` |
-| Type roles | `type-display`, `type-title`, `type-heading`, `type-body`, `type-data-label`, `type-data-value`, `type-small` |
+| Type roles | `type-hero`, `type-display`, `type-title`, `type-heading`, `type-body`, `type-data-label`, `type-data-value`, `type-small` |
 | Rules | `rule-heavy`, `rule-medium`, `rule-thin`, `rule-hair` (block elements, so they can scale in) |
 | Spacing 4 … 96 px | `1`, `2`, `3`, `4`, `6`, `8`, `12`, `16`, `24` (e.g. `p-4` is 16 px) |
 | Radius 2 px | `rounded-control`; panels and inputs use `rounded-none` |
 | Panel border | `panel` |
 | Body line length | `max-w-measure` (68ch) |
 | Page width (header, footer, product page, dashboard) | `max-w-page` (72rem) |
+| Home column from 1024 px | `max-w-hero` (48rem) |
 | Motion | `ease-out`, `ease-in-out`, `--dur-fast`, `--dur-base`, `--dur-slow` |
 
 ---
@@ -129,6 +141,27 @@ The search box is the hero. No marketing section above it.
 ```
 
 The product count in the placeholder comes from `/stats/overview`, never hard-coded.
+
+**Width and size.** The home column is `max-w-measure` on phones and `max-w-hero` (48 rem) from 1024 px, where the headline uses Hero and the search box gains height. Results and the panels below are the same width as the search box.
+
+**Before anything is typed**, the space under the search holds two short sections, so a first visit sees what the site knows and where else to go. Both hide as soon as the box has text, so results always sit directly under it.
+
+```
+│   What the data says                            (heading)  │
+│   ─────────────────────────────────────────── rule-thin    │
+│   63% of graded US products score C or worse        →     │
+│   80% of products with a NOVA group are ultra-processed →  │
+│   Citric acid is in more products than any other…    →     │
+│                                                            │
+│   More ways in                                  (heading)  │
+│   ─────────────────────────────────────────── rule-thin    │
+│   Compare two products   Their labels side by side   →     │
+│   Explore the graph      What shares an ingredient   →     │
+│   Ask a question         An agent that cites its rows →    │
+```
+
+- The findings are the dashboard's own headings, computed from the same numbers; each links to its chart. They need the API; if it is asleep the section is left out, never shown empty.
+- Rows are `type-data-label` (finding or name) with `type-small` `ink-muted` descriptions, separated by `rule-hair`.
 
 **Scanner.** On devices with a camera, "Scan a barcode" sits on its own line under the "Try:" line, as an underlined text button like the examples. It opens a panel (2 px `ink` border, square) right under that line, above the results: the live camera picture at full panel width, one `type-small` line under it that says what is happening ("Point the camera at the barcode. The picture stays on this device."), and a "Cancel" button. A read goes straight to the product page; a barcode the snapshot lacks says so, with a link to add the product on Open Food Facts. No scanning animation or overlay, so reduced motion needs nothing special. Focus moves to "Cancel" when the panel opens and back to "Scan a barcode" when it closes; Escape closes it.
 
@@ -261,7 +294,7 @@ The whole sequence takes under 900 ms. It runs once per page view, never on scro
 
 ## 5. Quality floor
 
-- Responsive from 375 px to 1600 px.
+- Responsive from 375 px to 2560 px (see "Scale on large screens").
 - Visible focus ring (`focus`, 2 px, 2 px offset) on every interactive element.
 - After a navigation inside the site, focus moves to `<main>`, so the next Tab lands on the new page's first control. `<main>` is not a control, so it shows no ring.
 - All text meets WCAG AA contrast.
