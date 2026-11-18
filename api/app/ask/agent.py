@@ -33,6 +33,7 @@ from api.app.config import embedding_price_per_mtok, price_per_mtok
 MAX_TOOL_CALLS = 6
 MAX_TURNS = MAX_TOOL_CALLS + 2  # parallel calls can use the budget in fewer turns
 MAX_TOKENS = 1500
+MAX_CALL_SECONDS = 25.0  # one model call; the run's deadline caps it further
 _CITE_GROUP = re.compile(r"\[([RNE]\d+(?:\s*,\s*[RNE]\d+)*)\]")
 BUDGET_USED = '{"error":"The tool budget for this question is used up. Answer with what you have."}'
 TURNS_USED = "I couldn't finish looking this up. Try a narrower question."
@@ -280,6 +281,9 @@ class Run:
     def _create(self, params: dict[str, Any]) -> Any:
         import anthropic
 
+        if self.deadline is not None:  # never wait past the run's deadline
+            remaining = self.deadline - time.monotonic()
+            params = params | {"timeout": max(1.0, min(MAX_CALL_SECONDS, remaining))}
         try:
             return self.agent.client.messages.create(**params)
         except anthropic.APIError as error:

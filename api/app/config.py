@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     # Public demo limits
     ask_rate_limit_per_hour: int = 10
     ask_daily_spend_cap_usd: float = 0.50
+    # A run stops here; Cloud Run's request timeout (60 s) leaves room to send the error.
+    ask_timeout_seconds: float = 45.0
 
 
 # US dollars per million input and output tokens at standard rates (the Batch API halves

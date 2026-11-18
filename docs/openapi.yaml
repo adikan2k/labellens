@@ -161,6 +161,7 @@ paths:
             answer: { $ref: "#/components/schemas/AskAnswer" }
             error: { $ref: "#/components/schemas/AskError" }
         "422": { $ref: "#/components/responses/InvalidRequest" }
+        "503": { $ref: "#/components/responses/Unavailable" }
         "429":
           description: Rate limit reached for this IP.
           headers:

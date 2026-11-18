@@ -1,11 +1,13 @@
+from pathlib import Path
+
 from scripts import deploy_api
 
+ENV_FILE = Path("env.yaml")
 
-def _plan() -> dict[str, list[str]]:
+
+def _plan(secrets: dict[str, str] | None = None) -> dict[str, list[str]]:
     return dict(
-        deploy_api.commands(
-            "my-project", "us-east4", "20261117-1200", "https://labellens.vercel.app", "123456"
-        )
+        deploy_api.commands("my-project", "us-east4", "20261117-1200", "123456", ENV_FILE, secrets)
     )
 
 
@@ -16,17 +18,37 @@ def test_cloud_run_keeps_the_cost_guardrails() -> None:
     assert "--allow-unauthenticated" in deploy
 
 
-def test_database_url_comes_from_secret_manager_never_the_command_line() -> None:
+def test_secrets_come_from_secret_manager_never_the_command_line() -> None:
     deploy = next(c for title, c in _plan().items() if title.startswith("Deploy"))
+    mounted = next(a for a in deploy if a.startswith("--set-secrets="))
+    for env, name in deploy_api.SECRETS.items():
+        assert f"{env}={name}:latest" in mounted
     joined = " ".join(deploy)
-    assert "--set-secrets=DATABASE_URL=labellens-database-url:latest" in joined
-    assert "postgres" not in joined.lower()
+    assert "postgres" not in joined.lower() and "sk-" not in joined
+    assert f"--env-vars-file={ENV_FILE}" in deploy
+
+
+def test_only_existing_secrets_are_mounted_and_granted() -> None:
+    plan = _plan({"DATABASE_URL": "labellens-database-url"})
+    deploy = next(c for title, c in plan.items() if title.startswith("Deploy"))
+    assert "--set-secrets=DATABASE_URL=labellens-database-url:latest" in deploy
+    grants = [title for title in plan if title.startswith("Let Cloud Run read")]
+    assert grants == ["Let Cloud Run read the secret labellens-database-url"]
+
+
+def test_ask_fits_in_the_request_timeout() -> None:
+    deploy = next(c for title, c in _plan().items() if title.startswith("Deploy"))
+    assert "--timeout=60" in deploy  # /ask stops at 45 s
 
 
 def test_cors_allows_the_web_origin_and_local_dev() -> None:
-    deploy = next(c for title, c in _plan().items() if title.startswith("Deploy"))
-    env = next(a for a in deploy if a.startswith("--set-env-vars="))
-    assert "https://labellens.vercel.app,http://localhost:3000" in env
+    assert deploy_api.cors_origins("https://x.vercel.app") == (
+        "https://x.vercel.app,http://localhost:3000"
+    )
+    text = deploy_api.env_file_text(
+        {"CORS_ORIGINS": "https://a,http://b", "NEO4J_URI": "", "NEO4J_USER": "neo4j"}
+    )
+    assert text == 'CORS_ORIGINS: "https://a,http://b"\nNEO4J_USER: "neo4j"\n'
 
 
 def test_image_is_built_from_the_api_dockerfile_and_tagged() -> None:
@@ -44,6 +66,6 @@ def test_registry_keeps_two_images() -> None:
 
 
 def test_runtime_service_account_reads_the_secret() -> None:
-    grant = next(c for title, c in _plan().items() if "secret" in title)
+    grant = next(c for title, c in _plan().items() if title.startswith("Let Cloud Run read"))
     assert "--member=serviceAccount:123456-compute@developer.gserviceaccount.com" in grant
     assert "--role=roles/secretmanager.secretAccessor" in grant
