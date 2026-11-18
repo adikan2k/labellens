@@ -1,0 +1,1258 @@
+{
+  "label": "claude-sonnet-5-5-full-silver",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "categories-v1",
+  "inputs": "name, brand and ingredients",
+  "measured_at": "2026-11-18T01:01:50+00:00",
+  "overall": {
+    "n": 200,
+    "correct": 184,
+    "accuracy": 0.92,
+    "invalid": 0,
+    "per_category": {
+      "bread": {
+        "support": 6,
+        "predicted": 6,
+        "recall": 0.833,
+        "precision": 0.833
+      },
+      "breakfast-cereals": {
+        "support": 7,
+        "predicted": 7,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "candy-chocolate": {
+        "support": 13,
+        "predicted": 11,
+        "recall": 0.846,
+        "precision": 1.0
+      },
+      "canned-soups": {
+        "support": 9,
+        "predicted": 8,
+        "recall": 0.889,
+        "precision": 1.0
+      },
+      "cheese": {
+        "support": 8,
+        "predicted": 9,
+        "recall": 1.0,
+        "precision": 0.889
+      },
+      "cookies-cakes": {
+        "support": 11,
+        "predicted": 10,
+        "recall": 0.909,
+        "precision": 1.0
+      },
+      "cooking-baking": {
+        "support": 12,
+        "predicted": 12,
+        "recall": 0.917,
+        "precision": 0.917
+      },
+      "deli-meats": {
+        "support": 12,
+        "predicted": 12,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "eggs-alternatives": {
+        "support": 1,
+        "predicted": 1,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "frozen-desserts": {
+        "support": 9,
+        "predicted": 9,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "fruit-veg": {
+        "support": 9,
+        "predicted": 11,
+        "recall": 1.0,
+        "precision": 0.818
+      },
+      "juices": {
+        "support": 7,
+        "predicted": 8,
+        "recall": 1.0,
+        "precision": 0.875
+      },
+      "meat": {
+        "support": 2,
+        "predicted": 3,
+        "recall": 1.0,
+        "precision": 0.667
+      },
+      "milk": {
+        "support": 6,
+        "predicted": 6,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "nuts-bars": {
+        "support": 8,
+        "predicted": 9,
+        "recall": 1.0,
+        "precision": 0.889
+      },
+      "other": {
+        "support": 3,
+        "predicted": 5,
+        "recall": 1.0,
+        "precision": 0.6
+      },
+      "pasta-rice": {
+        "support": 4,
+        "predicted": 3,
+        "recall": 0.75,
+        "precision": 1.0
+      },
+      "prepared-meals": {
+        "support": 17,
+        "predicted": 17,
+        "recall": 0.882,
+        "precision": 0.882
+      },
+      "salty-snacks": {
+        "support": 13,
+        "predicted": 14,
+        "recall": 0.923,
+        "precision": 0.857
+      },
+      "sauces-condiments": {
+        "support": 13,
+        "predicted": 11,
+        "recall": 0.846,
+        "precision": 1.0
+      },
+      "seafood": {
+        "support": 5,
+        "predicted": 4,
+        "recall": 0.8,
+        "precision": 1.0
+      },
+      "sodas": {
+        "support": 4,
+        "predicted": 4,
+        "recall": 0.75,
+        "precision": 0.75
+      },
+      "spreads": {
+        "support": 2,
+        "predicted": 2,
+        "recall": 0.5,
+        "precision": 0.5
+      },
+      "supplements": {
+        "support": 7,
+        "predicted": 6,
+        "recall": 0.857,
+        "precision": 1.0
+      },
+      "water-coffee-tea": {
+        "support": 9,
+        "predicted": 9,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "yogurt": {
+        "support": 3,
+        "predicted": 3,
+        "recall": 1.0,
+        "precision": 1.0
+      }
+    },
+    "confusions": [
+      [
+        "cookies-cakes",
+        "other",
+        1
+      ],
+      [
+        "candy-chocolate",
+        "salty-snacks",
+        1
+      ],
+      [
+        "pasta-rice",
+        "prepared-meals",
+        1
+      ],
+      [
+        "prepared-meals",
+        "fruit-veg",
+        1
+      ],
+      [
+        "spreads",
+        "nuts-bars",
+        1
+      ],
+      [
+        "supplements",
+        "sodas",
+        1
+      ],
+      [
+        "salty-snacks",
+        "other",
+        1
+      ],
+      [
+        "candy-chocolate",
+        "spreads",
+        1
+      ],
+      [
+        "sodas",
+        "juices",
+        1
+      ],
+      [
+        "prepared-meals",
+        "meat",
+        1
+      ],
+      [
+        "canned-soups",
+        "fruit-veg",
+        1
+      ],
+      [
+        "seafood",
+        "prepared-meals",
+        1
+      ],
+      [
+        "bread",
+        "salty-snacks",
+        1
+      ],
+      [
+        "sauces-condiments",
+        "cheese",
+        1
+      ],
+      [
+        "sauces-condiments",
+        "cooking-baking",
+        1
+      ]
+    ]
+  },
+  "halves": {
+    "dev": {
+      "n": 105,
+      "correct": 97,
+      "accuracy": 0.9238,
+      "invalid": 0,
+      "per_category": {
+        "bread": {
+          "support": 4,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 0.8
+        },
+        "breakfast-cereals": {
+          "support": 5,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "candy-chocolate": {
+          "support": 7,
+          "predicted": 6,
+          "recall": 0.857,
+          "precision": 1.0
+        },
+        "canned-soups": {
+          "support": 6,
+          "predicted": 5,
+          "recall": 0.833,
+          "precision": 1.0
+        },
+        "cheese": {
+          "support": 4,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 0.8
+        },
+        "cookies-cakes": {
+          "support": 5,
+          "predicted": 4,
+          "recall": 0.8,
+          "precision": 1.0
+        },
+        "cooking-baking": {
+          "support": 9,
+          "predicted": 8,
+          "recall": 0.889,
+          "precision": 1.0
+        },
+        "deli-meats": {
+          "support": 7,
+          "predicted": 7,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "frozen-desserts": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "fruit-veg": {
+          "support": 6,
+          "predicted": 7,
+          "recall": 1.0,
+          "precision": 0.857
+        },
+        "juices": {
+          "support": 4,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "meat": {
+          "support": 1,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 0.5
+        },
+        "milk": {
+          "support": 3,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "nuts-bars": {
+          "support": 6,
+          "predicted": 6,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "other": {
+          "support": 1,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 0.5
+        },
+        "pasta-rice": {
+          "support": 2,
+          "predicted": 1,
+          "recall": 0.5,
+          "precision": 1.0
+        },
+        "prepared-meals": {
+          "support": 10,
+          "predicted": 11,
+          "recall": 0.9,
+          "precision": 0.818
+        },
+        "salty-snacks": {
+          "support": 3,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 0.75
+        },
+        "sauces-condiments": {
+          "support": 4,
+          "predicted": 3,
+          "recall": 0.75,
+          "precision": 1.0
+        },
+        "seafood": {
+          "support": 2,
+          "predicted": 1,
+          "recall": 0.5,
+          "precision": 1.0
+        },
+        "sodas": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "spreads": {
+          "support": 1,
+          "predicted": 1,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "supplements": {
+          "support": 3,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "water-coffee-tea": {
+          "support": 6,
+          "predicted": 6,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "yogurt": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        }
+      },
+      "confusions": [
+        [
+          "cookies-cakes",
+          "other",
+          1
+        ],
+        [
+          "candy-chocolate",
+          "salty-snacks",
+          1
+        ],
+        [
+          "pasta-rice",
+          "prepared-meals",
+          1
+        ],
+        [
+          "prepared-meals",
+          "meat",
+          1
+        ],
+        [
+          "canned-soups",
+          "fruit-veg",
+          1
+        ],
+        [
+          "seafood",
+          "prepared-meals",
+          1
+        ],
+        [
+          "sauces-condiments",
+          "cheese",
+          1
+        ],
+        [
+          "cooking-baking",
+          "bread",
+          1
+        ]
+      ]
+    },
+    "test": {
+      "n": 95,
+      "correct": 87,
+      "accuracy": 0.9158,
+      "invalid": 0,
+      "per_category": {
+        "bread": {
+          "support": 2,
+          "predicted": 1,
+          "recall": 0.5,
+          "precision": 1.0
+        },
+        "breakfast-cereals": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "candy-chocolate": {
+          "support": 6,
+          "predicted": 5,
+          "recall": 0.833,
+          "precision": 1.0
+        },
+        "canned-soups": {
+          "support": 3,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "cheese": {
+          "support": 4,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "cookies-cakes": {
+          "support": 6,
+          "predicted": 6,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "cooking-baking": {
+          "support": 3,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 0.75
+        },
+        "deli-meats": {
+          "support": 5,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "eggs-alternatives": {
+          "support": 1,
+          "predicted": 1,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "frozen-desserts": {
+          "support": 7,
+          "predicted": 7,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "fruit-veg": {
+          "support": 3,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 0.75
+        },
+        "juices": {
+          "support": 3,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 0.75
+        },
+        "meat": {
+          "support": 1,
+          "predicted": 1,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "milk": {
+          "support": 3,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "nuts-bars": {
+          "support": 2,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 0.667
+        },
+        "other": {
+          "support": 2,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 0.667
+        },
+        "pasta-rice": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "prepared-meals": {
+          "support": 7,
+          "predicted": 6,
+          "recall": 0.857,
+          "precision": 1.0
+        },
+        "salty-snacks": {
+          "support": 10,
+          "predicted": 10,
+          "recall": 0.9,
+          "precision": 0.9
+        },
+        "sauces-condiments": {
+          "support": 9,
+          "predicted": 8,
+          "recall": 0.889,
+          "precision": 1.0
+        },
+        "seafood": {
+          "support": 3,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "sodas": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 0.5,
+          "precision": 0.5
+        },
+        "spreads": {
+          "support": 1,
+          "predicted": 1,
+          "recall": 0.0,
+          "precision": 0.0
+        },
+        "supplements": {
+          "support": 4,
+          "predicted": 3,
+          "recall": 0.75,
+          "precision": 1.0
+        },
+        "water-coffee-tea": {
+          "support": 3,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "yogurt": {
+          "support": 1,
+          "predicted": 1,
+          "recall": 1.0,
+          "precision": 1.0
+        }
+      },
+      "confusions": [
+        [
+          "prepared-meals",
+          "fruit-veg",
+          1
+        ],
+        [
+          "spreads",
+          "nuts-bars",
+          1
+        ],
+        [
+          "supplements",
+          "sodas",
+          1
+        ],
+        [
+          "salty-snacks",
+          "other",
+          1
+        ],
+        [
+          "candy-chocolate",
+          "spreads",
+          1
+        ],
+        [
+          "sodas",
+          "juices",
+          1
+        ],
+        [
+          "bread",
+          "salty-snacks",
+          1
+        ],
+        [
+          "sauces-condiments",
+          "cooking-baking",
+          1
+        ]
+      ]
+    }
+  },
+  "by_tags": {
+    "Products Open Food Facts' tags place": {
+      "n": 120,
+      "correct": 110,
+      "accuracy": 0.9167,
+      "invalid": 0,
+      "per_category": {
+        "bread": {
+          "support": 3,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 0.75
+        },
+        "breakfast-cereals": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "candy-chocolate": {
+          "support": 10,
+          "predicted": 9,
+          "recall": 0.9,
+          "precision": 1.0
+        },
+        "canned-soups": {
+          "support": 6,
+          "predicted": 6,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "cheese": {
+          "support": 4,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 0.8
+        },
+        "cookies-cakes": {
+          "support": 9,
+          "predicted": 9,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "cooking-baking": {
+          "support": 7,
+          "predicted": 7,
+          "recall": 0.857,
+          "precision": 0.857
+        },
+        "deli-meats": {
+          "support": 8,
+          "predicted": 8,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "eggs-alternatives": {
+          "support": 1,
+          "predicted": 1,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "frozen-desserts": {
+          "support": 7,
+          "predicted": 7,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "fruit-veg": {
+          "support": 7,
+          "predicted": 7,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "juices": {
+          "support": 2,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 0.667
+        },
+        "meat": {
+          "support": 0,
+          "predicted": 1,
+          "recall": 0.0,
+          "precision": 0.0
+        },
+        "milk": {
+          "support": 6,
+          "predicted": 6,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "nuts-bars": {
+          "support": 1,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 0.5
+        },
+        "pasta-rice": {
+          "support": 4,
+          "predicted": 3,
+          "recall": 0.75,
+          "precision": 1.0
+        },
+        "prepared-meals": {
+          "support": 12,
+          "predicted": 13,
+          "recall": 0.917,
+          "precision": 0.846
+        },
+        "salty-snacks": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "sauces-condiments": {
+          "support": 11,
+          "predicted": 9,
+          "recall": 0.818,
+          "precision": 1.0
+        },
+        "seafood": {
+          "support": 4,
+          "predicted": 3,
+          "recall": 0.75,
+          "precision": 1.0
+        },
+        "sodas": {
+          "support": 4,
+          "predicted": 4,
+          "recall": 0.75,
+          "precision": 0.75
+        },
+        "spreads": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 0.5,
+          "precision": 0.5
+        },
+        "supplements": {
+          "support": 2,
+          "predicted": 1,
+          "recall": 0.5,
+          "precision": 1.0
+        },
+        "water-coffee-tea": {
+          "support": 3,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "yogurt": {
+          "support": 3,
+          "predicted": 3,
+          "recall": 1.0,
+          "precision": 1.0
+        }
+      },
+      "confusions": [
+        [
+          "pasta-rice",
+          "prepared-meals",
+          1
+        ],
+        [
+          "spreads",
+          "nuts-bars",
+          1
+        ],
+        [
+          "supplements",
+          "sodas",
+          1
+        ],
+        [
+          "candy-chocolate",
+          "spreads",
+          1
+        ],
+        [
+          "sodas",
+          "juices",
+          1
+        ],
+        [
+          "prepared-meals",
+          "meat",
+          1
+        ],
+        [
+          "seafood",
+          "prepared-meals",
+          1
+        ],
+        [
+          "sauces-condiments",
+          "cheese",
+          1
+        ],
+        [
+          "sauces-condiments",
+          "cooking-baking",
+          1
+        ],
+        [
+          "cooking-baking",
+          "bread",
+          1
+        ]
+      ]
+    },
+    "Products they do not (what the fill is for)": {
+      "n": 80,
+      "correct": 74,
+      "accuracy": 0.925,
+      "invalid": 0,
+      "per_category": {
+        "bread": {
+          "support": 3,
+          "predicted": 2,
+          "recall": 0.667,
+          "precision": 1.0
+        },
+        "breakfast-cereals": {
+          "support": 5,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "candy-chocolate": {
+          "support": 3,
+          "predicted": 2,
+          "recall": 0.667,
+          "precision": 1.0
+        },
+        "canned-soups": {
+          "support": 3,
+          "predicted": 2,
+          "recall": 0.667,
+          "precision": 1.0
+        },
+        "cheese": {
+          "support": 4,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "cookies-cakes": {
+          "support": 2,
+          "predicted": 1,
+          "recall": 0.5,
+          "precision": 1.0
+        },
+        "cooking-baking": {
+          "support": 5,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "deli-meats": {
+          "support": 4,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "frozen-desserts": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "fruit-veg": {
+          "support": 2,
+          "predicted": 4,
+          "recall": 1.0,
+          "precision": 0.5
+        },
+        "juices": {
+          "support": 5,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "meat": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "nuts-bars": {
+          "support": 7,
+          "predicted": 7,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "other": {
+          "support": 3,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 0.6
+        },
+        "prepared-meals": {
+          "support": 5,
+          "predicted": 4,
+          "recall": 0.8,
+          "precision": 1.0
+        },
+        "salty-snacks": {
+          "support": 11,
+          "predicted": 12,
+          "recall": 0.909,
+          "precision": 0.833
+        },
+        "sauces-condiments": {
+          "support": 2,
+          "predicted": 2,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "seafood": {
+          "support": 1,
+          "predicted": 1,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "supplements": {
+          "support": 5,
+          "predicted": 5,
+          "recall": 1.0,
+          "precision": 1.0
+        },
+        "water-coffee-tea": {
+          "support": 6,
+          "predicted": 6,
+          "recall": 1.0,
+          "precision": 1.0
+        }
+      },
+      "confusions": [
+        [
+          "cookies-cakes",
+          "other",
+          1
+        ],
+        [
+          "candy-chocolate",
+          "salty-snacks",
+          1
+        ],
+        [
+          "prepared-meals",
+          "fruit-veg",
+          1
+        ],
+        [
+          "salty-snacks",
+          "other",
+          1
+        ],
+        [
+          "canned-soups",
+          "fruit-veg",
+          1
+        ],
+        [
+          "bread",
+          "salty-snacks",
+          1
+        ]
+      ]
+    }
+  },
+  "tag_baseline": {
+    "n": 120,
+    "correct": 105,
+    "accuracy": 0.875,
+    "invalid": 0,
+    "per_category": {
+      "bread": {
+        "support": 3,
+        "predicted": 2,
+        "recall": 0.667,
+        "precision": 1.0
+      },
+      "breakfast-cereals": {
+        "support": 2,
+        "predicted": 2,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "candy-chocolate": {
+        "support": 10,
+        "predicted": 10,
+        "recall": 0.9,
+        "precision": 0.9
+      },
+      "canned-soups": {
+        "support": 6,
+        "predicted": 5,
+        "recall": 0.667,
+        "precision": 0.8
+      },
+      "cheese": {
+        "support": 4,
+        "predicted": 4,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "cookies-cakes": {
+        "support": 9,
+        "predicted": 11,
+        "recall": 1.0,
+        "precision": 0.818
+      },
+      "cooking-baking": {
+        "support": 7,
+        "predicted": 7,
+        "recall": 0.857,
+        "precision": 0.857
+      },
+      "deli-meats": {
+        "support": 8,
+        "predicted": 7,
+        "recall": 0.875,
+        "precision": 1.0
+      },
+      "eggs-alternatives": {
+        "support": 1,
+        "predicted": 1,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "frozen-desserts": {
+        "support": 7,
+        "predicted": 6,
+        "recall": 0.857,
+        "precision": 1.0
+      },
+      "fruit-veg": {
+        "support": 7,
+        "predicted": 9,
+        "recall": 1.0,
+        "precision": 0.778
+      },
+      "juices": {
+        "support": 2,
+        "predicted": 0,
+        "recall": 0.0,
+        "precision": 0.0
+      },
+      "meat": {
+        "support": 0,
+        "predicted": 1,
+        "recall": 0.0,
+        "precision": 0.0
+      },
+      "milk": {
+        "support": 6,
+        "predicted": 6,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "nuts-bars": {
+        "support": 1,
+        "predicted": 1,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "pasta-rice": {
+        "support": 4,
+        "predicted": 3,
+        "recall": 0.75,
+        "precision": 1.0
+      },
+      "prepared-meals": {
+        "support": 12,
+        "predicted": 9,
+        "recall": 0.75,
+        "precision": 1.0
+      },
+      "salty-snacks": {
+        "support": 2,
+        "predicted": 6,
+        "recall": 1.0,
+        "precision": 0.333
+      },
+      "sauces-condiments": {
+        "support": 11,
+        "predicted": 9,
+        "recall": 0.818,
+        "precision": 1.0
+      },
+      "seafood": {
+        "support": 4,
+        "predicted": 4,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "sodas": {
+        "support": 4,
+        "predicted": 6,
+        "recall": 1.0,
+        "precision": 0.667
+      },
+      "spreads": {
+        "support": 2,
+        "predicted": 2,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "supplements": {
+        "support": 2,
+        "predicted": 2,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "water-coffee-tea": {
+        "support": 3,
+        "predicted": 3,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "yogurt": {
+        "support": 3,
+        "predicted": 4,
+        "recall": 1.0,
+        "precision": 0.75
+      }
+    },
+    "confusions": [
+      [
+        "juices",
+        "sodas",
+        2
+      ],
+      [
+        "sauces-condiments",
+        "salty-snacks",
+        2
+      ],
+      [
+        "pasta-rice",
+        "canned-soups",
+        1
+      ],
+      [
+        "bread",
+        "cooking-baking",
+        1
+      ],
+      [
+        "prepared-meals",
+        "cookies-cakes",
+        1
+      ],
+      [
+        "canned-soups",
+        "salty-snacks",
+        1
+      ],
+      [
+        "deli-meats",
+        "meat",
+        1
+      ],
+      [
+        "cooking-baking",
+        "candy-chocolate",
+        1
+      ],
+      [
+        "prepared-meals",
+        "fruit-veg",
+        1
+      ],
+      [
+        "candy-chocolate",
+        "cookies-cakes",
+        1
+      ],
+      [
+        "canned-soups",
+        "fruit-veg",
+        1
+      ],
+      [
+        "prepared-meals",
+        "salty-snacks",
+        1
+      ],
+      [
+        "frozen-desserts",
+        "yogurt",
+        1
+      ]
+    ]
+  },
+  "missing": [],
+  "cost_usd": 0.0872,
+  "target": 0.9,
+  "against": "gold",
+  "labels": "200 products labelled by Claude Opus 5.5 (an AI model, not a person)"
+}
