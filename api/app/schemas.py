@@ -114,6 +114,8 @@ class Additive(Model):
     name: str
     function: str | None
     explainer: Explainer | None
+    # Open Food Facts marks it as a high overexposure risk (EFSA). Swaps never contain one.
+    flagged: bool
 
 
 class Ingredient(Model):
@@ -218,4 +220,52 @@ class StatsOverview(Model):
     top_additives: list[CountByKey]
     nutriscore_by_category: list[CategoryGrades]
     median_sugars_by_category: list[CategoryMedian]
+    source: Source
+
+
+class LabelIngredient(Ingredient):
+    """An ingredient as printed. `ingredient_id` is ours when we know the ingredient (and then
+    it may have an explainer), else `label:<rank>`."""
+
+
+class LabelRead(Model):
+    """What was read from the photos, per 100 g, with what LabelLens knows about it."""
+
+    name: str | None
+    brand: str | None
+    barcode: str | None
+    category_id: str
+    category_name: str | None
+    basis: Literal["per_100g", "per_serving", "unknown"]
+    serving_size_g: float | None
+    conversion_note: str | None
+    nutrition: Nutrition
+    ingredients: list[LabelIngredient]
+    additives: list[Additive]
+    unmatched_additives: list[str]
+
+
+class LabelMatch(Model):
+    how: Literal["barcode", "name"]
+    product: Product
+
+
+class LabelResponse(Model):
+    is_food_label: bool
+    label: LabelRead | None
+    match: LabelMatch | None
+    suggestions: list[Swap]
+    suggestions_kind: Literal["swaps", "category"] | None
+    source: Source
+
+
+class Ready(Model):
+    """What a demo needs to know before it starts. Builds the lazy services; no model call."""
+
+    ask_configured: bool
+    label_configured: bool
+    questions_left: int = Field(ge=0)
+    label_reads_left: int = Field(ge=0)
+    spent_today_usd: float = Field(ge=0)
+    daily_cap_usd: float
     source: Source

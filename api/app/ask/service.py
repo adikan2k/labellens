@@ -54,14 +54,15 @@ RATE_SQL = """
 select count(*) as n, min(created_at) as oldest,
        extract(epoch from (min(created_at) + interval '1 hour' - now())) as wait
 from app.ask_runs
-where client_hash = %s and created_at > now() - interval '1 hour'
+where client_hash = %s and kind = %s and created_at > now() - interval '1 hour'
 """
 SPENT_SQL = """
 select coalesce(sum(cost_usd), 0) as spent from app.ask_runs
 where created_at >= date_trunc('day', now(), 'UTC')
 """
 START_SQL = """
-insert into app.ask_runs (client_hash, model, prompt_version) values (%s, %s, %s) returning id
+insert into app.ask_runs (client_hash, model, prompt_version, kind) values (%s, %s, %s, %s)
+returning id
 """
 FINISH_SQL = """
 update app.ask_runs set outcome = %(outcome)s, input_tokens = %(input_tokens)s,
@@ -163,7 +164,7 @@ class AskService:
     def retry_after(self, who: str) -> int | None:
         """Seconds until this client may ask again, or None if it may ask now."""
         with self._conn() as conn:
-            row = conn.execute(RATE_SQL, [who]).fetchone()
+            row = conn.execute(RATE_SQL, [who, "ask"]).fetchone()
         if row and row["n"] >= self.limits.per_hour:
             return max(1, int(float(row["wait"] or 0)) + 1)
         return None
@@ -175,7 +176,7 @@ class AskService:
 
     def _start(self, who: str) -> int:
         with self._conn() as conn:
-            row = conn.execute(START_SQL, [who, self.agent.model, PROMPT_VERSION]).fetchone()
+            row = conn.execute(START_SQL, [who, self.agent.model, PROMPT_VERSION, "ask"]).fetchone()
         assert row
         return int(row["id"])
 

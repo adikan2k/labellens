@@ -28,7 +28,7 @@ const product = (over: Partial<Product>): Product => ({
     proteins_100g: 12.4,
   },
   additives: [
-    { additive_id: "en:e306", e_number: "E306", name: "Tocopherols", function: null, explainer: null },
+    { additive_id: "en:e306", e_number: "E306", name: "Tocopherols", function: null, explainer: null, flagged: false },
   ],
   ingredients: [],
   off_url: "https://world.openfoodfacts.org/product/0016000275287",
@@ -44,8 +44,8 @@ const honeyNut = product({
   nova_group: 4,
   nutrition: { ...cheerios.nutrition, energy_kcal_100g: 393, sugars_100g: 33, fiber_100g: null },
   additives: [
-    { additive_id: "en:e306", e_number: "E306", name: "Tocopherols", function: null, explainer: null },
-    { additive_id: "en:e330", e_number: "E330", name: "Citric acid", function: null, explainer: null },
+    { additive_id: "en:e306", e_number: "E306", name: "Tocopherols", function: null, explainer: null, flagged: false },
+    { additive_id: "en:e330", e_number: "E330", name: "Citric acid", function: null, explainer: null, flagged: false },
   ],
 });
 

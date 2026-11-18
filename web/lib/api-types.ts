@@ -135,6 +135,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/label": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read a food label from one or two photos, and explain it from the data
+         * @description Claude (the default model in config) reads the photos into structured data: name,
+         *     brand, barcode, nutrition as printed, ingredients and additives. LabelLens converts the
+         *     nutrition to per 100 g in code, adds its explainers and the Open Food Facts
+         *     overexposure flag, finds the product the label most likely is (by barcode, else by
+         *     brand and name when the words agree), and suggests swaps or well-graded products.
+         *
+         *     The photos go to Anthropic to be read and are not stored. Limits: 10 reads per IP per
+         *     hour, counted apart from questions; reads share the daily spend cap with /ask, and
+         *     past it this answers 503.
+         */
+        post: operations["readLabel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What a demo has left, after waking the lazy services
+         * @description Builds the ask agent and the label reader if they are not built yet (their libraries
+         *     are slow to import on a cold instance) and reports today's spend against the cap and
+         *     this IP's remaining questions and label reads this hour. No model call.
+         */
+        get: operations["getReady"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/mcp": {
         parameters: {
             query?: never;
@@ -260,6 +310,8 @@ export interface components {
              */
             function: string | null;
             explainer: components["schemas"]["Explainer"];
+            /** @description Open Food Facts marks it as a high overexposure risk (EFSA). Swaps never contain one. */
+            flagged: boolean;
         };
         Ingredient: {
             ingredient_id: string;
@@ -416,6 +468,53 @@ export interface components {
             /** @enum {string} */
             code: "timeout" | "tool_failed" | "internal";
             message: string;
+        };
+        /** @description An ingredient as printed. ingredient_id is ours when LabelLens knows the ingredient (it may then have an explainer), else label:<rank>. */
+        LabelIngredient: components["schemas"]["Ingredient"];
+        LabelRead: {
+            name: string | null;
+            brand: string | null;
+            /** @description Digits read from the photo */
+            barcode: string | null;
+            /** @description A leaf of the category taxonomy */
+            category_id: string;
+            category_name: string | null;
+            /** @enum {string} */
+            basis: "per_100g" | "per_serving" | "unknown";
+            serving_size_g: number | null;
+            /** @example Converted from per serving (30 g) to per 100 g. */
+            conversion_note: string | null;
+            nutrition: components["schemas"]["Nutrition"];
+            ingredients: components["schemas"]["LabelIngredient"][];
+            additives: components["schemas"]["Additive"][];
+            /** @description Additives read from the label that LabelLens has no entry for. */
+            unmatched_additives: string[];
+        };
+        LabelMatch: {
+            /** @enum {string} */
+            how: "barcode" | "name";
+            product: components["schemas"]["Product"];
+        };
+        LabelResponse: {
+            is_food_label: boolean;
+            label: components["schemas"]["LabelRead"] | null;
+            match: components["schemas"]["LabelMatch"] | null;
+            suggestions: components["schemas"]["Swap"][];
+            /**
+             * @description Swaps for the matched product, or well-graded products in the label's category.
+             * @enum {string|null}
+             */
+            suggestions_kind: "swaps" | "category" | null;
+            source: components["schemas"]["Source"];
+        };
+        Ready: {
+            ask_configured: boolean;
+            label_configured: boolean;
+            questions_left: number;
+            label_reads_left: number;
+            spent_today_usd: number;
+            daily_cap_usd: number;
+            source: components["schemas"]["Source"];
         };
     };
     responses: {
@@ -633,6 +732,76 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: components["responses"]["Unavailable"];
+        };
+    };
+    readLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** @description JPEG, PNG or WebP, by their bytes; 5 MB each at most. */
+                    images: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description The label as read, and what LabelLens adds. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelResponse"];
+                };
+            };
+            /** @description The upload is larger than two 5 MB photos. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["InvalidRequest"];
+            /** @description Label read limit reached for this IP. */
+            429: {
+                headers: {
+                    /** @description Seconds until another read is accepted. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            503: components["responses"]["Unavailable"];
+        };
+    };
+    getReady: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ready state. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ready"];
                 };
             };
             503: components["responses"]["Unavailable"];

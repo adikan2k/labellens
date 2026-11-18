@@ -87,8 +87,9 @@ describe("AdditiveList", () => {
       name: "Citric acid",
       function: "Antioxidant, sequestrant",
       explainer: null,
+      flagged: false,
     },
-    { additive_id: "en:e999", e_number: "E999", name: "Quillaia extract", function: null, explainer: null },
+    { additive_id: "en:e999", e_number: "E999", name: "Quillaia extract", function: null, explainer: null, flagged: false },
   ];
 
   test("rows expand to show what the additive does", () => {

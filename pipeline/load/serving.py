@@ -174,6 +174,9 @@ create table if not exists app.ask_runs (
     replay boolean not null default false,
     refused boolean not null default false
 );
+-- What the run was: a question ('ask') or a label photo read ('label'). Each kind has its
+-- own hourly limit; all kinds share the daily spend cap.
+alter table app.ask_runs add column if not exists kind text not null default 'ask';
 create index if not exists ask_runs_client on app.ask_runs (client_hash, created_at);
 create index if not exists ask_runs_created on app.ask_runs (created_at);
 """
@@ -617,6 +620,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--database-url", help="default: DATABASE_URL from the environment or .env")
     parser.add_argument("--dry-run", action="store_true", help="print the size estimate only")
     parser.add_argument("--replace", action="store_true", help="drop the live tables first")
+    parser.add_argument(
+        "--app-only",
+        action="store_true",
+        help="only create or update the API's own tables (app.*); no data is loaded",
+    )
     args = parser.parse_args(argv)
 
     if args.dry_run:
@@ -636,6 +644,11 @@ def main(argv: list[str] | None = None) -> int:
     if not url:
         print("No database: set DATABASE_URL in .env or pass --database-url.", file=sys.stderr)
         return 1
+    if args.app_only:
+        with psycopg.connect(url, autocommit=True, prepare_threshold=None) as pg:
+            pg.execute(cast("LiteralString", APP_DDL))
+        print("App tables are up to date.")
+        return 0
     load(args.duckdb, url, replace=args.replace)
     return 0
 

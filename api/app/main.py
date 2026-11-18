@@ -7,19 +7,22 @@ thread pool. psycopg's async mode needs a selector event loop, which Windows doe
 default, so sync keeps local development working everywhere.
 """
 
+import hashlib
 import logging
 import platform
 import threading
 import time
 from collections.abc import Callable, Iterator
 from contextlib import asynccontextmanager
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends, FastAPI, Path, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import SecretStr
+from starlette.concurrency import run_in_threadpool
+from starlette.datastructures import UploadFile as StarletteUpload
 from starlette.exceptions import HTTPException
 
 from api.app import graph as graph_module
@@ -29,13 +32,16 @@ from api.app import swaps as swaps_module
 from api.app.ask import service as ask_module
 from api.app.config import Settings, get_settings
 from api.app.db import UNAVAILABLE, Database, DatabaseNotConfigured, DictConnection
+from api.app.label import images as label_images
 from api.app.mcp.server import create_mcp
 from api.app.schemas import (
     AskRequest,
     Error,
     GraphNeighborhood,
     Health,
+    LabelResponse,
     ProductResponse,
+    Ready,
     SearchResponse,
     Source,
     StatsOverview,
@@ -47,37 +53,45 @@ API_VERSION = "0.3.0"
 WAKING_UP = "Search is waking up. Try again in a few seconds."
 GRAPH_UNAVAILABLE = "The graph is waking up or being reloaded. Try again in a minute."
 ASK_NOT_CONFIGURED = "The ask agent is not configured."
+LABEL_NOT_CONFIGURED = "The label reader is not configured."
 # Uvicorn's own logger, so these lines reach Cloud Run's log without logging setup of our own.
 log = logging.getLogger("uvicorn.error")
 
 
-class LazyAsk:
-    """The ask service, built on the first /ask rather than at startup.
+class Lazy:
+    """A service built on first use rather than at startup: the ask agent and the label reader.
 
-    Its libraries (anthropic, langfuse with OpenTelemetry) take seconds to import, and on a
+    Their libraries (anthropic, langfuse with OpenTelemetry) take seconds to import, and on a
     fresh Cloud Run instance far longer: an hour-idle cold start spent 16 s in startup
-    (evals/results/cold_start.md). A search never needs them, so only the first question
-    after a quiet spell pays."""
+    (evals/results/cold_start.md). A search never needs them, so only the first question or
+    label after a quiet spell pays (or GET /ready, which builds both on purpose)."""
 
-    def __init__(self, build: Callable[[], ask_module.AskService | None]) -> None:
+    def __init__(
+        self,
+        name: str,
+        build: Callable[[], Any],
+        close: Callable[[Any], None] = lambda service: None,
+    ) -> None:
+        self._name = name
         self._build = build
+        self._close = close
         self._lock = threading.Lock()
         self._built = False
-        self._service: ask_module.AskService | None = None
+        self._service: Any = None
 
-    def get(self) -> ask_module.AskService | None:
+    def get(self) -> Any:
         if not self._built:
             with self._lock:
                 if not self._built:
                     started = time.perf_counter()
                     self._service = self._build()
                     self._built = True
-                    log.info("Ask service ready in %.2f s", time.perf_counter() - started)
+                    log.info("%s ready in %.2f s", self._name, time.perf_counter() - started)
         return self._service
 
     def close(self) -> None:
         if self._service is not None:
-            self._service.readonly.close()
+            self._close(self._service)
 
 
 def get_connection(request: Request) -> Iterator[DictConnection]:
@@ -102,7 +116,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.graph = graph_module.Graph.open(
                 settings.neo4j_uri, settings.neo4j_user, password
             )
-        app.state.ask = LazyAsk(lambda: _open_ask(app, settings))
+        app.state.ask = Lazy(
+            "Ask service", lambda: _open_ask(app, settings), lambda s: s.readonly.close()
+        )
+        app.state.label = Lazy("Label reader", lambda: _open_label(app, settings))
         try:
             # A mounted route's own lifespan never runs, so the MCP session manager runs here.
             async with app.state.mcp.server.session_manager.run():
@@ -112,6 +129,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.db.close()
             app.state.graph.close()
             app.state.ask.close()
+            app.state.label.close()
 
     app = FastAPI(title="LabelLens API", version=API_VERSION, lifespan=lifespan)
     # The MCP server reads app.state.db per call; the pool opens in the lifespan.
@@ -258,6 +276,101 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
         )
 
+    @app.post(
+        "/label",
+        response_model=LabelResponse,
+        responses={
+            413: {"model": Error},
+            422: {"model": Error},
+            429: {"model": Error},
+            503: {"model": Error},
+        },
+        openapi_extra={
+            "requestBody": {
+                "required": True,
+                "content": {
+                    "multipart/form-data": {
+                        "schema": {
+                            "type": "object",
+                            "required": ["images"],
+                            "properties": {
+                                "images": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "maxItems": label_images.MAX_IMAGES,
+                                    "items": {"type": "string", "format": "binary"},
+                                }
+                            },
+                        }
+                    }
+                },
+            }
+        },
+    )
+    async def label(request: Request) -> Any:
+        service = await run_in_threadpool(request.app.state.label.get)
+        if service is None:
+            raise HTTPException(503, LABEL_NOT_CONFIGURED)
+        length = int(request.headers.get("content-length") or 0)
+        if length > label_images.MAX_IMAGES * label_images.MAX_BYTES + 64 * 1024:
+            return error(request, 413, "The photos are too large. Each must be under 5 MB.")
+        peer = request.client.host if request.client else None
+        address = ask_module.client_address(request.headers.get("x-forwarded-for"), peer)
+        who = ask_module.client_hash(service.hash_key, address)
+        wait = await run_in_threadpool(service.retry_after, who)
+        if wait is not None:
+            minutes = max(1, round(wait / 60))
+            limited = error(
+                request,
+                429,
+                f"That's {service.limits.per_hour} labels this hour from here. "
+                f"Try again in about {minutes} minute{'s' if minutes != 1 else ''}.",
+            )
+            limited.headers["Retry-After"] = str(wait)
+            return limited
+        try:
+            form = await request.form(max_files=label_images.MAX_IMAGES + 1, max_fields=4)
+            files = [f for f in form.getlist("images") if isinstance(f, StarletteUpload)]
+            data = [await f.read(label_images.MAX_BYTES + 1) for f in files]
+            images = label_images.check(data)
+        except label_images.ImageError as problem:
+            return error(request, 422, str(problem))
+        except Exception:  # not multipart, or more files than allowed
+            return error(request, 422, "Send one or two photos as the form field 'images'.")
+        from api.app.label.service import LabelError, OverCap
+
+        try:
+            return await run_in_threadpool(service.read, images, who)
+        except OverCap as over:
+            return error(request, 503, str(over))
+        except LabelError as failure:
+            return error(request, failure.status, str(failure))
+
+    @app.get("/ready", responses={503: {"model": Error}})
+    def ready(request: Request, conn: Conn) -> Ready:
+        """For a demo's warm-up: builds the lazy services and says what is left today."""
+        ask_service = request.app.state.ask.get()
+        label_service = request.app.state.label.get()
+        database_url = _secret(settings.database_url) or ""
+        peer = request.client.host if request.client else None
+        address = ask_module.client_address(request.headers.get("x-forwarded-for"), peer)
+        who = ask_module.client_hash(client_hash_key(database_url), address)
+
+        def used(kind: str) -> int:
+            row = conn.execute(ask_module.RATE_SQL, [who, kind]).fetchone()
+            return int(row["n"]) if row else 0
+
+        spent = conn.execute(ask_module.SPENT_SQL).fetchone()
+        return Ready(
+            ask_configured=ask_service is not None,
+            label_configured=label_service is not None,
+            questions_left=max(0, settings.ask_rate_limit_per_hour - used("ask")),
+            label_reads_left=max(0, settings.label_rate_limit_per_hour - used("label")),
+            spent_today_usd=round(float(spent["spent"]) if spent else 0.0, 4),
+            daily_cap_usd=settings.ask_daily_spend_cap_usd,
+            source=source(request),
+        )
+
     @app.get("/stats/overview", responses={503: {"model": Error}})
     def stats(request: Request, response: Response, conn: Conn) -> StatsOverview:
         doc = products.get_stats(conn)
@@ -269,10 +382,47 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     return app
 
 
+def client_hash_key(database_url: str) -> bytes:
+    """The key for the keyed hash of client addresses; it never leaves the server."""
+    return hashlib.sha256(b"labellens-ask-client|" + database_url.encode()).digest()
+
+
+def _secret(value: SecretStr | None) -> str | None:
+    return value.get_secret_value() if value else None
+
+
+def _open_label(app: FastAPI, settings: Settings) -> Any:
+    """The label reader, or None without a model key or database."""
+    import anthropic
+
+    from api.app.ask.tracing import Tracer
+    from api.app.label.service import LabelLimits, LabelService
+
+    database_url = _secret(settings.database_url)
+    client = getattr(app.state, "label_client", None)
+    if client is None and settings.anthropic_api_key:
+        client = anthropic.Anthropic(api_key=_secret(settings.anthropic_api_key), max_retries=1)
+    if client is None or not database_url:
+        return None
+    tracer = getattr(app.state, "tracer", None) or Tracer.from_keys(
+        settings.langfuse_public_key,
+        _secret(settings.langfuse_secret_key),
+        settings.langfuse_base_url,
+    )
+    db = app.state.db
+    return LabelService(
+        db=db,
+        client=client,
+        model=settings.model_default,
+        tracer=tracer,
+        limits=LabelLimits(settings.label_rate_limit_per_hour, settings.ask_daily_spend_cap_usd),
+        hash_key=client_hash_key(database_url),
+        snapshot=lambda: Source(snapshot_date=db.snapshot_date()).model_dump(mode="json"),
+    )
+
+
 def _open_ask(app: FastAPI, settings: Settings) -> ask_module.AskService | None:
     """The ask service, or None without a model key, database or read-only database."""
-    import hashlib
-
     import anthropic
 
     from api.app.ask.agent import Agent
@@ -309,8 +459,7 @@ def _open_ask(app: FastAPI, settings: Settings) -> ask_module.AskService | None:
             settings.ask_daily_spend_cap_usd,
             settings.ask_timeout_seconds,
         ),
-        # A keyed hash of the client address; the key never leaves the server.
-        hash_key=hashlib.sha256(b"labellens-ask-client|" + database_url.encode()).digest(),
+        hash_key=client_hash_key(database_url),
         replays=getattr(app.state, "ask_replays", None) or ask_module.load_replays(),
         snapshot=lambda: Source(snapshot_date=db.snapshot_date()).model_dump(mode="json"),
     )
