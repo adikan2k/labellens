@@ -49,10 +49,24 @@ Both platforms had scaled down by then too, yet the first request took a sixth o
 The likeliest difference is that the instance landed on a host that still had the image's
 files cached.
 
-## What would fix it
+## The fix: the ask agent loads on the first question
 
-- Load the ask agent's libraries on the first `/ask`, not at startup, so a search never waits
-  for them. It costs nothing, and only the first question after a quiet spell pays it.
-- A minimum of one instance removes the cold start entirely but bills every hour.
+Since revision `labellens-api-00018-vng` (PR #19), the ask service is built on the first
+`/ask`, not at startup, so a search never waits for its libraries. Startup now logs its own
+duration (`Startup took …`), and the first question logs the build (`Ask service ready in …`).
 
-Neither is done yet. Proving either one needs another hour idle.
+| Startup step (Cloud Run log) | Revision | Time |
+| --- | --- | ---: |
+| Scale from zero after 67 minutes idle, 19:50 | 00017 | 16.0 s |
+| Scale from zero, 18:43 | 00017 | 4.6 s |
+| First instance of the new revision, 20:16 | 00018 | 0.41 s |
+
+The startup step no longer imports the ask agent's libraries. A test checks this in a fresh
+interpreter, and it fails on the old startup with `['anthropic']`. Not yet measured: a full
+hour-idle cold start on revision 00018. The 6.3 s for Cloud Run to start an instance and
+import the app is unchanged, so expect roughly 7 s, not 22 s. To confirm, time the same
+three searches with `curl -w "%{time_total}"` after an hour with no requests. The first question after a quiet spell
+now pays the library load instead of the first search.
+
+A minimum of one instance would remove the cold start entirely but bills every hour; it is
+not needed unless the remeasure disappoints.

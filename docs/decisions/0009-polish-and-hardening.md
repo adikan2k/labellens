@@ -100,6 +100,9 @@ After 67 minutes with no requests, the first search took 22.6 s, then 0.1 s. Aft
 - **Where the time went:** 6.3 s for Cloud Run to start an instance, 16.0 s in the app's startup step, and 0.2 s for the search with Neon waking. Neon was never the problem.
 - **Likely cause:** startup imports the ask agent's libraries (`anthropic`, `langfuse` with OpenTelemetry), which a search never needs. Locally they take 3.5 s warm, and a fresh Cloud Run host reads the image's files on demand. The startup step logs no timings, so this is not yet proven.
 
+- **Fix (PR #19):** the ask service is built on the first `/ask`. On revision 00018 the startup step took 0.41 s, against 4.6 s and 16.0 s on revision 00017's starts from zero.
+- **Rejected:** a minimum of one instance, which removes cold starts but bills every hour. Kept as the fallback.
+
 ## Still open
 
-- Bring the cold start down: load the ask agent's libraries on the first `/ask` instead of at startup, then time another hour idle. A minimum instance is the fallback, but it bills every hour.
+- Time a full hour-idle cold start on revision 00018. The expected figure is about 7 s (instance start and app import, 6.3 s, are unchanged).
