@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { GradeChip, Panel, Rule } from "@/components/label/primitives";
@@ -21,12 +20,25 @@ export const NOT_IN_GRAPH =
  * selected node, and the same nodes as a list, so everything works by keyboard and screen
  * reader too (the WebGL canvas itself is hidden from assistive technology).
  */
-export function GraphExplorer({ code }: { code: string }) {
-  const router = useRouter();
-  const [outcome, setOutcome] = useState<Outcome | null>(null);
+export function GraphExplorer({
+  code: firstCode,
+  initial = null,
+}: {
+  code: string;
+  /** The neighbourhood fetched while the server rendered the page, so the first draw waits for nothing. */
+  initial?: GraphNeighborhood | null;
+}) {
+  // Re-centring stays in the browser: the address changes with history.pushState and only the
+  // neighbourhood is fetched, without a server render of the page.
+  const [code, setCode] = useState(firstCode);
+  const [outcome, setOutcome] = useState<Outcome | null>(
+    initial ? { code: firstCode, data: initial } : null,
+  );
   const [selection, setSelection] = useState<{ code: string; node: string } | null>(null);
+  const loaded = outcome?.code === code;
 
   useEffect(() => {
+    if (loaded) return;
     const controller = new AbortController();
     getNeighborhood(code, { depth: 2, signal: controller.signal }).then(
       (data) => setOutcome({ code, data }),
@@ -37,7 +49,16 @@ export function GraphExplorer({ code }: { code: string }) {
       },
     );
     return () => controller.abort();
-  }, [code]);
+  }, [code, loaded]);
+
+  useEffect(() => {
+    const onBack = () => {
+      const previous = new URLSearchParams(window.location.search).get("code");
+      setCode(previous || firstCode);
+    };
+    window.addEventListener("popstate", onBack);
+    return () => window.removeEventListener("popstate", onBack);
+  }, [firstCode]);
 
   const current = outcome?.code === code ? outcome : null;
   if (!current) {
@@ -61,7 +82,9 @@ export function GraphExplorer({ code }: { code: string }) {
   const node = data.nodes.find((n) => n.id === selected) ?? data.nodes[0];
   const recenter = (nodeId: string) => {
     const next = productCode(nodeId);
-    if (next && next !== code) router.push(`/graph?code=${next}`);
+    if (!next || next === code) return;
+    window.history.pushState(null, "", `/graph?code=${next}`);
+    setCode(next);
   };
 
   return (

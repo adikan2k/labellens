@@ -72,12 +72,10 @@ describe("graph view", () => {
 });
 
 const api = vi.hoisted(() => ({ getNeighborhood: vi.fn() }));
-const router = vi.hoisted(() => ({ push: vi.fn() }));
 vi.mock("@/lib/api", async (original) => ({
   ...(await original<typeof import("@/lib/api")>()),
   getNeighborhood: api.getNeighborhood,
 }));
-vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("./graph-canvas", () => ({ GraphCanvas: () => <div data-testid="graph-canvas" /> }));
 
 const { GraphExplorer, NOT_IN_GRAPH } = await import("./graph-explorer");
@@ -86,7 +84,6 @@ const { ApiError } = await import("@/lib/api");
 afterEach(() => {
   cleanup();
   api.getNeighborhood.mockReset();
-  router.push.mockReset();
 });
 
 describe("GraphExplorer", () => {
@@ -111,13 +108,24 @@ describe("GraphExplorer", () => {
     expect(within(panel).getByText("Written by AI from Open Food Facts data.")).toBeTruthy();
   });
 
-  test("another product can become the centre", async () => {
+  test("another product becomes the centre without a page load", async () => {
     api.getNeighborhood.mockResolvedValue(DATA);
+    const push = vi.spyOn(window.history, "pushState");
     render(<GraphExplorer code="1" />);
     await screen.findByRole("region", { name: "Selected node" });
     fireEvent.click(screen.getByRole("button", { name: "Wheaties" }));
     fireEvent.click(screen.getByRole("button", { name: "Centre the graph here" }));
-    expect(router.push).toHaveBeenCalledWith("/graph?code=2");
+    expect(push).toHaveBeenCalledWith(null, "", "/graph?code=2");
+    await waitFor(() =>
+      expect(api.getNeighborhood).toHaveBeenLastCalledWith("2", expect.objectContaining({ depth: 2 })),
+    );
+    push.mockRestore();
+  });
+
+  test("data fetched on the server is drawn without another request", () => {
+    render(<GraphExplorer code="1" initial={DATA} />);
+    expect(screen.getByRole("region", { name: "Selected node" })).toBeTruthy();
+    expect(api.getNeighborhood).not.toHaveBeenCalled();
   });
 
   test("a product the graph does not hold says so and links to its page", async () => {

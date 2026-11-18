@@ -20,6 +20,10 @@ type SigmaLike = {
   getNodeDisplayData: (node: string) => { x: number; y: number } | undefined;
 };
 
+// Start downloading Sigma as soon as this module loads in the browser, not after the data
+// arrives, so the two overlap. (WebGL cannot run on the server.)
+const sigmaModule = typeof window === "undefined" ? null : import("sigma");
+
 function cssMs(name: string, fallback: number): number {
   const value = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
   return Number.isFinite(value) ? value : fallback;
@@ -43,7 +47,7 @@ export function GraphCanvas({ data, selected, onSelect }: Props) {
     let cancelled = false;
     const graph = toGraph(data, readTokens());
     layout(graph, data.center);
-    void import("sigma").then(({ default: Sigma, DEFAULT_STYLES }) => {
+    void (sigmaModule ?? import("sigma")).then(({ default: Sigma, DEFAULT_STYLES }) => {
       if (cancelled || !container.current) return;
       const instance = new Sigma(graph, container.current, {
         settings: {
