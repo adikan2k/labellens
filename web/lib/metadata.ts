@@ -30,6 +30,16 @@ export function productTitle(product: Pick<Product, "name" | "brand">): string {
   return product.brand ? `${name} (${product.brand})` : name;
 }
 
+export const COMPARE_TITLE = "Compare products";
+
+/** "Cheerios vs Honey Nut Cheerios", or "Compare Cheerios" while the second is being picked. */
+export function compareTitle(products: Pick<Product, "name">[]): string {
+  const names = products.map((p) => p.name ?? UNNAMED);
+  if (names.length >= 2) return `${names[0]} vs ${names[1]}`;
+  if (names.length === 1) return `Compare ${names[0]}`;
+  return COMPARE_TITLE;
+}
+
 /** "Nutrition, additives and ingredients for Lucky Charms, from Open Food Facts." */
 export function productDescription(product: Pick<Product, "name">): string {
   return `Nutrition, additives and ingredients for ${product.name ?? "this product"}, from Open Food Facts.`;

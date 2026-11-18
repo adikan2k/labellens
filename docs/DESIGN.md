@@ -151,6 +151,41 @@ The product count in the placeholder comes from `/stats/overview`, never hard-co
 
 On phones the panel moves under the name, and swaps follow it.
 
+### Compare
+
+Two products in one label panel, no wider than the reading width (`max-w-measure`), so each value stays close to its label. Reached from a product page ("Compare with another product") or from a swap ("Compare"); the URL is `/compare?codes=A,B`.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ Compare                                          (title)   │
+│ ┌ panel ───────────────────────────────────────────────┐   │
+│ │ ████████████████████████████████████ rule-heavy       │   │
+│ │              Cheerios              Honey Nut Cheerios │   │
+│ │              General Mills         General Mills      │   │
+│ │              [ A ]                 [ C ]              │   │
+│ │ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ rule-medium      │   │
+│ │ Per 100 g                                             │   │
+│ │ Energy           376 kcal          393 kcal           │   │
+│ │                                    17 kcal more       │   │
+│ │ ─ rule-thin between rows, rule-medium between groups  │   │
+│ │ ...                                                   │   │
+│ │ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ rule-medium      │   │
+│ │ Processing       NOVA 1             NOVA 4            │   │
+│ │ Additives        1                  4                 │   │
+│ │ Ingredients      6                  12                │   │
+│ │ ████████████████████████████████████ rule-heavy       │   │
+│ └───────────────────────────────────────────────────────┘   │
+│ Additives                                       (heading)  │
+│  In both · Only in Cheerios · Only in Honey Nut Cheerios   │
+└────────────────────────────────────────────────────────────┘
+```
+
+- Three columns at every width: row label, then each product. Values are right aligned in tabular figures; at 375 px names and long labels wrap, values do not.
+- Under the second product's value, in `type-small` `ink-muted`, its difference from the first ("6 g less", "Same"). Facts only: nothing is called better or worse except by the Nutri-Score grade itself.
+- A missing value reads "Not listed", as on the product page, and has no difference.
+- With one product picked, the second column is a search box for the other.
+- No motion: "the label prints" belongs to the product page.
+
 ### Dashboard
 
 A two-column grid of charts, each inside a panel opened by `rule-heavy` with its finding as the heading ("Most US cereals score C or worse"). One chart per question. Charts are black bars and lines; Nutri-Score colours only on Nutri-Score charts.

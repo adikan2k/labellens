@@ -179,12 +179,19 @@ describe("SwapList and no-swap reasons", async () => {
   };
 
   test("each swap links to its product with name, brand, grade and reason", () => {
-    render(<SwapList swaps={[swap]} />);
-    const link = screen.getByRole("link", { name: /Plain Cheerios/ });
+    render(<SwapList swaps={[swap]} from="0016000275287" />);
+    const link = screen.getByRole("link", { name: /^Plain Cheerios/ });
     expect(link.getAttribute("href")).toBe("/product/0016000124790");
     expect(within(link).getByText("General Mills")).toBeTruthy();
     expect(within(link).getByText(swap.reason)).toBeTruthy();
     expect(within(link).getByRole("img", { name: "Nutri-Score A" })).toBeTruthy();
+  });
+
+  test("each swap also compares with the product being viewed, beside its link", () => {
+    const { container } = render(<SwapList swaps={[swap]} from="0016000275287" />);
+    const compare = screen.getByRole("link", { name: "Compare with Plain Cheerios" });
+    expect(compare.getAttribute("href")).toBe("/compare?codes=0016000275287,0016000124790");
+    expect(container.querySelector("a a")).toBeNull(); // links never nest
   });
 
   test("an empty list says which rule left nothing", () => {

@@ -7,24 +7,9 @@ import { DataRow } from "@/components/label/primitives";
 import type { Nutrition } from "@/lib/api";
 import { missingValues } from "@/lib/copy";
 import { formatEnergy, formatGrams } from "@/lib/format";
+import { GROUPS, type NutritionRow } from "@/lib/nutrition";
 
-type Key = keyof Nutrition;
-type Row = { key: Key; label: string; noun: string; indent?: boolean };
-
-// US label order, grouped: rule-medium between groups, rule-thin between rows (DESIGN.md).
-export const GROUPS: Row[][] = [
-  [{ key: "energy_kcal_100g", label: "Energy", noun: "energy" }],
-  [
-    { key: "fat_100g", label: "Fat", noun: "fat" },
-    { key: "saturated_fat_100g", label: "Saturated fat", noun: "saturated fat", indent: true },
-  ],
-  [{ key: "salt_100g", label: "Salt", noun: "salt" }],
-  [
-    { key: "fiber_100g", label: "Fiber", noun: "fiber" },
-    { key: "sugars_100g", label: "Sugars", noun: "sugar" },
-  ],
-  [{ key: "proteins_100g", label: "Protein", noun: "protein" }],
-];
+type Row = NutritionRow;
 
 // "The label prints" (DESIGN.md section 3). Times in seconds; the sequence ends by 0.9 s.
 const EASE_OUT = [0.2, 0, 0, 1] as const;
