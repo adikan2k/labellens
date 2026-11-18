@@ -40,6 +40,18 @@ from pipeline.enrich import categories, core
 
 ROOT = Path(__file__).resolve().parents[2]
 GOLD = ROOT / "evals" / "datasets" / "category_gold.csv"
+# Labels written by Claude Opus 5.5 from the same sample and category definitions, without
+# seeing the evaluated model's answers. An AI's labels, so reports say so: agreement with a
+# stronger model, not accuracy against a person.
+SILVER = ROOT / "evals" / "datasets" / "category_silver_opus.csv"
+LABELS = {
+    "gold": (GOLD, "200 products labelled by hand"),
+    "silver": (SILVER, "200 products labelled by Claude Opus 5.5 (an AI model, not a person)"),
+    "audit": (
+        ROOT / "evals" / "datasets" / "category_audit_human.csv",
+        "30 of the 200 labelled by hand, blind to the AI labels (scripts/audit_labels.py)",
+    ),
+}
 CACHE = ROOT / "evals" / "cache" / "categories.jsonl"
 RESULTS = ROOT / "evals" / "results"
 TARGET = 0.90
@@ -111,6 +123,7 @@ class Report:
     cost_usd: float = 0.0
     target: float = TARGET
     against: str = "gold"  # "gold": your labels (accuracy); "tags": OFF's tags (agreement)
+    labels: str = ""  # who made the labels
 
 
 def _table(s: Scores) -> str:
@@ -120,7 +133,7 @@ def _table(s: Scores) -> str:
 def to_markdown(report: Report, names: dict[str, str]) -> str:
     o = report.overall
     gold = report.against == "gold"
-    truth = "Gold label" if gold else "Tag category"
+    truth = "Label" if gold else "Tag category"
     verdict = "meets" if o.accuracy >= report.target else "misses"
     lines = [
         f"# Category {'accuracy' if gold else 'agreement with tags'}: {report.label}",
@@ -128,10 +141,11 @@ def to_markdown(report: Report, names: dict[str, str]) -> str:
         f"Measured {report.measured_at}: `{report.model}`, prompt `{report.prompt_version}`, "
         f"inputs: {report.inputs}. Cost ${report.cost_usd:.4f} (0 when every answer was "
         "cached).",
+        *(["", f"Labels: {report.labels}."] if report.labels else []),
         "",
         "| | Accuracy |" if gold else "| | Agreement |",
         "| --- | ---: |",
-        f"| **All {'gold products' if gold else 'sampled products'}** | **{_table(o)}** |",
+        f"| **All {'labelled products' if gold else 'sampled products'}** | **{_table(o)}** |",
     ]
     for name, s in report.halves.items():
         lines.append(f"| {name} half | {_table(s)} |")
@@ -166,7 +180,7 @@ def to_markdown(report: Report, names: dict[str, str]) -> str:
         "",
         "## By category",
         "",
-        f"| Category | {'Gold products' if gold else 'Sampled products'} | Recall | Precision |",
+        f"| Category | {'Labelled' if gold else 'Sampled'} products | Recall | Precision |",
         "| --- | ---: | ---: | ---: |",
         *[
             f"| {names.get(k, k)} | {v['support']} | {v['recall']:.0%} | {v['precision']:.0%} |"
@@ -186,6 +200,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--model", choices=["default", "eval"], default="default")
     parser.add_argument("--name-only", action="store_true", help="leave out the ingredients")
     parser.add_argument("--tagged-sample", type=int, help="agreement with tags on N products")
+    parser.add_argument(
+        "--labels",
+        choices=list(LABELS),
+        default="gold",
+        help="gold: your hand labels; silver: Claude Opus 5.5's labels (reported as such)",
+    )
     parser.add_argument("--duckdb", type=Path, default=categories.DUCKDB_PATH)
     parser.add_argument("--out-dir", type=Path, default=RESULTS)
     args = parser.parse_args(argv)
@@ -210,8 +230,10 @@ def main(argv: list[str] | None = None) -> int:
             )
         name_only, label_suffix = True, f"tagged{args.tagged_sample}"
     else:
-        truth = load_gold()
+        truth = load_gold(LABELS[args.labels][0])
         name_only, label_suffix = args.name_only, ("name-only" if args.name_only else "full")
+        if args.labels != "gold":
+            label_suffix += f"-{args.labels}"
 
     items = categories.load_items(
         args.duckdb, codes=list(truth), untagged_only=False, name_only=name_only
@@ -246,6 +268,7 @@ def main(argv: list[str] | None = None) -> int:
         missing=[c for c in truth if c not in predicted],
         cost_usd=round(summary.cost, 4),
         against="tags" if args.tagged_sample else "gold",
+        labels="" if args.tagged_sample else LABELS[args.labels][1],
     )
     if not args.tagged_sample:
         report.halves = {
@@ -262,10 +285,10 @@ def main(argv: list[str] | None = None) -> int:
             )
         tagged = [c for c in found if tags.get(c)]
         report.by_tags = {
-            "Gold products Open Food Facts' tags place": score(
+            "Products Open Food Facts' tags place": score(
                 [(truth[c], predicted[c]) for c in tagged]
             ),
-            "Gold products they do not (what the fill is for)": score(
+            "Products they do not (what the fill is for)": score(
                 [(truth[c], predicted[c]) for c in found if not tags.get(c)]
             ),
         }

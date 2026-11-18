@@ -53,7 +53,7 @@ def test_markdown_reports_the_verdict_and_tables() -> None:
         tag_baseline=acc.score(pairs[:5]),
     )
     text = acc.to_markdown(report, {"milk": "Milk, cream and plant milks", "cheese": "Cheese"})
-    assert "| **All gold products** | **90.0% (9/10)** |" in text
+    assert "| **All labelled products** | **90.0% (9/10)** |" in text
     assert "This run **meets** it." in text
     assert "| Milk, cream and plant milks | Cheese | 1 |" in text
     assert "Baseline: Open Food Facts' tags" in text
