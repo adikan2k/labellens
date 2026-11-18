@@ -1,6 +1,6 @@
 # 0009: Polish and hardening (phase 7)
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18. Phase 7.
+Status: accepted. Date: 2026-11-18. Phase 7.
 
 Phase 7 followed a review of everything built so far. The engineering was strong, but the presentation was weak, and a few problems were visible to users. It ran as five parallel pieces of work (PRs #10–#14): data, website, operations, prompt caching and eval intervals. Human category labels were left out by choice.
 

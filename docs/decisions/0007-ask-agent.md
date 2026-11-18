@@ -1,6 +1,6 @@
 # 0007: The ask agent (phase 5)
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18. Phase 5.
+Status: accepted. Date: 2026-11-18. Phase 5.
 
 ## A hand-written loop, not a framework
 
@@ -56,17 +56,19 @@ Status: draft for Aditya to rewrite. Date: 2026-11-18. Phase 5.
 - The agent is compared with a baseline that has only `search_explainers` (the retrieval-only design).
 - Sonnet 5.5 judges each fact as supported or not, with structured output.
 
-**Result (`ask-v2`):**
+**Result (`ask-v2`, with 95% intervals added in phase 7):**
 
 | | Agent | Baseline |
 | --- | --- | --- |
-| Fact score | 0.98 | 0.26 |
-| Fully correct | 42/43 | 11/43 |
+| Fact score | 0.98 (0.93–1.00) | 0.26 (0.14–0.40) |
+| Fully correct | 42/43 (88–100%) | 11/43 (15–40%) |
 | Expected tool | 43/43 | 10/43 |
 | Cost, 50 questions | $0.044 | $0.015 |
-| p50 / p95 latency | 2.5 s / 4.6 s | 1.3 s / 2.7 s |
+| p50 / p95 latency | 2.6 s / 4.6 s | 1.3 s / 2.8 s |
 
-Explainer questions score 1.00 for both, as they should. The gap is all SQL and graph.
+Explainer questions score 1.00 for both, as they should. The gap is all SQL and graph. The intervals don't come close to touching, so the gap isn't noise from a small sample.
+
+The cost is from before prompt caching (decision 0009), which made a run 64% cheaper. When phase 7's category changes moved six truth facts, only those six questions were rerun; the score stayed 0.98.
 
 **What the first run taught (`ask-v1`, 0.88):**
 - The replays listed one product twice (separate barcodes, same name). A prompt rule alone didn't hold from run to run. What held was showing `distinct on (name, brand)` in the tool's example query.
