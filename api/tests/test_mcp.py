@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import AsyncIterator, Iterator
+from pathlib import Path
 from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
 from mcp import Client
+from mcp.server.apps import APP_MIME_TYPE
 from psycopg.rows import dict_row
 
 from api.app import swaps as swaps_module
@@ -15,7 +18,7 @@ from api.app.additives import normalise
 from api.app.config import Settings
 from api.app.db import Database, DictConnection
 from api.app.main import create_app
-from api.app.mcp.server import McpApp, create_mcp
+from api.app.mcp.server import CARD_URI, FONT_HOSTS, McpApp, create_mcp
 
 WEB = "https://labellens.test"
 MODERN = "2026-07-28"
@@ -192,6 +195,53 @@ def test_an_e_number_without_its_suffix_finds_its_family() -> None:
 async def test_unknown_additive_suggests_what_to_try(client: Client) -> None:
     result = await client.call_tool("explain_additive", {"additive": "zzqqxx"})
     assert result.is_error and "E-number" in text(result)
+
+
+# --- The card (MCP Apps) -------------------------------------------------------------------
+
+CARD = (Path(__file__).parents[1] / "app" / "mcp" / "card.html").read_text("utf-8")
+DESIGN = (Path(__file__).parents[2] / "docs" / "DESIGN.md").read_text("utf-8")
+
+
+@pytest.mark.anyio
+async def test_label_tools_link_the_card_and_text_tools_do_not(client: Client) -> None:
+    tools = {t.name: t for t in (await client.list_tools()).tools}
+    for name in ("get_product", "find_swaps"):
+        assert (tools[name].meta or {}).get("ui") == {"resourceUri": CARD_URI}, name
+    for name in ("search_products", "explain_additive"):
+        assert "ui" not in (tools[name].meta or {}), name
+
+
+@pytest.mark.anyio
+async def test_the_card_is_an_mcp_app_resource_that_loads_only_fonts(client: Client) -> None:
+    listed = {str(r.uri): r for r in (await client.list_resources()).resources}
+    card = listed[CARD_URI]
+    assert card.mime_type == APP_MIME_TYPE
+    ui = (card.meta or {})["ui"]
+    assert ui["csp"] == {"resourceDomains": FONT_HOSTS} and ui["prefersBorder"] is False
+    read = await client.read_resource(CARD_URI)
+    html = read.contents[0].text  # type: ignore[union-attr]
+    assert "ui/initialize" in html and "ui/notifications/tool-result" in html
+
+
+def test_the_card_uses_only_design_tokens() -> None:
+    tokens = {c.upper() for c in re.findall(r"#[0-9A-Fa-f]{6}\b", DESIGN)}
+    used = {c.upper() for c in re.findall(r"#[0-9A-Fa-f]{6}\b", CARD)}
+    assert used and used <= tokens, used - tokens
+
+
+def test_the_card_reaches_no_host_beyond_fonts_and_attribution() -> None:
+    hosts = set(re.findall(r"https://([a-z0-9.-]+)", CARD))
+    assert hosts == {"fonts.googleapis.com", "fonts.gstatic.com",
+                     "world.openfoodfacts.org", "opendatacommons.org"}  # fmt: skip
+    # Product names are data: the card builds text nodes, never markup.
+    for sink in ("innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "eval("):
+        assert sink not in CARD, sink
+
+
+def test_the_card_carries_the_odbl_attribution_and_reduced_motion() -> None:
+    assert "Contains data from " in CARD and "Open Database License" in CARD
+    assert "prefers-reduced-motion: no-preference" in CARD  # motion only when allowed
 
 
 # --- Over HTTP -----------------------------------------------------------------------------

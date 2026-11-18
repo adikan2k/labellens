@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LabelLens label</title>
+<!-- Archivo, the one family in docs/DESIGN.md. The resource's CSP allows only these hosts;
+     system-ui stands in if the host refuses them. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&display=swap">
+<style>
+  /* Tokens: docs/DESIGN.md, nothing else. The card is a printed label: paper and ink,
+     also in a dark host (decision 0008). */
+  :root {
+    --paper: #FFFFFF;
+    --ink: #000000;
+    --ink-muted: #6B6B6B;
+    --rule-light: #D9D9D9;
+    --focus: #1A4BFF;
+    --grade-a: #038141;
+    --grade-b: #85BB2F;
+    --grade-c: #FECB02;
+    --grade-d: #EE8100;
+    --grade-e: #E63E11;
+    --rule-heavy: 10px;
+    --rule-medium: 5px;
+    --ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --fast: 120ms;
+    --base: 240ms;
+    --slow: 420ms;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: transparent; }
+  body {
+    font-family: "Archivo", system-ui, sans-serif;
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .card {
+    max-width: 28rem;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 12px 16px 16px;
+  }
+  .heading { font-size: 21px; line-height: 26px; font-weight: 700; }
+  .small { font-size: 14px; line-height: 20px; }
+  .muted { color: var(--ink-muted); }
+  .label { font-size: 16px; line-height: 22px; font-weight: 500; font-stretch: 85%;
+           font-variant-numeric: tabular-nums; }
+  .value { font-size: 16px; line-height: 22px; font-weight: 700; font-stretch: 85%;
+           font-variant-numeric: tabular-nums; }
+  .rule { display: block; background: var(--ink); }
+  .rule.heavy { height: var(--rule-heavy); }
+  .rule.medium { height: var(--rule-medium); }
+  .rule.thin { height: 1px; }
+  .rule.hair { height: 1px; background: var(--rule-light); }
+  .row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+         padding: 4px 0; }
+  .row .label.indent { padding-left: 16px; }
+  .row .value { text-align: right; }
+  .chip { display: inline-flex; align-items: center; justify-content: center; flex: none;
+          border-radius: 2px; width: 32px; height: 32px; font-weight: 700; font-stretch: 85%; }
+  .chip.lg { width: 48px; height: 48px; font-size: 21px; line-height: 26px; }
+  .chip.a { background: var(--grade-a); color: var(--paper); }
+  .chip.b { background: var(--grade-b); color: var(--ink); }
+  .chip.c { background: var(--grade-c); color: var(--ink); }
+  .chip.d { background: var(--grade-d); color: var(--ink); }
+  .chip.e { background: var(--grade-e); color: var(--ink); }
+  .grade { display: flex; align-items: center; gap: 16px; padding: 12px 0; }
+  .list { list-style: none; }
+  .list li { border-bottom: 1px solid var(--rule-light); }
+  .list li:last-child { border-bottom: 0; }
+  .additive { display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+              padding: 8px 0; }
+  .swap { display: flex; align-items: center; justify-content: space-between; gap: 16px;
+          width: 100%; padding: 12px 0; background: none; border: 0; color: inherit;
+          font: inherit; text-align: left; cursor: pointer; }
+  .swap .text { min-width: 0; }
+  .swap .text > span { display: block; overflow: hidden; text-overflow: ellipsis;
+                       white-space: nowrap; }
+  .swap .text > .reason { white-space: normal; padding-top: 4px; }
+  .link { background: none; border: 0; padding: 0; color: inherit; font: inherit;
+          text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+  .footer { padding-top: 12px; }
+  .footer .link.value { display: inline-block; padding-bottom: 8px; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .notice { padding: 8px 0; }
+  .section { padding-top: 8px; }
+
+  /* "The label prints" (DESIGN.md), once per view: the top rule draws, rows wipe in 30 ms
+     apart, the chip settles. Under 900 ms. Absent with reduced motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .printing .rule.heavy:first-child {
+      transform-origin: left; animation: draw var(--base) var(--ease-out) both;
+    }
+    .printing .wipe {
+      animation: wipe var(--base) var(--ease-out) both;
+      animation-delay: calc(var(--i, 0) * 30ms + 120ms);
+    }
+    .printing .chip.lg { animation: settle var(--slow) var(--ease-out) both 360ms; }
+  }
+  @keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+  @keyframes settle { from { transform: scale(1.06); } to { transform: scale(1); } }
+</style>
+</head>
+<body>
+<main id="root" aria-live="polite"><p class="small muted">Waiting for LabelLens…</p></main>
+<script>
+"use strict";
+// MCP Apps (io.modelcontextprotocol/ui, 2026-01-26): JSON-RPC 2.0 over postMessage with the
+// host. Everything below builds DOM with textContent: product names are data, never markup.
+const PROTOCOL = "2026-01-26";
+const ATTRIBUTION_URLS = {
+  off: "https://world.openfoodfacts.org",
+  odbl: "https://opendatacommons.org/licenses/odbl/1-0/",
+};
+const NOVA = {
+  1: "Unprocessed or minimally processed",
+  2: "Processed culinary ingredients",
+  3: "Processed foods",
+  4: "Ultra-processed foods",
+};
+const NUTRIENT_GROUPS = [
+  [["energy_kcal_100g", "Energy"]],
+  [["fat_100g", "Fat"], ["saturated_fat_100g", "Saturated fat", true]],
+  [["salt_100g", "Salt"]],
+  [["fiber_100g", "Fiber"], ["sugars_100g", "Sugars"]],
+  [["proteins_100g", "Protein"]],
+];
+
+let nextId = 1;
+const pending = new Map();
+const embedded = window.parent !== window;
+
+function send(message) { window.parent.postMessage({ jsonrpc: "2.0", ...message }, "*"); }
+function request(method, params) {
+  const id = nextId++;
+  send({ id, method, params });
+  return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
+}
+function notify(method, params) { send({ method, params }); }
+
+window.addEventListener("message", (event) => {
+  if (event.source !== window.parent) return;
+  const msg = event.data;
+  if (!msg || msg.jsonrpc !== "2.0") return;
+  if (msg.id !== undefined && pending.has(msg.id)) {
+    const { resolve, reject } = pending.get(msg.id);
+    pending.delete(msg.id);
+    msg.error ? reject(msg.error) : resolve(msg.result);
+    return;
+  }
+  if (msg.method === "ui/notifications/tool-input") showLoading();
+  if (msg.method === "ui/notifications/tool-result") showResult(msg.params || {});
+});
+
+function openLink(url) {
+  if (embedded) request("ui/open-link", { url }).catch(() => window.open(url, "_blank", "noopener"));
+  else window.open(url, "_blank", "noopener");
+}
+
+// --- Building blocks --------------------------------------------------------------------
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined && text !== null) node.textContent = String(text);
+  return node;
+}
+function rule(weight) {
+  const r = el("div", `rule ${weight}`);
+  r.setAttribute("aria-hidden", "true");
+  return r;
+}
+let wipeIndex = 0;
+function wipe(node) {
+  node.classList.add("wipe");
+  node.style.setProperty("--i", String(Math.min(wipeIndex++, 18)));
+  return node;
+}
+function chip(grade, large) {
+  if (!grade) return el("span", "small muted", "No Nutri-Score");
+  const c = el("span", `chip ${grade}${large ? " lg" : " value"}`);
+  c.setAttribute("role", "img");
+  c.setAttribute("aria-label", `Nutri-Score ${grade.toUpperCase()}`);
+  const letter = el("span", "", grade.toUpperCase());
+  letter.setAttribute("aria-hidden", "true");
+  c.append(letter);
+  return c;
+}
+function grams(value) {
+  if (value === 0) return "0 g";
+  if (value < 0.05) return "<0.1 g";
+  if (value < 10) return `${Number(value.toFixed(1))} g`;
+  return `${Math.round(value)} g`;
+}
+function dataRow(label, value, indent) {
+  const row = el("div", "row");
+  row.append(el("span", `label${indent ? " indent" : ""}`, label));
+  row.append(value === null ? el("span", "label muted", "Not listed") : el("span", "value", value));
+  return wipe(row);
+}
+function named(p) { return p.name || "Unnamed product"; }
+function linkButton(text, url, className) {
+  const b = el("button", `link ${className || ""}`.trim(), text);
+  b.type = "button";
+  b.addEventListener("click", () => openLink(url));
+  return b;
+}
+function footer(url) {
+  const f = el("div", "footer");
+  f.append(linkButton("Open in LabelLens", url, "value"));
+  const note = el("p", "small muted");
+  note.append("Contains data from ", linkButton("Open Food Facts", ATTRIBUTION_URLS.off),
+              ", available under the ", linkButton("Open Database License", ATTRIBUTION_URLS.odbl), ".");
+  f.append(note);
+  return f;
+}
+
+// --- Views ------------------------------------------------------------------------------
+
+function productView(data) {
+  const p = data.product;
+  const card = el("section", "card");
+  card.setAttribute("aria-label", `Label for ${named(p)}`);
+  card.append(rule("heavy"));
+  card.append(wipe(el("h1", "heading", named(p))));
+  const sub = [p.brand || "Brand not listed", p.category_name].filter(Boolean).join(" · ");
+  card.append(wipe(el("p", "small muted", sub)));
+
+  const grade = el("div", "grade");
+  grade.append(chip(p.nutriscore_grade, true));
+  grade.append(el("span", "value", p.nova_group ? `NOVA ${p.nova_group}: ${NOVA[p.nova_group]}`
+                                                : "No NOVA group"));
+  card.append(wipe(grade));
+
+  card.append(rule("medium"));
+  const head = el("div", "row");
+  head.append(el("span", "value", "Nutrition Facts"), el("span", "small", "Per 100 g"));
+  card.append(wipe(head));
+  NUTRIENT_GROUPS.forEach((group, gi) => {
+    card.append(rule(gi === 0 ? "thin" : "medium"));
+    group.forEach(([key, label, indent], i) => {
+      if (i > 0) card.append(rule("thin"));
+      const v = p.nutrition[key];
+      const shown = v === null || v === undefined ? null
+        : key === "energy_kcal_100g" ? `${Math.round(v)} kcal` : grams(v);
+      card.append(dataRow(label, shown, indent));
+    });
+  });
+
+  card.append(rule("medium"));
+  card.append(wipe(el("p", "value section", `Additives (${p.additives.length})`)));
+  if (p.additives.length) {
+    const list = el("ul", "list");
+    p.additives.forEach((a) => {
+      const li = el("li", "additive");
+      const name = el("span", "label");
+      if (a.e_number) name.append(el("span", "value", `${a.e_number} `));
+      name.append(a.name);
+      li.append(name);
+      if (a.flagged) li.append(el("span", "small", "Flagged by Open Food Facts"));
+      list.append(wipe(li));
+    });
+    card.append(list);
+  } else {
+    card.append(wipe(el("p", "small muted notice", "No additives listed.")));
+  }
+  card.append(rule("heavy"));
+  card.append(footer(p.url));
+  return card;
+}
+
+function swapsView(data) {
+  const p = data.product;
+  const card = el("section", "card");
+  card.setAttribute("aria-label", `Better swaps for ${named(p)}`);
+  card.append(rule("heavy"));
+  const head = el("div", "grade");
+  const title = el("div");
+  title.append(el("p", "small muted", "Better swaps for"), el("h1", "heading", named(p)));
+  head.append(chip(p.nutriscore_grade, true), title);
+  card.append(wipe(head));
+  card.append(rule("medium"));
+  if (!data.swaps.length) {
+    card.append(wipe(el("p", "notice", "No better swap in its category.")));
+  } else {
+    const list = el("ol", "list");
+    data.swaps.forEach((s) => {
+      const li = el("li");
+      const b = el("button", "swap");
+      b.type = "button";
+      b.setAttribute("aria-label", `${named(s.product)}: ${s.reason}. Opens in LabelLens.`);
+      b.addEventListener("click", () => openLink(s.product.url));
+      const text = el("span", "text");
+      text.append(el("span", "value", named(s.product)),
+                  el("span", "small muted", s.product.brand || "Brand not listed"),
+                  el("span", "small reason", s.reason));
+      b.append(text, chip(s.product.nutriscore_grade, false));
+      li.append(b);
+      list.append(wipe(li));
+    });
+    card.append(list);
+  }
+  card.append(rule("heavy"));
+  card.append(footer(p.url));
+  return card;
+}
+
+// --- Rendering --------------------------------------------------------------------------
+
+const root = document.getElementById("root");
+let printed = false;
+
+function render(node, print) {
+  root.replaceChildren(node);
+  // The label prints once per view; an error is not a label, so it just appears.
+  if (print && !printed) { root.classList.add("printing"); printed = true; }
+  wipeIndex = 0;
+  reportSize();
+}
+function showLoading() {
+  if (!root.querySelector(".card")) root.replaceChildren(el("p", "small muted", "Reading the label…"));
+}
+function showResult(result) {
+  const data = result.structuredContent;
+  if (result.isError || !data) {
+    const text = (result.content || []).map((c) => c.text).filter(Boolean).join(" ")
+      .replace(/^Error executing tool \w+: /, "");
+    const box = el("section", "card");
+    box.append(rule("heavy"), el("p", "notice", text || "LabelLens could not answer that."));
+    render(box, false);
+    return;
+  }
+  render(data.view === "swaps" ? swapsView(data) : productView(data), true);
+}
+
+function reportSize() {
+  if (!embedded) return;
+  const r = document.documentElement.getBoundingClientRect();
+  notify("ui/notifications/size-changed", { width: Math.ceil(r.width), height: Math.ceil(r.height) });
+}
+new ResizeObserver(reportSize).observe(document.documentElement);
+
+if (embedded) {
+  request("ui/initialize", {
+    appInfo: { name: "LabelLens", version: "1.0.0" },
+    appCapabilities: {},
+    protocolVersion: PROTOCOL,
+  }).then(() => notify("ui/notifications/initialized", {}))
+    .catch(() => notify("ui/notifications/initialized", {}));
+}
+// The local preview (scripts/card_preview.py) sets this to render without a host.
+if (window.__LABELLENS_PREVIEW__) showResult(window.__LABELLENS_PREVIEW__);
+</script>
+</body>
+</html>

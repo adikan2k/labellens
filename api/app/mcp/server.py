@@ -14,8 +14,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from contextlib import AbstractContextManager, contextmanager
+from pathlib import Path
 from typing import Annotated, Any
 
+from mcp.server.apps import Apps, ResourceCsp
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.server.transport_security import TransportSecuritySettings
@@ -42,6 +44,9 @@ from api.app.mcp.models import (
 from api.app.schemas import Explainer, Nutrition, Source
 
 PATH = "/mcp"
+CARD_URI = "ui://labellens/label-card.html"
+CARD_HTML = (Path(__file__).parent / "card.html").read_text("utf-8")
+FONT_HOSTS = ["https://fonts.googleapis.com", "https://fonts.gstatic.com"]
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=False)
 
 INSTRUCTIONS = """\
@@ -87,7 +92,27 @@ def create_mcp(get_db: Callable[[], Database], web_url: str) -> McpApp:
     """The MCP server over the app's database. `get_db` is read per call (the pool opens with
     the app's lifespan, after this runs)."""
     web_url = web_url.rstrip("/")
-    server = MCPServer("LabelLens", instructions=INSTRUCTIONS, website_url=web_url)
+    # get_product and find_swaps render the label card (MCP Apps); the other two are text.
+    # UI-bound tools go on the extension before the server exists; plain ones are collected
+    # and registered after it.
+    apps = Apps()
+    apps.add_html_resource(
+        CARD_URI,
+        CARD_HTML,
+        name="label-card",
+        title="LabelLens label card",
+        description="A compact product label, or a product's better swaps.",
+        csp=ResourceCsp(resource_domains=FONT_HOSTS),
+        prefers_border=False,  # the card draws its own 2 px panel border
+    )
+    plain: list[tuple[Callable[..., Any], dict[str, Any]]] = []
+
+    def tool(**kwargs: Any) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+        def register(fn: Callable[..., Any]) -> Callable[..., Any]:
+            plain.append((fn, kwargs))
+            return fn
+
+        return register
 
     def page(code: str) -> str:
         return f"{web_url}/product/{code}"
@@ -109,7 +134,7 @@ def create_mcp(get_db: Callable[[], Database], web_url: str) -> McpApp:
             "call search_products and use the barcode it returns."
         )
 
-    @server.tool(
+    @tool(
         title="Search products",
         description=(
             "Find US packaged-food products by name, brand or barcode. Returns the best-known "
@@ -144,7 +169,8 @@ def create_mcp(get_db: Callable[[], Database], web_url: str) -> McpApp:
         ]
         return _result("\n".join([*lines, "", text.attribution(output.source)]), output)
 
-    @server.tool(
+    @apps.tool(
+        resource_uri=CARD_URI,
         title="Get product label",
         description=(
             "The label of one product by barcode: Nutri-Score, NOVA processing group, "
@@ -177,7 +203,8 @@ def create_mcp(get_db: Callable[[], Database], web_url: str) -> McpApp:
         output = ProductOutput(product=product, source=source())
         return _result(text.product_text(product, output.source), output)
 
-    @server.tool(
+    @apps.tool(
+        resource_uri=CARD_URI,
         title="Find better swaps",
         description=(
             "Healthier swaps for one product, by barcode: similar products in the same "
@@ -208,7 +235,7 @@ def create_mcp(get_db: Callable[[], Database], web_url: str) -> McpApp:
         )
         return _result(text.swaps_text(output), output)
 
-    @server.tool(
+    @tool(
         title="Explain an additive",
         description=(
             "What a food additive is and what it does, by E-number (E471), Open Food Facts id "
@@ -249,6 +276,12 @@ def create_mcp(get_db: Callable[[], Database], web_url: str) -> McpApp:
             source=source(),
         )
         return _result(text.additive_text(output), output)
+
+    server = MCPServer(
+        "LabelLens", instructions=INSTRUCTIONS, website_url=web_url, extensions=[apps]
+    )
+    for fn, kwargs in plain:
+        server.tool(**kwargs)(fn)
 
     app = server.streamable_http_app(
         streamable_http_path=PATH,
