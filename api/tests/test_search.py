@@ -188,3 +188,30 @@ def test_tsquery_is_built_from_words_only(text: str, expected: str | None) -> No
 )  # fmt: skip
 def test_barcode_detection(text: str, expected: str | None) -> None:
     assert search.barcode_digits(text) == expected
+
+
+def test_one_listing_per_product_keeps_the_best_ranked() -> None:
+    rows = [
+        {"code": "1", "name": "Lucky Charms", "brand": "General Mills"},
+        {"code": "2", "name": "lucky charms ", "brand": "general mills"},  # another pack size
+        {"code": "3", "name": "Lucky Charms", "brand": "Lucky Charms"},  # another brand: kept
+        {"code": "4", "name": None, "brand": None},
+        {"code": "5", "name": None, "brand": None},
+    ]
+    assert [r["code"] for r in search.one_per_product(rows, 10)] == ["1", "3", "4"]
+    assert [r["code"] for r in search.one_per_product(rows, 2)] == ["1", "3"]
+
+
+def test_text_search_lists_each_product_once(
+    client: TestClient, products: list[dict[str, Any]]
+) -> None:
+    pairs = [((p["name"] or "").casefold(), (p["brand"] or "").casefold()) for p in products]
+    repeated = next(
+        (p for p, key in zip(products, pairs, strict=True) if pairs.count(key) > 1), None
+    )
+    if repeated is None:
+        pytest.skip("fixture has no product listed twice")
+    word = next(w for w in search.words(repeated["name"]) if len(w) >= 3)
+    results = _get(client, word, limit=50)["results"]
+    keys = [((r["name"] or "").casefold(), (r["brand"] or "").casefold()) for r in results]
+    assert len(keys) == len(set(keys)), "a product appears twice"
