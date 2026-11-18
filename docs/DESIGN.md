@@ -165,7 +165,7 @@ A single column: the question box, then each agent step as a row in a label-styl
 
 ### MCP card (inside Claude)
 
-One panel, at most 28rem wide, drawn by `api/app/mcp/card.html` in the host's sandboxed frame. It uses the tokens above and no others.
+One panel that fills the host's frame (Claude draws the widget at the conversation's width), drawn by `api/app/mcp/card.html` in the host's sandboxed frame. It uses the tokens above and no others.
 - **Product:** name (heading), brand and category, the large grade chip with the NOVA group, a compact Nutrition Facts block per 100 g with the same rule rhythm as the product page, and the additives. A flagged additive says "Flagged by Open Food Facts" in text, never by colour alone.
 - **Swaps:** "Better swaps for" the product, then one row per swap: name, brand, reason and its grade chip. A row opens the swap's page.
 - **Footer:** "Open in LabelLens", then the ODbL attribution.
