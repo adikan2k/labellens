@@ -26,6 +26,7 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - API locally: `uv run fastapi dev api/app/main.py` (set `DATABASE_URL`)
 - Deploy the API: `uv run python scripts/deploy_api.py --project <id> --web-origin <vercel url>` prints the commands; add `--yes` to run them
 - Search latency eval: `uv run python -m evals.runners.search_latency --base-url <api url> --label public`
+- Lighthouse eval (needs Node and Chrome): `uv run python -m evals.runners.lighthouse --base-url https://labellens-beige.vercel.app`
 - Regenerate web API types after changing `docs/openapi.yaml`: `pnpm -C web gen:api`
 - Web: `pnpm -C web dev`, `pnpm -C web lint`, `pnpm -C web typecheck`, `pnpm -C web test`
 - An eval: `uv run python -m evals.runners.<name>` (results go to `evals/results/`)
