@@ -1,0 +1,650 @@
+{
+ "model": "claude-haiku-5-5",
+ "prompt_version": "ask-v2",
+ "runs": [
+  {
+   "id": "sql-01",
+   "variant": "before",
+   "ms": 4786,
+   "cost_usd": 0.0011278,
+   "model_calls": 2,
+   "input_tokens": 7998,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 656,
+   "calls": [
+    {
+     "ms": 1913,
+     "input": 3440,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 419
+    },
+    {
+     "ms": 1315,
+     "input": 4558,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 237
+    }
+   ],
+   "tools": [
+    "query_sql",
+    "query_sql"
+   ],
+   "text": "There are 1,178 distinct breakfast cereal products with a Nutri-Score of A [1]. That count merges repeat listings of the same name and brand. Counting every listing gives 1,323 [1].\n\nExamples, best-known first:\n- Quaker Oats Old Fashioned Oats [2]\n- Quaker Oats Quick 1-Minute Oats [3]\n- Post Shredded Wheat [4]\n- Bob's Red Mill Old Fashioned Rolled Oats Whole Grain [5]\n- Kashi organic cinnamon harvest [6]\n\nNutri-Score is crowd-sourced from Open Food Facts, so some listings may be missing or out of date.",
+   "error": null
+  },
+  {
+   "id": "sql-01",
+   "variant": "after",
+   "ms": 2459,
+   "cost_usd": 0.00065104,
+   "model_calls": 2,
+   "input_tokens": 7109,
+   "cache_creation_input_tokens": 3344,
+   "cache_read_input_tokens": 3344,
+   "output_tokens": 315,
+   "calls": [
+    {
+     "ms": 1070,
+     "input": 96,
+     "cache_write": 3344,
+     "cache_read": 0,
+     "output": 183
+    },
+    {
+     "ms": 1052,
+     "input": 325,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 132
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "There are 1,323 breakfast cereal listings with a Nutri-Score of A, covering about 1,178 distinct name-and-brand products [1]. The count includes repeated listings for pack sizes and reformulations, so the distinct figure is the better measure of how many different cereals there are. Nutri-Score is only as complete as the crowd-sourced data, so some cereals may be missing a grade.",
+   "error": null
+  },
+  {
+   "id": "sql-02",
+   "variant": "after",
+   "ms": 2874,
+   "cost_usd": 0.00031138,
+   "model_calls": 2,
+   "input_tokens": 7193,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 388,
+   "calls": [
+    {
+     "ms": 1217,
+     "input": 106,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 247
+    },
+    {
+     "ms": 1301,
+     "input": 399,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 141
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "There are 3,347 breakfast cereal listings with under 5 g of sugar per 100 g and no colour additives [1]. These collapse to 2,862 distinct products once repeated pack sizes and reformulations are merged by name and brand.\n\nNote that sugar is only recorded for some products, so this count excludes cereals with no sugar figure on file. The count also depends on crowd-sourced additive data, which may be incomplete.",
+   "error": null
+  },
+  {
+   "id": "sql-02",
+   "variant": "before",
+   "ms": 2543,
+   "cost_usd": 0.0008978,
+   "model_calls": 2,
+   "input_tokens": 7193,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 357,
+   "calls": [
+    {
+     "ms": 1211,
+     "input": 3450,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 247
+    },
+    {
+     "ms": 989,
+     "input": 3743,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 110
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "There are 3,347 breakfast cereal listings under 5 g of sugar per 100 g with no colour additives [1]. These collapse to 2,862 distinct products once repeated names and brands are merged [1]. Sugar values are as entered in the crowd-sourced data, and products with no sugar figure are excluded from this count.",
+   "error": null
+  },
+  {
+   "id": "sql-03",
+   "variant": "before",
+   "ms": 2465,
+   "cost_usd": 0.0008453000000000001,
+   "model_calls": 2,
+   "input_tokens": 7088,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 273,
+   "calls": [
+    {
+     "ms": 1057,
+     "input": 3438,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 166
+    },
+    {
+     "ms": 1032,
+     "input": 3650,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 107
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "LabelLens has 25,293 soda listings in the sodas category [1]. Counting each distinct name and brand once gives 19,425 products [1]. The gap is because one product often appears several times, for example in different pack sizes or reformulations. This count covers only the sodas category, so other drinks such as juices or water are not included.",
+   "error": null
+  },
+  {
+   "id": "sql-03",
+   "variant": "after",
+   "ms": 2459,
+   "cost_usd": 0.00025618,
+   "model_calls": 2,
+   "input_tokens": 7091,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 298,
+   "calls": [
+    {
+     "ms": 1034,
+     "input": 94,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 169
+    },
+    {
+     "ms": 1047,
+     "input": 309,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 129
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "LabelLens has 25,293 soda listings in the sodas category [1]. Counting distinct name and brand pairs, that is about 19,425 different products [1]. The count includes pack sizes and reformulations, so the first number counts every listing. The category is only what Open Food Facts and the app's model assigned, so some soft drinks may sit in other categories, such as water-coffee-tea.",
+   "error": null
+  },
+  {
+   "id": "sql-04",
+   "variant": "after",
+   "ms": 2386,
+   "cost_usd": 0.00029758000000000003,
+   "model_calls": 2,
+   "input_tokens": 7215,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 356,
+   "calls": [
+    {
+     "ms": 1185,
+     "input": 109,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 251
+    },
+    {
+     "ms": 858,
+     "input": 418,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 105
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "About 95.5% of candy and chocolate products with a NOVA group are ultra-processed (NOVA 4): 32,303 of 33,828 listings [1]. This counts every listing, including repeated pack sizes and reformulations, and NOVA groups are crowd-sourced, so treat the share as approximate.",
+   "error": null
+  },
+  {
+   "id": "sql-04",
+   "variant": "before",
+   "ms": 2360,
+   "cost_usd": 0.0008932,
+   "model_calls": 2,
+   "input_tokens": 7192,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 348,
+   "calls": [
+    {
+     "ms": 1133,
+     "input": 3453,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 228
+    },
+    {
+     "ms": 899,
+     "input": 3739,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 120
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "About 95.5% of candy and chocolate products with a NOVA group are ultra-processed (NOVA 4): 32,303 of 33,828 listings [1].\n\nThis counts every listing, so repeated pack sizes and reformulations are included. The share reflects the NOVA groups recorded in the crowd-sourced data, so it may shift as labels are corrected.",
+   "error": null
+  },
+  {
+   "id": "sql-05",
+   "variant": "before",
+   "ms": 3727,
+   "cost_usd": 0.001025,
+   "model_calls": 2,
+   "input_tokens": 7420,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 566,
+   "calls": [
+    {
+     "ms": 1682,
+     "input": 3445,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 368
+    },
+    {
+     "ms": 1332,
+     "input": 3975,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 198
+    }
+   ],
+   "tools": [
+    "query_sql",
+    "query_sql"
+   ],
+   "text": "The median sugar content of yogurts is 8.85 g per 100 g, based on 13,917 yogurt listings with sugar data [1].\n\n\"Dairy desserts\" isn't a separate category in LabelLens. Across all dairy products (milk, yogurt and cheese), the median is 3.57 g per 100 g, based on 57,763 listings [2]. That broader figure includes many unsweetened items like cheese and plain milk, so it's lower than the yogurt figure.\n\nThese medians are across all listings, not just well-known brands, and the data is crowd-sourced, so treat them as approximate.",
+   "error": null
+  },
+  {
+   "id": "sql-05",
+   "variant": "after",
+   "ms": 2858,
+   "cost_usd": 0.00033198000000000006,
+   "model_calls": 2,
+   "input_tokens": 7309,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 406,
+   "calls": [
+    {
+     "ms": 1280,
+     "input": 101,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 241
+    },
+    {
+     "ms": 1195,
+     "input": 520,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 165
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "The median sugar for yogurts is 8.85 g per 100 g, based on 13,917 yogurt listings that state a sugar value (out of 16,082 total) [1].\n\nDairy desserts don't have their own category in LabelLens, so I couldn't measure them separately. The closest I can give is the yogurt figure above. For context, the milk category has a median of 5.0 g per 100 g [1]. Note that this is crowd-sourced label data, so some listings may be incomplete or wrong.",
+   "error": null
+  },
+  {
+   "id": "sql-06",
+   "variant": "after",
+   "ms": 2977,
+   "cost_usd": 0.00034238000000000004,
+   "model_calls": 2,
+   "input_tokens": 7333,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 422,
+   "calls": [
+    {
+     "ms": 1370,
+     "input": 90,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 289
+    },
+    {
+     "ms": 941,
+     "input": 555,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 133
+    }
+   ],
+   "tools": [
+    "query_sql",
+    "query_sql"
+   ],
+   "text": "Xanthan gum (E415) appears in 39,492 product listings in LabelLens, which is 34,909 distinct product names and brands once repeated pack sizes and reformulations are merged [1]. The additive is classed as an emulsifier, stabilizer and thickener [2].\n\nSources:\n- [1] products table, count of listings with en:e415\n- [2] additives table, entry for E415",
+   "error": null
+  },
+  {
+   "id": "sql-06",
+   "variant": "before",
+   "ms": 3041,
+   "cost_usd": 0.0009294000000000001,
+   "model_calls": 2,
+   "input_tokens": 7329,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 393,
+   "calls": [
+    {
+     "ms": 1548,
+     "input": 3434,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 305
+    },
+    {
+     "ms": 825,
+     "input": 3895,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 88
+    }
+   ],
+   "tools": [
+    "query_sql",
+    "query_sql"
+   ],
+   "text": "Xanthan gum (E415) appears in 39,492 product listings in LabelLens [1][2]. Those listings cover about 34,909 distinct name-and-brand combinations, since one product is often listed several times for different pack sizes or reformulations [2].",
+   "error": null
+  },
+  {
+   "id": "sql-07",
+   "variant": "before",
+   "ms": 3200,
+   "cost_usd": 0.0009019000000000001,
+   "model_calls": 2,
+   "input_tokens": 7319,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 340,
+   "calls": [
+    {
+     "ms": 1114,
+     "input": 3430,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 198
+    },
+    {
+     "ms": 1075,
+     "input": 3889,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 142
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "Citric acid (E330) appears in the most products: 100,764 product listings in the LabelLens data [1]. Lecithins (E322) come next with 68,492 listings [1], followed by Lecithin (E322i) with 67,995 [1].\n\nThese counts include every listing, so a product sold in several pack sizes or versions is counted more than once. The data is crowd-sourced from Open Food Facts and may be incomplete.",
+   "error": null
+  },
+  {
+   "id": "sql-07",
+   "variant": "after",
+   "ms": 3120,
+   "cost_usd": 0.00031848,
+   "model_calls": 2,
+   "input_tokens": 7579,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 325,
+   "calls": [
+    {
+     "ms": 1122,
+     "input": 86,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 198
+    },
+    {
+     "ms": 953,
+     "input": 805,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 127
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "Citric acid (E330) appears in the most products: 100,764 product listings in the LabelLens data [1]. It is followed by lecithins (E322, about 68,492 listings) and lecithin (E322i, about 67,995) [1].\n\nThese counts are listings, not unique products, since one product is often listed several times, so they are a fair measure of how common each additive is but not an exact product count.",
+   "error": null
+  },
+  {
+   "id": "sql-08",
+   "variant": "after",
+   "ms": 1774,
+   "cost_usd": 0.00021358000000000003,
+   "model_calls": 2,
+   "input_tokens": 7080,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 215,
+   "calls": [
+    {
+     "ms": 828,
+     "input": 101,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 121
+    },
+    {
+     "ms": 755,
+     "input": 291,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 94
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "The product with barcode 0016000275287 is Cheerios (brand Cheerios), which has 5.128 g of sugar per 100 g [1]. This is the value stored in the database, and crowd-sourced data can be incomplete or wrong, so check the physical label if precision matters.",
+   "error": null
+  },
+  {
+   "id": "sql-08",
+   "variant": "before",
+   "ms": 1526,
+   "cost_usd": 0.0007934999999999999,
+   "model_calls": 2,
+   "input_tokens": 7080,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 171,
+   "calls": [
+    {
+     "ms": 750,
+     "input": 3445,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 121
+    },
+    {
+     "ms": 585,
+     "input": 3635,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 50
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "The product with barcode 0016000275287 is Cheerios (brand Cheerios), with 5.128 g of sugar per 100 g [1].",
+   "error": null
+  },
+  {
+   "id": "sql-09",
+   "variant": "before",
+   "ms": 1761,
+   "cost_usd": 0.0008198000000000001,
+   "model_calls": 2,
+   "input_tokens": 7113,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 217,
+   "calls": [
+    {
+     "ms": 779,
+     "input": 3446,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 133
+    },
+    {
+     "ms": 790,
+     "input": 3667,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 84
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "The product with barcode 0049000042566 is Coca-Cola Zero Sugar (Coca-Cola) [1]. It has a Nutri-Score of C [1] and a NOVA group of 4, meaning ultra-processed [1].",
+   "error": null
+  },
+  {
+   "id": "sql-09",
+   "variant": "after",
+   "ms": 1781,
+   "cost_usd": 0.00021638,
+   "model_calls": 2,
+   "input_tokens": 7113,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 214,
+   "calls": [
+    {
+     "ms": 854,
+     "input": 102,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 133
+    },
+    {
+     "ms": 733,
+     "input": 323,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 81
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "The product at barcode 0049000042566 is Coca-Cola Zero Sugar from Coca-Cola. It has a Nutri-Score of C [1] and a NOVA group of 4, meaning it is ultra-processed [1].",
+   "error": null
+  },
+  {
+   "id": "sql-10",
+   "variant": "after",
+   "ms": 3600,
+   "cost_usd": 0.00041668,
+   "model_calls": 2,
+   "input_tokens": 8116,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 6688,
+   "output_tokens": 414,
+   "calls": [
+    {
+     "ms": 1162,
+     "input": 109,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 178
+    },
+    {
+     "ms": 2243,
+     "input": 1319,
+     "cache_write": 0,
+     "cache_read": 3344,
+     "output": 236
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "Nacho Cheese Flavored Doritos (Doritos, barcode 0028400516464) list eight additives in LabelLens:\n\n- E102, Tartrazine (colour) [1]\n- E110, Sunset yellow FCF (colour) [1]\n- E129, Allura red (colour) [1]\n- E270, Lactic acid [1]\n- E330, Citric acid (antioxidant, sequestrant) [1]\n- E621, Monosodium glutamate (flavour enhancer) [1]\n- E627, Disodium guanylate [1]\n- E631, Disodium inosinate [1]\n\nThe data is crowd-sourced from labels, so check the physical package if you need certainty.",
+   "error": null
+  },
+  {
+   "id": "sql-10",
+   "variant": "before",
+   "ms": 2553,
+   "cost_usd": 0.0010353,
+   "model_calls": 2,
+   "input_tokens": 8198,
+   "cache_creation_input_tokens": 0,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 431,
+   "calls": [
+    {
+     "ms": 1062,
+     "input": 3453,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 188
+    },
+    {
+     "ms": 1299,
+     "input": 4745,
+     "cache_write": 0,
+     "cache_read": 0,
+     "output": 243
+    }
+   ],
+   "tools": [
+    "query_sql"
+   ],
+   "text": "Nacho Cheese Flavored Doritos (Doritos, barcode 0028400516464) lists eight additives in LabelLens [1]:\n\n- E102, Tartrazine (colour)\n- E110, Sunset yellow FCF (colour)\n- E129, Allura red (colour)\n- E270, Lactic acid\n- E330, Citric acid (antioxidant, sequestrant)\n- E621, Monosodium glutamate (flavour enhancer)\n- E627, Disodium guanylate\n- E631, Disodium inosinate\n\nLabelLens flags this product as containing additives that Open Food Facts rates as high overexposure risk [1]. The data is crowd-sourced, so check the physical label if you need certainty.",
+   "error": null
+  }
+ ]
+}

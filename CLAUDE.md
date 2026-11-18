@@ -36,6 +36,7 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - Preview the MCP label card without Claude (a local stand-in host on the local database): `uv run python scripts/card_preview.py --serve 8765`, then open http://localhost:8765
 - MCP server: mounted on the API at `/mcp`; in Claude, add it as a custom connector with the API URL plus `/mcp` (no OAuth)
 - Category eval (needs `evals/datasets/category_gold.csv`): `uv run python -m evals.runners.category_accuracy --limit 200` (add `--yes`; variants `--name-only`, `--model eval`, `--tagged-sample 1000`)
+- Prompt caching measurement for the ask agent (first N SQL questions, with and without caching; prints the estimate, sends only with `--yes`): `uv run python -m scripts.measure_ask_caching --limit 10` (add `--env-file` when `.env` is elsewhere)
 - Search latency eval: `uv run python -m evals.runners.search_latency --base-url <api url> --label public`
 - Graph and swap latency eval: `uv run python -m evals.runners.graph_latency --base-url <api url> --label public`
 - Lighthouse eval (needs Node and Chrome): `uv run python -m evals.runners.lighthouse --base-url https://labellens-beige.vercel.app`

@@ -15,7 +15,7 @@ thinking off at the default effort.
 
 Prompt caching: the system prompt is one text block with an ephemeral cache_control marker.
 Tools render before the system prompt, so that one marker caches the tool definitions and the
-system prompt together (about 2,200 tokens, over Haiku 5.5's 512-token minimum). Every later
+system prompt together (3,344 tokens measured, over Haiku 5.5's 512-token minimum). Every later
 call of the run, and of any run within the 5-minute TTL, reads that prefix at a tenth of the
 input price instead of paying for it again. tool_choice switching to none does not break it.
 See evals/results/ask_caching.md for the measured effect.
