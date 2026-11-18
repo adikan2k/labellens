@@ -116,9 +116,10 @@ function ProductLayout({ product }: { product: Product }) {
   );
 }
 
+/** A screen tall, so the footer starts below the fold and does not jump when the label streams in. */
 function ProductSkeleton() {
   return (
-    <div aria-busy="true" className="mx-auto w-full max-w-page px-4 pt-8 pb-16">
+    <div aria-busy="true" className="mx-auto min-h-dvh w-full max-w-page px-4 pt-8 pb-16">
       <p className="type-body text-ink-muted">Reading the label…</p>
     </div>
   );
