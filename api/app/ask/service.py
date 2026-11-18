@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import ipaddress
 import json
 import logging
 import re
@@ -83,8 +84,22 @@ def client_address(forwarded_for: str | None, peer: str | None) -> str:
     return peer or "unknown"
 
 
+def client_key(address: str) -> str:
+    """One client per IPv4 address, and per IPv6 /64: a home or phone gets a whole /64 and
+    rotates its address inside it, which would otherwise reset the hourly limit."""
+    try:
+        ip = ipaddress.ip_address(address)
+    except ValueError:
+        return address
+    if isinstance(ip, ipaddress.IPv6Address):
+        if ip.ipv4_mapped is not None:
+            return str(ip.ipv4_mapped)
+        return str(ipaddress.ip_network(f"{ip}/64", strict=False))
+    return str(ip)
+
+
 def client_hash(key: bytes, address: str) -> str:
-    return hmac.new(key, address.encode(), hashlib.sha256).hexdigest()[:32]
+    return hmac.new(key, client_key(address).encode(), hashlib.sha256).hexdigest()[:32]
 
 
 # --- Replays -------------------------------------------------------------------------------

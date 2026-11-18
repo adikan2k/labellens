@@ -46,6 +46,8 @@ Status: draft for Aditya to rewrite. Date: 2026-11-18. Phase 5.
 
 **Why:** Cloud Run can run two instances, so limits held in memory would double. The table also makes cost per run something we can query.
 
+**A client is an IPv4 address or an IPv6 /64.** Testing on the live API showed the same laptop counted twice (once over IPv4, once over IPv6). A phone or home on IPv6 also rotates its address inside its /64, which would reset the hourly limit at will. The daily cap bounds spend either way; the /64 keeps the per-person limit meaningful.
+
 ## The eval: computed truth, a baseline, and a judge
 
 **Chosen:**

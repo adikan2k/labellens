@@ -21,6 +21,7 @@ from api.app.ask.service import (
     choose_replay,
     client_address,
     client_hash,
+    client_key,
 )
 from api.app.config import Settings
 from api.app.db import DictConnection
@@ -220,6 +221,15 @@ def test_client_address_takes_the_last_forwarded_entry() -> None:
     first, again = client_hash(b"k", "2.2.2.2"), client_hash(b"k", "2.2.2.2")
     assert first == again and first != client_hash(b"other", "2.2.2.2")
     assert "2.2.2.2" not in first and len(first) == 32
+
+
+def test_ipv6_clients_are_counted_per_64() -> None:
+    """Privacy addresses rotate inside a /64; each would otherwise get its own 10 an hour."""
+    a = client_hash(b"k", "2600:1700:3a70:1380:fc79:281f:5ec:27b4")
+    assert a == client_hash(b"k", "2600:1700:3a70:1380::1")
+    assert a != client_hash(b"k", "2600:1700:3a70:1381::1")
+    assert client_key("::ffff:2.2.2.2") == client_key("2.2.2.2") == "2.2.2.2"
+    assert client_key("unknown") == "unknown"
 
 
 def test_choose_replay_by_shared_words() -> None:
