@@ -121,6 +121,14 @@ describe("charts", () => {
     expect(container.textContent).toContain("70");
   });
 
+  test("long category names wrap in full, in a wider column from tablet up", () => {
+    const label = "Supplements and protein powders";
+    render(<BarChart bars={[{ label, value: 1, display: "1" }]} />);
+    const cell = screen.getByText(label);
+    expect(cell.className).toContain("break-words");
+    expect(cell.parentElement?.className).toContain("sm:grid-cols-[minmax(0,13rem)");
+  });
+
   test("Nutri-Score colours only on Nutri-Score bars", () => {
     const { container } = render(
       <BarChart bars={[{ label: "Nutri-Score A", value: 1, display: "1", grade: "a" }]} />,
