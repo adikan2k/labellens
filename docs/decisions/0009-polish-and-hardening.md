@@ -94,6 +94,12 @@ Phase 7 followed a review of everything built so far. The engineering was strong
 
 Every eval report now gives 95% Wilson intervals, and the fact score gets a bootstrap interval over questions with a fixed seed. Reports were regenerated from cache at $0, and no point estimate changed. "97% on 30" now reads as 83–99%.
 
+## Cold start, after an hour idle
+
+After 67 minutes with no requests, the first search took 22.6 s, then 0.1 s. After 25 minutes it had taken 3.9 s, so the shorter wait was not representative.
+- **Where the time went:** 6.3 s for Cloud Run to start an instance, 16.0 s in the app's startup step, and 0.2 s for the search with Neon waking. Neon was never the problem.
+- **Likely cause:** startup imports the ask agent's libraries (`anthropic`, `langfuse` with OpenTelemetry), which a search never needs. Locally they take 3.5 s warm, and a fresh Cloud Run host reads the image's files on demand. The startup step logs no timings, so this is not yet proven.
+
 ## Still open
 
-- Time a cold start after a full hour idle (the measured 3.9 s was after 25 minutes, already past both platforms' scale-down points).
+- Bring the cold start down: load the ask agent's libraries on the first `/ask` instead of at startup, then time another hour idle. A minimum instance is the fallback, but it bills every hour.
