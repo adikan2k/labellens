@@ -52,6 +52,8 @@ class Settings(BaseSettings):
     ask_daily_spend_cap_usd: float = 0.50
     # A run stops here; Cloud Run's request timeout (60 s) leaves room to send the error.
     ask_timeout_seconds: float = 45.0
+    # MCP requests per client per minute, per instance (in memory; decision 0008)
+    mcp_rate_limit_per_minute: int = 60
 
 
 # US dollars per million input and output tokens at standard rates (the Batch API halves

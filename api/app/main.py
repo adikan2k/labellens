@@ -80,7 +80,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(title="LabelLens API", version=API_VERSION, lifespan=lifespan)
     # The MCP server reads app.state.db per call; the pool opens in the lifespan.
-    app.state.mcp = create_mcp(lambda: app.state.db, settings.public_web_url)
+    app.state.mcp = create_mcp(
+        lambda: app.state.db,
+        settings.public_web_url,
+        per_minute=settings.mcp_rate_limit_per_minute,
+    )
     # Exactly /mcp: no slash redirect, and other paths keep the API's own JSON errors.
     app.router.routes.append(app.state.mcp.route)
     app.add_middleware(

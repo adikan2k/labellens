@@ -31,6 +31,7 @@ from api.app import search as search_module
 from api.app import swaps as swaps_module
 from api.app.db import Database, DictConnection
 from api.app.mcp import text
+from api.app.mcp.limit import RateLimited
 from api.app.mcp.models import (
     AdditiveOutput,
     CardAdditive,
@@ -88,7 +89,7 @@ def _codes(code: str) -> list[str]:
     return [digits, f"0{digits}"] if len(digits) == 12 else [digits]
 
 
-def create_mcp(get_db: Callable[[], Database], web_url: str) -> McpApp:
+def create_mcp(get_db: Callable[[], Database], web_url: str, *, per_minute: int = 60) -> McpApp:
     """The MCP server over the app's database. `get_db` is read per call (the pool opens with
     the app's lifespan, after this runs)."""
     web_url = web_url.rstrip("/")
@@ -293,11 +294,11 @@ def create_mcp(get_db: Callable[[], Database], web_url: str) -> McpApp:
         transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
     )
     sdk_route = next(r for r in app.routes if isinstance(r, Route) and r.path == PATH)
-    # The SDK's handler on a route of our own: the methods MCP uses, and out of the generated
-    # OpenAPI (docs/openapi.yaml documents /mcp by hand).
+    # The SDK's handler, behind the per-client limit, on a route of our own: the methods MCP
+    # uses, and out of the generated OpenAPI (docs/openapi.yaml documents /mcp by hand).
     route = Route(
         PATH,
-        endpoint=sdk_route.endpoint,
+        endpoint=RateLimited(sdk_route.endpoint, per_minute),
         methods=["GET", "POST", "DELETE"],
         include_in_schema=False,
     )
