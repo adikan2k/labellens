@@ -199,7 +199,8 @@ def main(argv: list[str] | None = None) -> int:
 
     RESULTS.parent.mkdir(parents=True, exist_ok=True)
     payload = {"model": model, "prompt_version": PROMPT_VERSION, "runs": rows}
-    RESULTS.write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n", "utf-8")
+    text = json.dumps(payload, indent=1, ensure_ascii=False) + "\n"
+    RESULTS.write_text(text, "utf-8", newline="\n")
     print()
     print(table(rows, model))
     print(f"Wrote {RESULTS.relative_to(ROOT)}")
