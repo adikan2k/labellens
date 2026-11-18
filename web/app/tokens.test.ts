@@ -72,4 +72,14 @@ describe("design pass rules (DESIGN.md sections 1, 3 and 4)", () => {
     const rule = css.slice(css.indexOf("::-webkit-search-cancel-button"));
     expect(rule.slice(0, rule.indexOf("}"))).toContain("background-color: var(--color-ink)");
   });
+
+  test("no label is cut off with an ellipsis: text wraps instead", () => {
+    const offending: string[] = [];
+    for (const dir of SOURCE_DIRS) {
+      for (const file of sourceFiles(join(WEB, dir))) {
+        if (/\btruncate\b/.test(readFileSync(file, "utf-8"))) offending.push(relative(WEB, file));
+      }
+    }
+    expect(offending).toEqual([]);
+  });
 });

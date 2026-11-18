@@ -61,7 +61,7 @@ export function BarChart({ bars }: { bars: Bar[] }) {
     <ul aria-hidden="true" className="space-y-2">
       {bars.map((bar) => (
         <li key={bar.label} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto] items-center gap-3">
-          <span className="type-data-label truncate">{bar.label}</span>
+          <span className="type-data-label break-words">{bar.label}</span>
           <span className="block h-4">
             <Grow
               className={`h-4 ${bar.grade ? GRADE_BG[bar.grade] : "bg-ink"}`}
@@ -93,7 +93,7 @@ export function GradeStacks({ stacks }: { stacks: Stack[] }) {
       <ul className="space-y-2">
         {stacks.map((stack) => (
           <li key={stack.label} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] items-center gap-3">
-            <span className="type-data-label truncate">{stack.label}</span>
+            <span className="type-data-label break-words">{stack.label}</span>
             <Grow className="flex h-4">
               {grades.map((g) =>
                 stack.parts[g] ? (
