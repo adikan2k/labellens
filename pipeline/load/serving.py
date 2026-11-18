@@ -183,10 +183,11 @@ INDEXES = f"""
 create index products_search on {NEXT}.products
     using gin (to_tsvector('english'::regconfig, name || ' ' || coalesce(brand, '')));
 create index products_rank on {NEXT}.products (rank_pos);
--- Swaps: same category, better grade, no flagged additive, a real barcode, fewest additives,
--- then rank.
+-- Swaps: same category, better grade, no flagged additive, a real barcode, an ingredient list,
+-- fewest additives, then rank.
 create index products_swaps on {NEXT}.products
-    (category_id, nutriscore_grade, additive_count, rank_pos) where not has_flagged and gtin_valid;
+    (category_id, nutriscore_grade, additive_count, rank_pos)
+    where not has_flagged and gtin_valid and cardinality(ingredient_ids) > 0;
 """
 
 PRODUCTS_SQL = f"""
