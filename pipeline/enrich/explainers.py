@@ -170,7 +170,7 @@ def ingredient_items(
 
 
 def main(argv: list[str] | None = None) -> int:
-    from api.app.config import get_settings
+    from api.app.config import get_settings, price_per_mtok
 
     parser = argparse.ArgumentParser(description="Write additive and ingredient explainers.")
     parser.add_argument("--limit", type=int, required=True, help="most explainers per kind")
@@ -197,7 +197,7 @@ def main(argv: list[str] | None = None) -> int:
             client_factory=client_factory,
             settings=core.CallSettings(model=model, thinking_off=True),
             store=core.OutputStore(core.OUTPUTS / filename),
-            prices=settings.price_per_mtok(model),
+            prices=price_per_mtok(model),
             limit=args.limit,
             yes=args.yes,
             batch=not args.direct,

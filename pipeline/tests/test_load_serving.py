@@ -105,7 +105,7 @@ def test_stats_document_matches_the_contract(pg: psycopg.Connection) -> None:
     assert sum(item["count"] for item in doc["nutriscore"]) == doc["product_count"]
     assert sum(item["count"] for item in doc["nova"]) == doc["product_count"]
     assert doc["named_product_count"] <= doc["product_count"]
-    assert doc["category_count"] == 26
+    assert doc["category_count"] == 25  # 26 leaf categories; "Other or unclear" is not ranked
 
 
 def test_meta_names_the_snapshot(pg: psycopg.Connection) -> None:
@@ -122,6 +122,29 @@ def test_lookups_are_loaded(pg: psycopg.Connection, marts: duckdb.DuckDBPyConnec
     assert pg.execute(
         "select name, function from additives where additive_id = 'en:e330'"
     ).fetchone() == ("Citric acid", "Antioxidant, sequestrant")
+    # Explainers come from the fixture's enrichment outputs and are flagged as AI-written.
+    explained = pg.execute(
+        "select additive_id from additives where explainer is not null and explainer_ai"
+    ).fetchall()
+    assert sorted(a for (a,) in explained) == ["en:e322", "en:e330"]
+    assert pg.execute(
+        "select count(*) from additives where explainer is null and explainer_ai"
+    ).fetchone() == (0,)
+
+
+def test_category_source_is_loaded_and_other_is_left_out_of_rankings(
+    pg: psycopg.Connection,
+) -> None:
+    assert pg.execute(
+        "select category_id, category_source from products where code = '000287050'"
+    ).fetchone() == ("supplements", "model")
+    row = pg.execute("select doc from stats").fetchone()
+    assert row
+    doc = row[0]
+    assert "other" not in {c["key"] for c in doc["categories"]}
+    sources = {s["key"]: s["count"] for s in doc["category_sources"]}
+    assert sources["model"] == 2  # the fixture's two valid model answers
+    assert sum(sources.values()) == doc["named_product_count"]
 
 
 def test_reload_swaps_in_place(serving_url: str, dbt_fixture: Build) -> None:

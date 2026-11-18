@@ -21,18 +21,18 @@ models:
       - name: brand
         description: First brand listed.
       - name: category_main
-        description: category_id from dim_categories; from category_map now, the model in phase 3.
+        description: category_id from dim_categories; from Open Food Facts' tags, else the model.
         data_tests:
           - relationships:
               arguments:
                 to: ref('dim_categories')
                 field: category_id
       - name: category_source
-        description: "'off_tags' when category_main came from category_map; null when unset."
+        description: "'off_tags' (category_map) or 'model' (phase 3 enrichment); null when unset."
         data_tests:
           - accepted_values:
               arguments:
-                values: ["off_tags"]
+                values: ["off_tags", "model"]
       - name: nutriscore_grade
         description: a to e; Open Food Facts' 'unknown' and 'not-applicable' are null.
         data_tests:
@@ -119,7 +119,16 @@ models:
       - name: function
         description: What it does, from the taxonomy classes ("Antioxidant, sequestrant").
       - name: explainer
-        description: Plain-English note, written once per additive in phase 3.
+        description: Plain-English note written by the model once per additive (phase 3).
+        data_tests:
+          # Additives on 100 or more products should all have one; warn, since the weekly
+          # build cannot write new ones (paid runs are manual).
+          - max_null_share:
+              arguments:
+                max_share: 0.05
+              config:
+                severity: warn
+                where: "product_count >= 100"
 
   - name: bridge_product_additives
     description: Which additives each product contains.

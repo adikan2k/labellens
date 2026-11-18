@@ -168,7 +168,7 @@ def to_markdown(report: Report, names: dict[str, str]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    from api.app.config import get_settings
+    from api.app.config import get_settings, price_per_mtok
 
     parser = argparse.ArgumentParser(description="Category accuracy against the gold labels.")
     parser.add_argument("--limit", type=int, required=True, help="most products to send")
@@ -212,7 +212,7 @@ def main(argv: list[str] | None = None) -> int:
         client_factory=categories.client_factory,
         settings=call,
         store=core.OutputStore(CACHE),
-        prices=settings.price_per_mtok(model),
+        prices=price_per_mtok(model),
         limit=args.limit,
         yes=args.yes,
         batch=False,

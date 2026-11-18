@@ -11,10 +11,13 @@ Assets:
 
 dbt runs with its working directory set to pipeline/dbt, so every path is passed absolute.
 These environment variables override the defaults (the tests use them to run on the fixture):
-LABELLENS_RAW_DIR, LABELLENS_DUCKDB, LABELLENS_DUCKDB_TMP, LABELLENS_REPORTS_DIR,
-LABELLENS_DBT_TARGET (where dbt writes run_results.json for the report), and
-LABELLENS_DBT_VARS (JSON merged into the dbt vars). A run pointed elsewhere must override all
-of them, or it overwrites the real run's files.
+LABELLENS_RAW_DIR, LABELLENS_ENRICH_DIR (enrichment outputs dbt reads), LABELLENS_DUCKDB,
+LABELLENS_DUCKDB_TMP, LABELLENS_REPORTS_DIR, LABELLENS_DBT_TARGET (where dbt writes
+run_results.json for the report), and LABELLENS_DBT_VARS (JSON merged into the dbt vars). A
+run pointed elsewhere must override all of them, or it overwrites the real run's files.
+
+Enrichment (pipeline/enrich) is not an asset: it costs money, so it runs only from its own
+command with --limit and --yes. The build reads whatever enrichment outputs are committed.
 """
 
 # No `from __future__ import annotations`: Dagster reads config classes from real annotations.
@@ -35,13 +38,20 @@ from pipeline.ingest.profile import latest_snapshot
 ROOT = Path(__file__).resolve().parents[2]
 DBT_DIR = ROOT / "pipeline" / "dbt"
 RAW_DIR = Path(os.environ.get("LABELLENS_RAW_DIR", str(ROOT / "data" / "raw")))
+ENRICH_DIR = Path(
+    os.environ.get("LABELLENS_ENRICH_DIR", str(ROOT / "pipeline" / "enrich" / "outputs"))
+)
 DUCKDB_PATH = Path(
     os.environ.setdefault("LABELLENS_DUCKDB", str(ROOT / "data" / "labellens.duckdb"))
 )
 os.environ.setdefault("LABELLENS_DUCKDB_TMP", str(ROOT / "data" / "tmp"))
 REPORTS_DIR = Path(os.environ.get("LABELLENS_REPORTS_DIR", str(report.REPORTS_DIR)))
 RUN_TARGET = Path(os.environ.get("LABELLENS_DBT_TARGET", str(DBT_DIR / "target" / "dagster")))
-DBT_VARS = {"raw_dir": RAW_DIR.as_posix(), **json.loads(os.environ.get("LABELLENS_DBT_VARS", "{}"))}
+DBT_VARS = {
+    "raw_dir": RAW_DIR.as_posix(),
+    "enrich_dir": ENRICH_DIR.as_posix(),
+    **json.loads(os.environ.get("LABELLENS_DBT_VARS", "{}")),
+}
 
 RAW_SNAPSHOT = dg.AssetKey("raw_snapshot")
 # Models that read the snapshot files directly (through the snapshot_dir() macro).

@@ -65,6 +65,14 @@ NOVA_LABELS = {
     4: "Ultra-processed foods",
 }
 MIN_CATEGORY_PRODUCTS = 200  # dashboard per-category figures need enough products
+# "Other or unclear" holds what the model could not place and alcohol and baby food; it is
+# not a category anyone shops, so the dashboard's per-category figures leave it out.
+OTHER = "other"
+CATEGORY_SOURCE_LABELS = {
+    "off_tags": "From Open Food Facts' category tags",
+    "model": "Suggested by AI",
+    None: "No category",
+}
 
 DDL = f"""
 create schema {NEXT};
@@ -73,6 +81,7 @@ create table {NEXT}.products (
     name text not null,
     brand text,
     category_id text,
+    category_source text,
     nutriscore_grade text,
     nova_group smallint,
     completeness real,
@@ -136,6 +145,7 @@ select
     p.name,
     p.brand,
     p.category_main,
+    p.category_source,
     p.nutriscore_grade,
     p.nova_group,
     p.completeness,
@@ -158,15 +168,23 @@ where p.name is not null
 order by rank_pos
 """
 
-# (DuckDB mart, columns, serving table)
-LOOKUPS: list[tuple[str, tuple[str, ...], str]] = [
-    ("dim_additives", ("additive_id", "e_number", "name", "function"), "additives"),
-    ("dim_ingredients", ("ingredient_id", "name"), "ingredients"),
-    ("dim_categories", ("category_id", "name", "parent_id"), "categories"),
+# Every explainer is written by the model (phase 3), so explainer_ai is true where one exists.
+_EXPLAINER = {"explainer": "explainer", "explainer_ai": "explainer is not null"}
+
+# (DuckDB mart, {serving column: DuckDB expression}, serving table)
+LOOKUPS: list[tuple[str, dict[str, str], str]] = [
+    (
+        "dim_additives",
+        {c: c for c in ("additive_id", "e_number", "name", "function")} | _EXPLAINER,
+        "additives",
+    ),
+    ("dim_ingredients", {c: c for c in ("ingredient_id", "name")} | _EXPLAINER, "ingredients"),
+    ("dim_categories", {c: c for c in ("category_id", "name", "parent_id")}, "categories"),
 ]
 
 PRODUCT_COLUMNS = [
-    "code", "name", "brand", "category_id", "nutriscore_grade", "nova_group", "completeness",
+    "code", "name", "brand", "category_id", "category_source", "nutriscore_grade", "nova_group",
+    "completeness",
     "scans", "image_path", *NUTRIENTS, "additive_ids", "ingredient_ids", "rank_pos",
 ]  # fmt: skip
 
@@ -200,7 +218,8 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
         select
             count(*),
             sum(28 + strlen(code) + 1 + strlen(name) + 1 + coalesce(strlen(brand) + 1, 0)
-                + coalesce(strlen(category_main) + 1, 0) + 2 + 2 + 4 + 4 + 4
+                + coalesce(strlen(category_main) + 1, 0)
+                + coalesce(strlen(category_source) + 1, 0) + 2 + 2 + 4 + 4 + 4
                 + coalesce(strlen(image_path) + 1, 0) + 7 * 4
                 + 24 + coalesce(
                     list_sum(list_transform(additive_ids, lambda x: strlen(x) + 4)), 0)
@@ -215,7 +234,7 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
     rows, heap, pk_keys, words = (int(v or 0) for v in row)
     lookup_bytes = 0
     for table, columns, _ in LOOKUPS:
-        sizes = " + ".join(f"coalesce(strlen({c}::varchar), 0)" for c in columns)
+        sizes = " + ".join(f"coalesce(strlen(({e})::varchar), 0)" for e in columns.values())
         row = con.execute(f"select coalesce(sum(60 + {sizes}), 0) from {table}").fetchone()
         lookup_bytes += int(row[0]) if row else 0
     return Estimate(
@@ -255,10 +274,11 @@ def _stats(con: duckdb.DuckDBPyConnection) -> dict[str, Any]:
     categories = [
         {"key": c, "label": name, "count": n}
         for c, name, n in rows(
-            """select c.category_id, c.name, count(p.code) from dim_categories c
+            f"""select c.category_id, c.name, count(p.code) from dim_categories c
                left join dim_products p on p.category_main = c.category_id
                where c.category_id not in (
                    select parent_id from dim_categories where parent_id is not null)
+                 and c.category_id <> '{OTHER}'
                group by all order by 3 desc, 1"""
         )
     ]
@@ -284,8 +304,16 @@ def _stats(con: duckdb.DuckDBPyConnection) -> dict[str, Any]:
                        count(*) filter (where p.nutriscore_grade = 'd'),
                        count(*) filter (where p.nutriscore_grade = 'e')
                 from dim_products p join dim_categories c on c.category_id = p.category_main
+                where c.category_id <> '{OTHER}'
                 group by all having count(p.nutriscore_grade) >= {MIN_CATEGORY_PRODUCTS}
                 order by 1"""
+        )
+    ]
+    category_sources = [
+        {"key": source, "label": CATEGORY_SOURCE_LABELS[source], "count": n}
+        for source, n in rows(
+            "select category_source, count(*) from dim_products where name is not null "
+            "group by 1 order by 2 desc"
         )
     ]
     sugars = [
@@ -294,6 +322,7 @@ def _stats(con: duckdb.DuckDBPyConnection) -> dict[str, Any]:
             f"""select c.category_id, c.name, median(f.sugars_100g), count(f.sugars_100g)
                 from dim_products p join fct_nutrition f using (code)
                 join dim_categories c on c.category_id = p.category_main
+                where c.category_id <> '{OTHER}'
                 group by all having count(f.sugars_100g) >= {MIN_CATEGORY_PRODUCTS}
                 order by 3 desc"""
         )
@@ -307,6 +336,7 @@ def _stats(con: duckdb.DuckDBPyConnection) -> dict[str, Any]:
         "nutriscore": nutriscore,
         "nova": nova,
         "categories": categories,
+        "category_sources": category_sources,
         "top_additives": top_additives,
         "nutriscore_by_category": by_category,
         "median_sugars_by_category": sugars,
@@ -412,7 +442,7 @@ def load(
                 n = _copy(pg, "products", PRODUCT_COLUMNS, _batches(cur, PRODUCTS_SQL))
                 log(f"products: {n:,} rows in {time.perf_counter() - started:.0f} s")
                 for source, columns, target in LOOKUPS:
-                    query = f"select {', '.join(columns)} from {source}"
+                    query = f"select {', '.join(columns.values())} from {source}"
                     _copy(pg, target, list(columns), _batches(cur, query))
                 pg.execute(f"insert into {NEXT}.stats (doc) values (%s)", [json.dumps(stats)])
                 for key, value in meta.items():

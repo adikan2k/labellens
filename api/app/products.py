@@ -64,6 +64,7 @@ def get_product(conn: DictConnection, code: str) -> dict[str, Any] | None:
     return {
         **summary(row),
         "category_name": row["category_name"],
+        "category_source": row["category_source"],
         "completeness": row["completeness"],
         "nutrition": {n: row[n] for n in NUTRIENTS},
         "additives": [_with_explainer(a) for a in row["additives"]],
