@@ -57,6 +57,7 @@ export function AskPanel() {
   const [showSteps, setShowSteps] = useState(false);
   const controller = useRef<AbortController | null>(null);
   const inputId = useId();
+  const stepsId = useId();
   const running = state.kind === "running";
 
   async function ask(text: string) {
@@ -152,7 +153,7 @@ export function AskPanel() {
         {state.kind === "error" && state.message}
       </div>
 
-      {state.kind !== "idle" && (
+      {state.kind !== "idle" && !(state.kind === "error" && steps.length === 0) && (
         <section aria-label="Steps" className="panel mt-8 px-4 pt-3 pb-4">
           <Rule weight="heavy" />
           <div className="flex items-baseline justify-between gap-4 pt-2 pb-1">
@@ -161,6 +162,7 @@ export function AskPanel() {
               <button
                 type="button"
                 aria-expanded={showSteps}
+                aria-controls={stepsId}
                 onClick={() => setShowSteps((open) => !open)}
                 className="type-small cursor-pointer underline underline-offset-2"
               >
@@ -168,25 +170,25 @@ export function AskPanel() {
               </button>
             )}
           </div>
-          {stepsOpen && (
-            <>
-              <Rule weight="medium" />
-              <ol>
-                {steps.map((step) => (
-                  <StepRow key={step.index} step={step} />
-                ))}
-              </ol>
-              {running && (
-                <p className="type-data-label py-2 text-ink-muted">
-                  {steps.length === 0 ? "Reading the question…" : "Working…"}
-                </p>
-              )}
-              {state.kind === "done" && steps.length === 0 && (
-                <p className="type-small py-2 text-ink-muted">Answered without looking anything up.</p>
-              )}
-            </>
-          )}
-          {stepsOpen && <Rule weight="heavy" className="mt-2" />}
+          {/* Hidden, not unmounted: the button's aria-controls always points at it, and
+              reopening shows the steps without replaying their wipe. */}
+          <div id={stepsId} hidden={!stepsOpen}>
+            <Rule weight="medium" />
+            <ol>
+              {steps.map((step) => (
+                <StepRow key={step.index} step={step} />
+              ))}
+            </ol>
+            {running && (
+              <p className="type-data-label py-2 text-ink-muted">
+                {steps.length === 0 ? "Reading the question…" : "Working…"}
+              </p>
+            )}
+            {state.kind === "done" && steps.length === 0 && (
+              <p className="type-small py-2 text-ink-muted">Answered without looking anything up.</p>
+            )}
+            <Rule weight="heavy" className="mt-2" />
+          </div>
         </section>
       )}
 
