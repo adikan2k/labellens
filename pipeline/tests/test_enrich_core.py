@@ -229,3 +229,25 @@ def test_prune_keeps_only_current_items(tmp_path: Path) -> None:
     run(client, tmp_path / "out.jsonl", ["apple", "fig", "kiwi"])  # without prune: kept, added
     refs = [r["ref"] for r in core.OutputStore(tmp_path / "out.jsonl").load()]
     assert refs == ["apple", "fig", "kiwi"]
+
+
+# Real runs: (characters the estimator counts, requests, input tokens billed). The estimate
+# must stay above each; with 3 characters per token it was a third under on the fill.
+MEASURED_RUNS = {
+    "categories fill": (106_338_363, 12_093, 51_669_473),
+    "additive explainers": (106_623, 54, 53_714),
+    "ingredient explainers": (71_721, 51, 38_763),
+}
+
+
+@pytest.mark.parametrize("name", list(MEASURED_RUNS))
+def test_the_input_estimate_is_above_every_measured_run(name: str) -> None:
+    chars, requests, billed = MEASURED_RUNS[name]
+    estimated = chars / core.CHARS_PER_TOKEN + core.REQUEST_OVERHEAD_TOKENS * requests
+    assert estimated >= billed
+
+
+def test_category_output_estimate_is_above_the_measured_rate() -> None:
+    from pipeline.enrich.categories import CategoryTask
+
+    assert CategoryTask.output_tokens_per_item >= 10_370_267 / 604_507  # 17.2 per product

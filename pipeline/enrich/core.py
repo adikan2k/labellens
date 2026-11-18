@@ -37,8 +37,12 @@ ROOT = Path(__file__).resolve().parents[2]
 OUTPUTS = ROOT / "pipeline" / "enrich" / "outputs"
 STATE_DIR = ROOT / "data" / "enrich"
 BATCH_DISCOUNT = 0.5
-# Conservative: English runs about 4 characters per token, so the estimate errs high.
-CHARS_PER_TOKEN = 3.0
+# Measured on the first real runs (categories, additive and ingredient explainers): about 2
+# characters per input token, plus a small per-request overhead. 1.8 and 100 keep the
+# estimate above every measured run; an earlier 3.0 underestimated the category fill by a
+# third. pipeline/tests/test_enrich_core.py pins the measured runs.
+CHARS_PER_TOKEN = 1.8
+REQUEST_OVERHEAD_TOKENS = 100
 EFFORT = "low"
 
 Log = Callable[[str], None]
@@ -258,7 +262,7 @@ def estimate(
     )
     items = sum(len(g) for g in groups)
     usage = Usage(
-        input_tokens=math.ceil(chars / CHARS_PER_TOKEN),
+        input_tokens=math.ceil(chars / CHARS_PER_TOKEN) + REQUEST_OVERHEAD_TOKENS * len(groups),
         output_tokens=items * task.output_tokens_per_item,
     )
     return Estimate(

@@ -91,7 +91,7 @@ class CategoryTask:
     prompt_version = "categories-v1"
     group_size = 50
     max_tokens = 2048
-    output_tokens_per_item = 14  # {"id":12,"category":"breakfast-cereals"}, measured
+    output_tokens_per_item = 20  # measured 17.2 on the full fill
 
     def __init__(self) -> None:
         self.leaves = leaf_categories()
