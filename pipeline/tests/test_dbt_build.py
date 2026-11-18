@@ -203,3 +203,30 @@ def test_report_formats_small_shares_and_plurals() -> None:
     assert report._pct(1, 0) == "n/a"
     assert report._products(1) == "1 product"
     assert report._products(2_000) == "2,000 products"
+
+
+def test_the_build_runs_in_two_steps_so_ci_can_delete_the_parquet(
+    build: Build, tmp_path: Path
+) -> None:
+    """The weekly workflow builds base_off__us_products, deletes the 8 GB food.parquet to free
+    the runner's disk, then builds the rest with the snapshot folder pinned. Same nodes, same
+    passing tests as one build."""
+    snapshot = tmp_path / "raw" / FIXTURE_PARQUET.parent.name
+    shutil.copytree(FIXTURE_PARQUET.parent, snapshot)
+    vars_ = {**FIXTURE_VARS, "raw_dir": (tmp_path / "raw").as_posix()}
+
+    first = run_dbt("build", tmp_path, vars_, "base_off__us_products", target_name="target-1")
+    assert first.returncode == 0, first.output[-3000:]
+    parquet = snapshot / "food.parquet"
+    parquet.chmod(0o644)  # snapshots are read-only; Windows will not unlink one
+    parquet.unlink()
+
+    pinned = {**vars_, "snapshot_dir": snapshot.as_posix()}
+    rest = run_dbt(
+        "build", tmp_path, pinned, exclude=("base_off__us_products",), target_name="target-2"
+    )
+    assert rest.returncode == 0, rest.output[-3000:]
+
+    two_steps = {r["unique_id"] for r in first.results + rest.results}
+    assert two_steps == {r["unique_id"] for r in build.run.results}
+    assert all(r["status"] in ("success", "pass") for r in first.results + rest.results)
