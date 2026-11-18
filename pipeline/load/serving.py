@@ -14,6 +14,10 @@ The API reads only what is loaded here, in schema `serving`:
   French water) are often heavily scanned and recorded as English, so the barcode prefix is
   the signal that keeps US products on top. Rows are written in rank order.
 - additives, ingredients, categories: lookups. stats: the dashboard document. meta: snapshot.
+- explainers: one row per additive or ingredient explainer with its Voyage embedding
+  (pgvector, from pipeline/enrich/outputs/explainer_embeddings.parquet) for the ask agent's
+  explainer search. Vectors whose text no longer matches the current explainer are left out.
+  About 1,000 rows, so exact search is fast and there is no vector index.
 
 Safety: the size is estimated from DuckDB before connecting, and the load stops above 800 MB
 (Neon's free plan blocks writes past 1 GB). Tables are built in `serving_next` and swapped in
@@ -41,6 +45,9 @@ from typing import Any, LiteralString, cast
 import duckdb
 import psycopg
 from psycopg import sql
+
+from pipeline.enrich.embeddings import OUTPUT as EMBEDDINGS_PATH
+from pipeline.enrich.embeddings import TEXTS_SQL as EXPLAINER_TEXTS_SQL
 
 ROOT = Path(__file__).resolve().parents[2]
 DUCKDB_PATH = ROOT / "data" / "labellens.duckdb"
@@ -113,6 +120,13 @@ create table {NEXT}.categories (
     category_id text primary key,
     name text not null,
     parent_id text
+);
+create table {NEXT}.explainers (
+    id text primary key,
+    kind text not null,
+    name text not null,
+    text text not null,
+    embedding public.vector(1024) not null
 );
 create table {NEXT}.stats (
     id smallint primary key default 1 check (id = 1),
@@ -189,6 +203,25 @@ LOOKUPS: list[tuple[str, dict[str, str], str]] = [
     ("dim_categories", {c: c for c in ("category_id", "name", "parent_id")}, "categories"),
 ]
 
+EXPLAINER_COLUMNS = ["id", "kind", "name", "text", "embedding"]
+
+
+def _sql_path(path: Path) -> str:
+    return "'" + str(path).replace("'", "''") + "'"
+
+
+def explainers_sql(embeddings: Path) -> str:
+    """Vectors for the current explainers only: same kind, id, name and text as embedded."""
+    return f"""
+    select t.id, t.kind, t.name, t.text,
+           '[' || array_to_string(e.embedding::float[], ',') || ']' as embedding
+    from ({EXPLAINER_TEXTS_SQL}) as t
+    join read_parquet({_sql_path(embeddings)}) as e
+      on e.kind = t.kind and e.id = t.id and e.name = t.name and e.text = t.text
+    order by t.id
+    """
+
+
 PRODUCT_COLUMNS = [
     "code", "name", "brand", "category_id", "category_source", "nutriscore_grade", "nova_group",
     "completeness",
@@ -210,7 +243,7 @@ def _mb(n: int | float) -> str:
     return f"{n / 1e6:,.1f} MB"
 
 
-def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
+def estimate(con: duckdb.DuckDBPyConnection, embeddings: Path | None = None) -> Estimate:
     """Upper-end size of the serving tables in Postgres, from the DuckDB marts.
 
     Heap: 28 bytes of tuple and pointer overhead per row, text as length + 1, numbers at their
@@ -245,6 +278,14 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
         sizes = " + ".join(f"coalesce(strlen(({e})::varchar), 0)" for e in columns.values())
         row = con.execute(f"select coalesce(sum(60 + {sizes}), 0) from {table}").fetchone()
         lookup_bytes += int(row[0]) if row else 0
+    explainer_bytes = 0
+    if embeddings and embeddings.exists():
+        # 1,024 float4 per vector plus its header, the text, and row overhead.
+        row = con.execute(
+            f"select coalesce(sum(60 + 4104 + strlen(text) + strlen(name) + strlen(id)), 0) "
+            f"from ({explainers_sql(embeddings)})"
+        ).fetchone()
+        explainer_bytes = int(row[0]) if row else 0
     return Estimate(
         {
             "products (heap)": int(heap * 1.15) + floor,
@@ -255,6 +296,7 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
             "products_swaps": int(rows * 44 * 1.4) + floor,
             "products_search (GIN)": int(words * 10) + floor,
             "lookups, stats, meta": int(lookup_bytes * 1.5) + 2_000_000,
+            "explainers (vectors)": int(explainer_bytes * 1.15) + floor,
         }
     )
 
@@ -414,12 +456,17 @@ def _drop_old(pg: psycopg.Connection, log=print) -> bool:
 
 
 def load(
-    duckdb_path: Path, database_url: str, *, replace: bool = False, log=print
+    duckdb_path: Path,
+    database_url: str,
+    *,
+    replace: bool = False,
+    embeddings: Path | None = EMBEDDINGS_PATH,
+    log=print,
 ) -> dict[str, int]:
     """Load everything and swap it in. Returns actual sizes in bytes per relation."""
     con = duckdb.connect(str(duckdb_path), read_only=True)
     try:
-        est = estimate(con)
+        est = estimate(con, embeddings)
         log("Estimated size in Postgres:")
         for name, size in est.tables.items():
             log(f"  {name:<24} {_mb(size):>10}")
@@ -446,6 +493,8 @@ def load(
                 live = False
 
             pg.execute(f"drop schema if exists {NEXT} cascade")
+            # Database-wide and outside the swapped schemas, so the vector type outlives swaps.
+            pg.execute("create extension if not exists vector with schema public")
             pg.execute(cast("LiteralString", DDL))  # built only from module constants
             started = time.perf_counter()
             with pg.transaction():
@@ -455,6 +504,18 @@ def load(
                 for source, columns, target in LOOKUPS:
                     query = f"select {', '.join(columns.values())} from {source}"
                     _copy(pg, target, list(columns), _batches(cur, query))
+                vectors = 0
+                if embeddings and embeddings.exists():
+                    vectors = _copy(
+                        pg, "explainers", EXPLAINER_COLUMNS,
+                        _batches(cur, explainers_sql(embeddings)),
+                    )  # fmt: skip
+                texts = cur.execute(f"select count(*) from ({EXPLAINER_TEXTS_SQL})").fetchone()
+                missing = (texts[0] if texts else 0) - vectors
+                log(f"explainers: {vectors:,} with vectors" + (
+                    f"; {missing:,} not embedded yet (run pipeline.enrich.embeddings)"
+                    if missing else ""
+                ))  # fmt: skip
                 pg.execute(f"insert into {NEXT}.stats (doc) values (%s)", [json.dumps(stats)])
                 for key, value in meta.items():
                     pg.execute(
@@ -504,7 +565,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.dry_run:
         with duckdb.connect(str(args.duckdb), read_only=True) as con:
-            est = estimate(con)
+            est = estimate(con, EMBEDDINGS_PATH)
         for name, size in est.tables.items():
             print(f"  {name:<24} {_mb(size):>10}")
         print(f"  {'total':<24} {_mb(est.total):>10}   (limit {_mb(MAX_LOAD_BYTES)})")

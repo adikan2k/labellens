@@ -11,6 +11,7 @@ import psycopg
 import pytest
 import yaml
 
+from pipeline.enrich.embeddings import TEXTS_SQL as EXPLAINER_TEXTS_SQL
 from pipeline.load import serving
 from pipeline.tests.support import Build
 
@@ -147,9 +148,11 @@ def test_category_source_is_loaded_and_other_is_left_out_of_rankings(
     assert sum(sources.values()) == doc["named_product_count"]
 
 
-def test_reload_swaps_in_place(serving_url: str, dbt_fixture: Build) -> None:
+def test_reload_swaps_in_place(
+    serving_url: str, dbt_fixture: Build, fixture_embeddings: Path
+) -> None:
     before = _count(serving_url)
-    serving.load(dbt_fixture.db, serving_url, log=lambda *_: None)
+    serving.load(dbt_fixture.db, serving_url, embeddings=fixture_embeddings, log=lambda *_: None)
     assert _count(serving_url) == before
     with psycopg.connect(serving_url) as pg:
         schemas = {s for (s,) in pg.execute("select nspname from pg_namespace").fetchall()}
@@ -158,21 +161,25 @@ def test_reload_swaps_in_place(serving_url: str, dbt_fixture: Build) -> None:
 
 
 def test_a_reader_on_the_old_tables_does_not_block_the_swap(
-    serving_url: str, dbt_fixture: Build, monkeypatch: pytest.MonkeyPatch
+    serving_url: str, dbt_fixture: Build, fixture_embeddings: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(serving, "SWAP_LOCK_TIMEOUT", "1s")
     messages: list[str] = []
     with psycopg.connect(serving_url) as reader:  # not autocommit: holds its lock until rollback
         reader.execute("select 1 from serving.products limit 1").fetchall()
         started = time.perf_counter()
-        serving.load(dbt_fixture.db, serving_url, log=messages.append)
+        serving.load(
+            dbt_fixture.db, serving_url, embeddings=fixture_embeddings, log=messages.append
+        )
         assert time.perf_counter() - started < 60
         reader.rollback()
     assert any("still being read" in m for m in messages)
     assert _count(serving_url) > 0  # the new tables are live
     assert serving.OLD in _schemas(serving_url)
 
-    serving.load(dbt_fixture.db, serving_url, log=lambda *_: None)  # cleans up the leftover
+    serving.load(
+        dbt_fixture.db, serving_url, embeddings=fixture_embeddings, log=lambda *_: None
+    )  # cleans up the leftover
     assert serving.OLD not in _schemas(serving_url)
 
 
@@ -186,13 +193,21 @@ def test_size_guard_stops_before_connecting(
 
 
 def test_database_cap_needs_replace(
-    serving_url: str, dbt_fixture: Build, monkeypatch: pytest.MonkeyPatch
+    serving_url: str, dbt_fixture: Build, fixture_embeddings: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(serving, "MAX_DATABASE_BYTES", 1)
     with pytest.raises(SystemExit, match="--replace"):
-        serving.load(dbt_fixture.db, serving_url, log=lambda *_: None)
+        serving.load(
+            dbt_fixture.db, serving_url, embeddings=fixture_embeddings, log=lambda *_: None
+        )
     assert _count(serving_url) > 0  # the live tables are untouched
-    serving.load(dbt_fixture.db, serving_url, replace=True, log=lambda *_: None)
+    serving.load(
+        dbt_fixture.db,
+        serving_url,
+        embeddings=fixture_embeddings,
+        replace=True,
+        log=lambda *_: None,
+    )
     assert _count(serving_url) > 0
 
 
@@ -224,3 +239,47 @@ def test_in_graph_marks_exactly_the_graph_subset(
     in_graph = {c for (c,) in pg.execute("select code from products where in_graph").fetchall()}
     subset = {c for (c,) in marts.execute("select code from int_graph_products").fetchall()}
     assert in_graph == subset and subset
+
+
+def test_explainers_carry_a_vector_each(
+    pg: psycopg.Connection, marts: duckdb.DuckDBPyConnection
+) -> None:
+    texts = marts.execute(f"select count(*) from ({EXPLAINER_TEXTS_SQL})").fetchone()
+    loaded = pg.execute(
+        "select count(*), min(public.vector_dims(embedding)), max(public.vector_dims(embedding)) "
+        "from explainers"
+    ).fetchone()
+    assert texts and texts[0] > 0
+    assert loaded == (texts[0], 1024, 1024)
+    # The additive E330's explainer is there, as "Name: explainer" was embedded.
+    row = pg.execute("select kind, name from explainers where id = 'en:e330'").fetchone()
+    assert row == ("additive", "Citric acid")
+    # Nearest to its own text by cosine distance (fake vectors share words).
+    nearest = pg.execute(
+        "select id from explainers order by embedding operator(public.<=>) "
+        "(select embedding from explainers where id = 'en:e330') limit 1"
+    ).fetchone()
+    assert nearest == ("en:e330",)
+
+
+def test_stale_vectors_are_left_out(
+    serving_url: str, dbt_fixture: Build, fixture_embeddings: Path, tmp_path: Path
+) -> None:
+    stale = tmp_path / "stale.parquet"
+    with duckdb.connect() as con:
+        con.execute(
+            f"copy (select * replace (case when id = 'en:e330' then text || ' (old)' else text "
+            f"end as text) from read_parquet('{fixture_embeddings.as_posix()}')) "
+            f"to '{stale.as_posix()}' (format parquet)"
+        )
+    messages: list[str] = []
+    try:
+        serving.load(dbt_fixture.db, serving_url, embeddings=stale, log=messages.append)
+        with psycopg.connect(serving_url) as pg:
+            ids = {i for (i,) in pg.execute("select id from serving.explainers").fetchall()}
+        assert "en:e330" not in ids and ids
+        assert any("1 not embedded yet" in m for m in messages)
+    finally:
+        serving.load(
+            dbt_fixture.db, serving_url, embeddings=fixture_embeddings, log=lambda *_: None
+        )

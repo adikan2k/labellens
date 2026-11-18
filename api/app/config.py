@@ -58,6 +58,16 @@ MODEL_PRICES: dict[str, tuple[float, float]] = {
 }
 
 
+# US dollars per million tokens for the embeddings model (decision 0001).
+EMBEDDING_PRICES: dict[str, float] = {"voyage-4-lite": 0.02}
+
+
+def embedding_price_per_mtok(model: str) -> float:
+    if model not in EMBEDDING_PRICES:
+        raise ValueError(f"No price for {model} in api/app/config.py; add it before a paid run.")
+    return EMBEDDING_PRICES[model]
+
+
 def price_per_mtok(model: str) -> tuple[float, float]:
     if model not in MODEL_PRICES:
         raise ValueError(f"No price for {model} in api/app/config.py; add it before a paid run.")
