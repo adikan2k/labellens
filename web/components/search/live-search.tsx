@@ -158,7 +158,8 @@ function ScanLine() {
           onClick={() => setOpen((was) => !was)}
         >
           {SCAN.button}
-        </button>
+        </button>{" "}
+        <Link href="/label">{SCAN.orPhotograph}</Link>
       </p>
       {open && (
         <BarcodeScanner

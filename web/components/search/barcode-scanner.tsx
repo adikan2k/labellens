@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
@@ -164,7 +165,8 @@ export function BarcodeScanner({ onClose }: { onClose: () => void }) {
         {phase.kind === "looking" && <p>{SCAN.lookingUp(phase.code)}</p>}
         {phase.kind === "missing" && (
           <p>
-            {SCAN.missing(phase.code)} <a href={addProductUrl(phase.code)}>{SCAN.addIt}</a>.
+            {SCAN.missing(phase.code)} <Link href="/label">{SCAN.photographInstead}</Link>, or{" "}
+            <a href={addProductUrl(phase.code)}>{SCAN.addIt.toLowerCase()}</a>.
           </p>
         )}
         {phase.kind === "error" && <p>{phase.message}</p>}

@@ -33,6 +33,10 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - Read-only database role for the ask agent's SQL tool (once per database; writes `DATABASE_URL_READONLY` to `.env` without printing it; `--rotate` for a new password): `uv run python scripts/create_readonly_role.py`
 - Ask eval dataset (truth queries on the local Postgres and dev graph): `uv run python -m evals.datasets.build_ask`
 - Ask eval, agent against the explainer-only baseline: `uv run python -m evals.runners.ask_eval --limit 50` (add `--yes`; cached per prompt version, so reruns cost $0)
+- Warm everything up before a demo (read-only, no model calls; reports spend and limits left; exits 0 when ready): `uv run python -m scripts.warm` (`--hold 45` keeps it warm for 45 minutes)
+- Label-reading eval: `uv run python -m evals.datasets.build_labels --download` (the dataset and its photos, into a git-ignored cache), then `uv run python -m evals.runners.label_eval --limit 30` (add `--yes`; `--model eval` for Sonnet; cached per prompt version, model and photos, so reruns cost $0). Corrections to Open Food Facts' truth, checked against the photos: `evals/datasets/labels_audit.json`
+- Sample labels on the /label page (recorded reads, shown at no cost): `uv run python -m scripts.record_label_samples` (add `--yes`; needs the local Postgres)
+- Add or change the API's own tables (`app.*`) without loading data: `uv run python -m pipeline.load.serving --app-only`
 - Replays served past the daily cap (the /ask page's example questions): `uv run python scripts/record_replays.py` (add `--yes`)
 - MCP tool-selection eval (30 requests, target 90%; cached per tool definitions; CI runs it on server changes): `uv run python -m evals.runners.mcp_eval --limit 30` (add `--yes --min-score 0.9`)
 - Preview the MCP label card without Claude (a local stand-in host on the local database): `uv run python scripts/card_preview.py --serve 8765`, then open http://localhost:8765

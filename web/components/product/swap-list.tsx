@@ -7,10 +7,10 @@ import { compareHref } from "@/lib/compare";
 
 /**
  * Better swaps as label rows: name, brand and grade, then the reason built from the data. Each
- * row also links to a side-by-side comparison with `from`, the product being viewed; it sits
- * beside the row's own link, since links cannot nest.
+ * row also links to a side-by-side comparison with `from`, the product being viewed (when
+ * there is one); it sits beside the row's own link, since links cannot nest.
  */
-export function SwapList({ swaps, from }: { swaps: Swap[]; from: string }) {
+export function SwapList({ swaps, from }: { swaps: Swap[]; from?: string }) {
   return (
     <ol>
       {swaps.map(({ product, reason }) => (
@@ -34,13 +34,15 @@ export function SwapList({ swaps, from }: { swaps: Swap[]; from: string }) {
               </span>
             </ViewTransition>
           </Link>
-          <Link
-            href={compareHref([from, product.code])}
-            className="type-small inline-block pt-1"
-            aria-label={`Compare with ${product.name}`}
-          >
-            Compare
-          </Link>
+          {from && (
+            <Link
+              href={compareHref([from, product.code])}
+              className="type-small inline-block pt-1"
+              aria-label={`Compare with ${product.name}`}
+            >
+              Compare
+            </Link>
+          )}
         </li>
       ))}
     </ol>

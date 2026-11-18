@@ -22,6 +22,7 @@ It's built as one end-to-end system: a tested dbt pipeline, AI enrichment throug
 - **Search and product pages.** Name, brand or barcode search with results as you type. Each page shows a Nutrition Facts panel per 100 g, the Nutri-Score and NOVA group, and additives with a short explainer. A flagged additive is marked when Open Food Facts flags it for a high overexposure risk.
 - **Better swaps.** Similar products in the same category with a better Nutri-Score, no flagged additive and a real barcode, each with the reason it's better.
 - **Scan a barcode.** On a phone, point the camera at a barcode to open its label. The reader runs in the browser, so the picture never leaves the device, and its WebAssembly is served from the site, not a CDN. A barcode missing from the snapshot links to adding it on Open Food Facts.
+- **Read a label from a photo.** Photograph any pack's ingredients or nutrition panel. Claude Haiku reads what's printed into structured data; LabelLens converts it to per 100 g in code, explains the additives, finds the product it most likely is, and suggests better-graded ones. It works for packs that aren't in the data at all. Photos go to Anthropic to be read and aren't stored.
 - **Compare.** Two products' labels side by side, per 100 g, with the difference on every row and their additives split into shared and unique. Open it from any product page or straight from a swap.
 - **Dashboard.** The US packaged-food landscape: grades, processing and additives by category.
 - **Graph explorer.** 27,662 products and their brands, categories, additives and ingredients in Neo4j.
@@ -67,6 +68,7 @@ Each linked result is a report in [`evals/results/`](evals/results/); the data-t
 | [Search latency](evals/results/search_latency_public.md) | 200 searches against the live API | p95 under 300 ms | **p95 184 ms**, p50 104 ms |
 | [Graph and swaps](evals/results/graph_latency_public.md) | 100 products, live API | Under 1 s | p95 406 ms (graph), 233 ms (swaps) |
 | [Lighthouse](evals/results/lighthouse.md) | Home, product and dashboard pages on mobile | 90 in every category | 98 to 100 in every category |
+| [Label reading](evals/results/label_reading_claude-haiku-5-5.md) | 30 real label photos from Open Food Facts, read by `POST /label`'s code and checked against the photos | Measured | **98% (95–99%) of nutrient values right**; every value right on 85% (68–94%) of labels; additives 93% precision, 98% recall (tuned on this set). Against Open Food Facts' own data, uncorrected: 71% |
 | [Prompt caching](evals/results/ask_caching.md) | 10 agent runs with and without a cached prompt | Cheaper, same answers | **64% cheaper per run** |
 | [Cold start](evals/results/cold_start.md) | First request after Cloud Run and Neon both scaled to zero | Timed and noted | **22.6 s after an hour idle** (3.9 s after 25 minutes), then about 0.1 s; 16 s of it was startup, cut to 0.4 s since (not yet re-timed after an hour) |
 
@@ -130,7 +132,7 @@ Every other command (loading, enrichment, evals, deploys) is listed in [`CLAUDE.
 
 ## Data and licence
 
-Contains data from [Open Food Facts](https://world.openfoodfacts.org), available under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/). Individual contents are under the Database Contents License, and product images under CC BY-SA. Images are linked from Open Food Facts, not re-hosted.
+Contains data from [Open Food Facts](https://world.openfoodfacts.org), available under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/). Individual contents are under the Database Contents License, and product images under CC BY-SA. Images are linked from Open Food Facts, not re-hosted, with one exception: the four sample label photos in `web/public/label-samples/` are copies, credited there and on the page, under CC BY-SA 3.0.
 
 Tables this project publishes that are derived from the Open Food Facts database (the dbt marts, the serving tables, the graph, the evaluation datasets and the 284-row test fixture in `pipeline/tests/fixtures/`) remain under the ODbL.
 
