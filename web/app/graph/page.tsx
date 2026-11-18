@@ -6,7 +6,7 @@ import { GraphSearch } from "@/components/graph/graph-search";
 import type { GraphNeighborhood } from "@/lib/api";
 import { cachedNeighborhood } from "@/lib/cached";
 
-export const metadata: Metadata = { title: "Graph · LabelLens" };
+export const metadata: Metadata = { title: "Graph" };
 
 // Shown when no product is chosen: a well-known product the graph holds.
 const DEFAULT_CODE = "0016000275263";

@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { Rule } from "@/components/label/primitives";
 
-export const metadata: Metadata = { title: "About · LabelLens" };
+export const metadata: Metadata = { title: "About" };
 
 const REPO = "https://github.com/adikan2k/labellens";
 

@@ -18,7 +18,7 @@ import {
 } from "@/lib/findings";
 import { formatCount, formatShare } from "@/lib/format";
 
-export const metadata: Metadata = { title: "Dashboard · LabelLens" };
+export const metadata: Metadata = { title: "Dashboard" };
 
 export default function DashboardPage() {
   return (

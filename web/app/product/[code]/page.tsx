@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense, ViewTransition } from "react";
@@ -18,6 +19,29 @@ import {
   WAKING_UP,
 } from "@/lib/copy";
 import { NOVA_LABELS } from "@/lib/format";
+import {
+  PRODUCT_NOT_FOUND_TITLE,
+  PRODUCT_UNAVAILABLE_TITLE,
+  productDescription,
+  productTitle,
+} from "@/lib/metadata";
+
+/** "Lucky Charms (Lucky Charms) · LabelLens". Shares the cached product read with the page. */
+export async function generateMetadata({
+  params,
+}: PageProps<"/product/[code]">): Promise<Metadata> {
+  const { code } = await params;
+  try {
+    const result = await cachedProduct(code);
+    if (!result) return { title: PRODUCT_NOT_FOUND_TITLE };
+    return {
+      title: productTitle(result.product),
+      description: productDescription(result.product),
+    };
+  } catch {
+    return { title: PRODUCT_UNAVAILABLE_TITLE };
+  }
+}
 
 /** Not async: params are awaited inside the Suspense boundary, so the shell prerenders. */
 export default function ProductPage({ params }: PageProps<"/product/[code]">) {

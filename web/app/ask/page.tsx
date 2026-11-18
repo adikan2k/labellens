@@ -4,7 +4,7 @@ import { AskPanel } from "@/components/ask/ask-panel";
 import { Rule } from "@/components/label/primitives";
 
 export const metadata: Metadata = {
-  title: "Ask a question · LabelLens",
+  title: "Ask a question",
   description: "Ask about US food labels in plain English. Every answer cites the products it used.",
 };
 
