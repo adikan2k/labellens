@@ -226,6 +226,7 @@ The whole sequence takes under 900 ms. It runs once per page view, never on scro
 
 - Responsive from 375 px to 1600 px.
 - Visible focus ring (`focus`, 2 px, 2 px offset) on every interactive element.
+- After a navigation inside the site, focus moves to `<main>`, so the next Tab lands on the new page's first control. `<main>` is not a control, so it shows no ring.
 - All text meets WCAG AA contrast.
 - Every chart has a text alternative: its heading states the finding, and the data is available as a table on request.
 - Lighthouse performance 90 or better on the home and product pages.
