@@ -5,6 +5,7 @@ description = "Open Food Facts as a tested pipeline, knowledge graph, web app an
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "anthropic>=2.10.0",
     "fastapi[standard]",
     "psycopg[binary,pool]>=3.3.9",
     "pydantic-settings",

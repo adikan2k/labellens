@@ -17,6 +17,19 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr | None = None
     model_default: str = "claude-haiku-5-5"
     model_eval: str = "claude-sonnet-5-5"
+    # US dollars per million input and output tokens at standard rates (the Batch API halves
+    # them). Used for the printed estimate before any paid run; check against current pricing.
+    model_prices: dict[str, tuple[float, float]] = {
+        "claude-haiku-5-5": (0.10, 0.50),
+        "claude-sonnet-5-5": (2.00, 10.00),
+    }
+
+    def price_per_mtok(self, model: str) -> tuple[float, float]:
+        if model not in self.model_prices:
+            raise ValueError(
+                f"No price for {model} in api/app/config.py; add it before a paid run."
+            )
+        return self.model_prices[model]
 
     # Embeddings (see docs/decisions/0001-embeddings.md)
     embeddings_api_key: SecretStr | None = None
