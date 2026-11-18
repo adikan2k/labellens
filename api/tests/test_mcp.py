@@ -8,9 +8,12 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 from mcp import Client
+from psycopg.rows import dict_row
 
+from api.app import swaps as swaps_module
+from api.app.additives import normalise
 from api.app.config import Settings
-from api.app.db import Database
+from api.app.db import Database, DictConnection
 from api.app.main import create_app
 from api.app.mcp.server import McpApp, create_mcp
 
@@ -52,7 +55,7 @@ def text(result: Any) -> str:
 @pytest.mark.anyio
 async def test_the_tools_are_listed_read_only(client: Client) -> None:
     tools = {t.name: t for t in (await client.list_tools()).tools}
-    assert "search_products" in tools
+    assert set(tools) == {"search_products", "get_product", "find_swaps", "explain_additive"}
     for tool in tools.values():
         assert tool.annotations and tool.annotations.read_only_hint, tool.name
         assert tool.output_schema, tool.name
@@ -77,6 +80,118 @@ async def test_search_returns_text_and_structured_results(client: Client) -> Non
 async def test_no_match_is_a_tool_error_with_a_next_step(client: Client) -> None:
     result = await client.call_tool("search_products", {"query": "zzqqxx"})
     assert result.is_error and "Try fewer words" in text(result)
+
+
+@pytest.fixture(scope="module")
+def picks(serving_url: str) -> dict[str, Any]:
+    """Fixture rows the tool tests need, chosen by query like the API tests do."""
+    with DictConnection.connect(serving_url, row_factory=dict_row) as pg:
+        flagged = pg.execute(
+            "select p.code, a.additive_id, a.e_number, a.name from serving.products p "
+            "join serving.additives a on a.additive_id = any(p.additive_ids) "
+            "where a.flagged and a.e_number is not null and p.name is not null "
+            "order by p.rank_pos limit 1"
+        ).fetchone()
+        explained = pg.execute(
+            "select additive_id, e_number, name, explainer from serving.additives "
+            "where explainer is not null and e_number is not null order by additive_id limit 1"
+        ).fetchone()
+        candidates = pg.execute(
+            "select code from serving.products where nutriscore_grade in ('d', 'e') "
+            "order by rank_pos limit 200"
+        ).fetchall()
+        with_swaps = next(
+            (c["code"] for c in candidates if swaps_module.find_swaps(pg, c["code"], 3)),
+            None,
+        )
+    if not (flagged and explained and with_swaps):
+        pytest.skip("fixture lacks a flagged additive, an explainer or a product with swaps")
+    return {"flagged": flagged, "explained": explained, "with_swaps": with_swaps}
+
+
+@pytest.mark.anyio
+async def test_get_product_gives_the_label_and_marks_flagged_additives(
+    client: Client, picks: dict[str, Any]
+) -> None:
+    flagged = picks["flagged"]
+    result = await client.call_tool("get_product", {"code": flagged["code"]})
+    assert not result.is_error, text(result)
+    data = result.structured_content
+    assert data and data["view"] == "product"
+    product = data["product"]
+    assert product["code"] == flagged["code"] and product["url"].endswith(flagged["code"])
+    assert set(product["nutrition"]) >= {"energy_kcal_100g", "sugars_100g", "salt_100g"}
+    marked = {a["additive_id"]: a["flagged"] for a in product["additives"]}
+    assert marked[flagged["additive_id"]] is True
+    body = text(result)
+    assert f"barcode {flagged['code']}" in body and "Per 100 g:" in body
+    assert f"{flagged['e_number']}: flagged by Open Food Facts" in body
+    assert "ingredients" not in product  # the card shows the label, not the full ingredient list
+
+
+@pytest.mark.anyio
+async def test_a_12_digit_upc_finds_the_stored_ean(client: Client, picks: dict[str, Any]) -> None:
+    code = picks["flagged"]["code"]
+    if not (len(code) == 13 and code.startswith("0")):
+        pytest.skip("picked product is not a zero-led EAN-13")
+    result = await client.call_tool("get_product", {"code": code[1:]})
+    assert not result.is_error and result.structured_content["product"]["code"] == code  # type: ignore[index]
+
+
+@pytest.mark.anyio
+async def test_unknown_barcode_points_to_search(client: Client) -> None:
+    result = await client.call_tool("get_product", {"code": "0000000000000"})
+    assert result.is_error and "call search_products" in text(result)
+
+
+@pytest.mark.anyio
+async def test_find_swaps_lists_better_products_with_reasons(
+    client: Client, picks: dict[str, Any]
+) -> None:
+    result = await client.call_tool("find_swaps", {"code": picks["with_swaps"], "limit": 3})
+    assert not result.is_error, text(result)
+    data = result.structured_content
+    assert data and data["view"] == "swaps" and data["product"]["code"] == picks["with_swaps"]
+    assert 1 <= len(data["swaps"]) <= 3
+    for swap in data["swaps"]:
+        assert swap["reason"] and swap["product"]["url"].startswith(f"{WEB}/product/")
+    assert "better swaps in the same category" in text(result)
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("form", ["e_number", "lower", "spaced", "id", "name"])
+async def test_explain_additive_by_any_name(
+    client: Client, picks: dict[str, Any], form: str
+) -> None:
+    row = picks["explained"]
+    term = {
+        "e_number": row["e_number"],
+        "lower": row["e_number"].lower(),
+        "spaced": f"E {row['e_number'][1:]}",
+        "id": row["additive_id"],
+        "name": row["name"].upper(),
+    }[form]
+    result = await client.call_tool("explain_additive", {"additive": term})
+    assert not result.is_error, text(result)
+    data = result.structured_content
+    assert data and data["additive_id"] == row["additive_id"]
+    assert data["explainer"]["text"] == row["explainer"]
+    assert "written by AI" in text(result)
+
+
+def test_an_e_number_without_its_suffix_finds_its_family() -> None:
+    assert normalise("E322")["prefix"] == "e322%"  # type: ignore[index]  # stored as E322i
+    assert normalise("e 150 a")["id"] == "en:e150a"  # type: ignore[index]
+    assert normalise("E322(i)")["e"] == "e322i"  # type: ignore[index]
+    assert "prefix" not in normalise("carrageenan")  # type: ignore[operator]
+    assert normalise("   ") is None
+    assert normalise(" MSG ")["id"] == "en:e621"  # type: ignore[index]  # label abbreviations
+
+
+@pytest.mark.anyio
+async def test_unknown_additive_suggests_what_to_try(client: Client) -> None:
+    result = await client.call_tool("explain_additive", {"additive": "zzqqxx"})
+    assert result.is_error and "E-number" in text(result)
 
 
 # --- Over HTTP -----------------------------------------------------------------------------

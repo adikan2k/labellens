@@ -118,7 +118,9 @@ create table {NEXT}.additives (
     name text not null,
     function text,
     explainer text,
-    explainer_ai boolean not null default false
+    explainer_ai boolean not null default false,
+    -- Open Food Facts marks a high overexposure risk (EFSA); swaps avoid these.
+    flagged boolean not null default false
 );
 create table {NEXT}.ingredients (
     ingredient_id text primary key,
@@ -230,7 +232,7 @@ _EXPLAINER = {"explainer": "explainer", "explainer_ai": "explainer is not null"}
 LOOKUPS: list[tuple[str, dict[str, str], str]] = [
     (
         "dim_additives",
-        {c: c for c in ("additive_id", "e_number", "name", "function")} | _EXPLAINER,
+        {c: c for c in ("additive_id", "e_number", "name", "function", "flagged")} | _EXPLAINER,
         "additives",
     ),
     ("dim_ingredients", {c: c for c in ("ingredient_id", "name")} | _EXPLAINER, "ingredients"),
