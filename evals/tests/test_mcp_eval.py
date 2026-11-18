@@ -81,7 +81,10 @@ def test_scoring_needs_the_tool_and_its_arguments() -> None:
         "measured_at": "2026-11-18T12:00:00+00:00", "model": "claude-haiku-5-5",
         "tools_hash": "abc", "cost_usd": 0.001,
     })  # fmt: skip
-    assert "| Right tool and arguments | 2/5 (40%) |" in report
+    assert summary["score_ci95"] == [0.1176, 0.7693]
+    assert "| Right tool and arguments | 2/5: 40% (12–77%) |" in report
+    assert "| Right tool | 3/5: 60% (23–88%) |" in report
+    assert "95% confidence intervals (Wilson score)" in report
     assert "| x-3 | request 3 | `get_product" in report and "**fail**: called get_product" in report
 
 

@@ -1,8 +1,8 @@
 {
-  "measured_at": "2026-11-18T05:34:50+00:00",
+  "measured_at": "2026-11-18T08:11:49+00:00",
   "model": "claude-haiku-5-5",
   "judge_model": "claude-sonnet-5-5",
-  "judge_cost_usd": 0.1027,
+  "judge_cost_usd": 0.0,
   "questions": 50,
   "scores": {
     "agent": {
@@ -21,6 +21,26 @@
       "cost_usd": 0.044,
       "latency_p50_ms": 2458,
       "latency_p95_ms": 4551,
+      "fact_score_ci95": [
+        0.93,
+        1.0
+      ],
+      "correct_ci95": [
+        0.8794,
+        0.9959
+      ],
+      "tool_right_ci95": [
+        0.918,
+        1.0
+      ],
+      "refusals_ci95": [
+        0.5655,
+        1.0
+      ],
+      "scope_ci95": [
+        0.3424,
+        1.0
+      ],
       "by_category": {
         "sql": {
           "n": 25,
@@ -58,6 +78,26 @@
       "cost_usd": 0.0152,
       "latency_p50_ms": 1279,
       "latency_p95_ms": 2668,
+      "fact_score_ci95": [
+        0.14,
+        0.395
+      ],
+      "correct_ci95": [
+        0.1493,
+        0.4024
+      ],
+      "tool_right_ci95": [
+        0.1315,
+        0.3774
+      ],
+      "refusals_ci95": [
+        0.5655,
+        1.0
+      ],
+      "scope_ci95": [
+        0.3424,
+        1.0
+      ],
       "by_category": {
         "sql": {
           "n": 25,

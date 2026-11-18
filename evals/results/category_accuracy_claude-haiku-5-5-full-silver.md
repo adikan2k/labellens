@@ -1,23 +1,25 @@
 # Category accuracy: claude-haiku-5-5-full-silver
 
-Measured 2026-11-18T00:59:39+00:00: `claude-haiku-5-5`, prompt `categories-v1`, inputs: name, brand and ingredients. Cost $0.0044 (0 when every answer was cached).
+Measured 2026-11-18T08:12:06+00:00: `claude-haiku-5-5`, prompt `categories-v1`, inputs: name, brand and ingredients. Cost $0.0000 (0 when every answer was cached).
 
 Labels: 200 products labelled by Claude Opus 5.5 (an AI model, not a person).
 
 | | Accuracy |
 | --- | ---: |
-| **All gold products** | **90.0% (180/200)** |
-| dev half | 88.6% (93/105) |
-| test half | 91.6% (87/95) |
-| Gold products Open Food Facts' tags place | 90.8% (109/120) |
-| Gold products they do not (what the fill is for) | 88.8% (71/80) |
-| Baseline: Open Food Facts' tags, where they give a category | 87.5% (105/120) |
+| **All labelled products** | **180/200: 90.0% (85.1–93.4%)** |
+| dev half | 93/105: 88.6% (81.1–93.3%) |
+| test half | 87/95: 91.6% (84.3–95.7%) |
+| Products Open Food Facts' tags place | 109/120: 90.8% (84.3–94.8%) |
+| Products they do not (what the fill is for) | 71/80: 88.8% (80.0–94.0%) |
+| Baseline: Open Food Facts' tags, where they give a category | 105/120: 87.5% (80.4–92.3%) |
+
+Ranges in brackets are 95% confidence intervals (Wilson score): with this few cases the true rate could plausibly be anywhere in the range, so a gap smaller than the ranges may be noise.
 
 Target: 90%. This run **meets** it. Invalid answers (counted wrong): 0.
 
 ## Most common confusions
 
-| Gold label | Model said | Count |
+| Label | Model said | Count |
 | --- | --- | ---: |
 | Canned goods and soups | Fruits and vegetables | 3 |
 | Candy and chocolate | Chips, crackers and salty snacks | 1 |
@@ -37,7 +39,7 @@ Target: 90%. This run **meets** it. Invalid answers (counted wrong): 0.
 
 ## By category
 
-| Category | Gold products | Recall | Precision |
+| Category | Labelled products | Recall | Precision |
 | --- | ---: | ---: | ---: |
 | Prepared meals and pizza | 17 | 100% | 81% |
 | Candy and chocolate | 13 | 85% | 100% |

@@ -15,7 +15,8 @@ Reported: accuracy (an invalid answer counts as wrong), accuracy on the "dev" an
 halves (split by a hash of the barcode; prompt changes are tuned on dev errors only),
 accuracy for gold products that Open Food Facts' tags place and those they do not, the
 tag mapping's own accuracy on the products it places (the baseline), per-category recall
-and precision, and the most common confusions.
+and precision, and the most common confusions. Every accuracy carries a 95% Wilson score
+interval (evals/runners/stats.py).
 
 --tagged-sample N instead compares the model, given only the name and brand, with the tag
 category of N products that have one: a larger, cheaper check of agreement, not accuracy.
@@ -36,6 +37,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
+from evals.runners.stats import INTERVAL_NOTE, ci95, pct_ci
 from pipeline.enrich import categories, core
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -65,6 +67,7 @@ class Scores:
     invalid: int
     per_category: dict[str, dict[str, float | int]]
     confusions: list[tuple[str, str, int]]
+    ci95: list[float] = field(default_factory=lambda: [0.0, 1.0])  # Wilson, [low, high]
 
 
 def score(pairs: Sequence[tuple[str, str | None]]) -> Scores:
@@ -91,6 +94,7 @@ def score(pairs: Sequence[tuple[str, str | None]]) -> Scores:
         invalid=sum(1 for _, p in pairs if p is None),
         per_category=per_category,
         confusions=[(t, p, c) for (t, p), c in confusions.most_common(15)],
+        ci95=ci95(correct, n),
     )
 
 
@@ -127,7 +131,7 @@ class Report:
 
 
 def _table(s: Scores) -> str:
-    return f"{s.accuracy:.1%} ({s.correct}/{s.n})"
+    return f"{s.correct}/{s.n}: {pct_ci(s.correct, s.n, digits=1)}"
 
 
 def to_markdown(report: Report, names: dict[str, str]) -> str:
@@ -156,7 +160,7 @@ def to_markdown(report: Report, names: dict[str, str]) -> str:
             f"| Baseline: Open Food Facts' tags, where they give a category | "
             f"{_table(report.tag_baseline)} |"
         )
-    lines.append("")
+    lines += ["", INTERVAL_NOTE, ""]
     if gold:
         lines.append(
             f"Target: {report.target:.0%}. This run **{verdict}** it. "

@@ -3,7 +3,7 @@
   "model": "claude-haiku-5-5",
   "prompt_version": "categories-v1",
   "inputs": "name and brand only",
-  "measured_at": "2026-11-18T00:49:17+00:00",
+  "measured_at": "2026-11-18T08:12:08+00:00",
   "overall": {
     "n": 1000,
     "correct": 797,
@@ -243,6 +243,10 @@
         "spreads",
         3
       ]
+    ],
+    "ci95": [
+      0.771,
+      0.8208
     ]
   },
   "halves": {},
@@ -251,5 +255,6 @@
   "missing": [],
   "cost_usd": 0.0,
   "target": 0.9,
-  "against": "tags"
+  "against": "tags",
+  "labels": ""
 }

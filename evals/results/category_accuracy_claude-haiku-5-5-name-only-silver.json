@@ -3,7 +3,7 @@
   "model": "claude-haiku-5-5",
   "prompt_version": "categories-v1",
   "inputs": "name and brand only",
-  "measured_at": "2026-11-18T01:01:40+00:00",
+  "measured_at": "2026-11-18T08:12:07+00:00",
   "overall": {
     "n": 200,
     "correct": 175,
@@ -243,6 +243,10 @@
         "prepared-meals",
         1
       ]
+    ],
+    "ci95": [
+      0.822,
+      0.9139
     ]
   },
   "halves": {
@@ -474,6 +478,10 @@
           "bread",
           1
         ]
+      ],
+      "ci95": [
+        0.7776,
+        0.9115
       ]
     },
     "test": {
@@ -690,6 +698,10 @@
           "other",
           1
         ]
+      ],
+      "ci95": [
+        0.817,
+        0.9418
       ]
     }
   },
@@ -933,6 +945,10 @@
           "bread",
           1
         ]
+      ],
+      "ci95": [
+        0.7944,
+        0.9162
       ]
     },
     "Products they do not (what the fill is for)": {
@@ -1120,6 +1136,10 @@
           "pasta-rice",
           1
         ]
+      ],
+      "ci95": [
+        0.7998,
+        0.9397
       ]
     }
   },
@@ -1346,10 +1366,14 @@
         "yogurt",
         1
       ]
+    ],
+    "ci95": [
+      0.804,
+      0.9228
     ]
   },
   "missing": [],
-  "cost_usd": 0.0031,
+  "cost_usd": 0.0,
   "target": 0.9,
   "against": "gold",
   "labels": "200 products labelled by Claude Opus 5.5 (an AI model, not a person)"
