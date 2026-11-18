@@ -80,7 +80,7 @@ def test_a_tool_call_streams_a_step_then_a_cited_answer() -> None:
     assert first["model"] == MODEL and first["thinking"] == {"type": "disabled"}
     assert first["tool_choice"] == {"type": "auto"}
     assert [t["name"] for t in first["tools"]] == ["query_sql", "query_graph", "search_explainers"]
-    assert "query_graph for relationships" in first["system"]
+    assert "query_graph for relationships" in first["system"][0]["text"]
     # The tool result goes back under the call's id, after the assistant's tool_use turn.
     assert second["messages"][1]["content"][0]["type"] == "tool_use"
     result = second["messages"][2]["content"][0]
@@ -125,15 +125,60 @@ def test_a_model_refusal_stop_reason_is_a_refused_answer() -> None:
 
 def test_cost_counts_model_and_embedding_tokens() -> None:
     client = ScriptedClient(
-        tool_calls(SQL, usage=Usage(input_tokens=2000, output_tokens=100,
-                                    cache_read_input_tokens=500)),
+        tool_calls(SQL, usage=Usage(input_tokens=2000, output_tokens=100)),
         text("Done.", usage=Usage(input_tokens=3000, output_tokens=200)),
     )  # fmt: skip
     run, _ = _events(_agent(client), StubTools(embedding_tokens=10_000))
-    assert run.usage.input_tokens == 5500 and run.usage.output_tokens == 300
+    assert run.usage.input_tokens == 5000 and run.usage.output_tokens == 300
     assert run.usage.embedding_tokens == 10_000 and run.usage.model_calls == 2
-    expected = (5500 * 0.10 + 300 * 0.50 + 10_000 * 0.02) / 1e6
+    assert run.usage.cache_read_input_tokens == run.usage.cache_creation_input_tokens == 0
+    expected = (5000 * 0.10 + 300 * 0.50 + 10_000 * 0.02) / 1e6
     assert run.cost == pytest.approx(expected)
+
+
+def test_cache_reads_and_writes_cost_their_multiples_of_the_input_price() -> None:
+    """Haiku 5.5: input $0.10/MTok, a cache write 1.25 times it, a cache read 0.1 times it.
+    The API reports input_tokens as the uncached part only."""
+    client = ScriptedClient(
+        tool_calls(SQL, usage=Usage(input_tokens=50, output_tokens=100,
+                                    cache_creation_input_tokens=2200)),
+        text("Done.", usage=Usage(input_tokens=400, output_tokens=200,
+                                  cache_read_input_tokens=2200)),
+    )  # fmt: skip
+    run, _ = _events(_agent(client), StubTools())
+    usage = run.usage
+    assert usage.input_tokens == 50 + 2200 + 400 + 2200  # every input token, as before
+    assert usage.cache_creation_input_tokens == 2200 and usage.cache_read_input_tokens == 2200
+    assert usage.uncached_input_tokens == 450
+    expected_in = (450 + 2200 * 1.25 + 2200 * 0.10) * 0.10 / 1e6
+    assert run.cost == pytest.approx(expected_in + 300 * 0.50 / 1e6)
+    # The same tokens all at the full input price cost more than the cached run.
+    assert run.cost < (usage.input_tokens * 0.10 + 300 * 0.50) / 1e6
+
+
+def test_the_tools_and_system_prompt_are_cached_with_one_marker() -> None:
+    """Tools render before the system prompt, so one ephemeral marker on the system block
+    caches both. The prefix must be byte-identical on every call of the run, including the
+    forced-answer call where tool_choice is none; nothing after it carries a marker."""
+    calls = [tool_calls(SQL) for _ in range(MAX_TOOL_CALLS)]
+    client = ScriptedClient(*calls, text("Done."))
+    _events(_agent(client), StubTools())
+    first, last = client.calls[0], client.calls[-1]
+    (block,) = first["system"]
+    assert block["type"] == "text" and block["cache_control"] == {"type": "ephemeral"}
+    assert all("cache_control" not in t for t in first["tools"])
+    assert "cache_control" not in first  # no automatic marker on the varying tail
+    assert last["tool_choice"] == {"type": "none"}
+    for call in client.calls:
+        assert call["system"] == first["system"] and call["tools"] == first["tools"]
+        assert "cache_control" not in json.dumps(call["messages"])
+
+
+def test_caching_can_be_turned_off_to_measure_it() -> None:
+    client = ScriptedClient(text("Hi."))
+    _events(_agent(client, cache_prompt=False), StubTools())
+    (call,) = client.calls
+    assert isinstance(call["system"], str) and "cache_control" not in json.dumps(call)
 
 
 def test_a_lost_database_ends_the_run_with_tool_failed() -> None:
@@ -162,7 +207,7 @@ def test_the_baseline_sees_only_its_tool() -> None:
     _events(_agent(client, tool_names=("search_explainers",)), StubTools())
     (call,) = client.calls
     assert [t["name"] for t in call["tools"]] == ["search_explainers"]
-    assert "query_sql" not in call["system"]
+    assert "query_sql" not in call["system"][0]["text"]
 
 
 def test_finalize_handles_groups_and_unknown_ids() -> None:
@@ -182,9 +227,12 @@ class Recorded:
         self.log, self.name = log, name
         log.append(("start", name, as_type))
         self.fields = fields
+        self.children: list[Recorded] = []
 
     def start_observation(self, *, name: str, as_type: str = "span", **fields: Any) -> Recorded:
-        return Recorded(self.log, name, as_type, fields)
+        child = Recorded(self.log, name, as_type, fields)
+        self.children.append(child)
+        return child
 
     def update(self, **fields: Any) -> None:
         self.fields |= fields
@@ -226,6 +274,26 @@ def test_a_run_is_traced_as_generations_and_tool_spans() -> None:
     assert root and root.fields["metadata"]["prompt_version"] == PROMPT_VERSION
     assert root.fields["output"]["text"] == "Done [1]."
     assert root.fields["metadata"]["tool_calls"] == 1
+
+
+def test_a_generation_reports_cached_tokens_at_their_own_price() -> None:
+    langfuse = RecordingLangfuse()
+    client = ScriptedClient(
+        text("Hi.", usage=Usage(input_tokens=100, output_tokens=10,
+                                cache_read_input_tokens=2000, cache_creation_input_tokens=300)),
+    )  # fmt: skip
+    _events(_agent(client, Tracer(langfuse)), StubTools())
+    assert langfuse.root is not None
+    (generation,) = langfuse.root.children
+    assert generation.fields["usage_details"] == {
+        "input": 100, "input_cache_read": 2000, "input_cache_creation": 300, "output": 10,
+    }  # fmt: skip
+    cost = generation.fields["cost_details"]
+    assert cost["input"] == pytest.approx(100 * 0.10 / 1e6)
+    assert cost["input_cache_read"] == pytest.approx(2000 * 0.10 * 0.10 / 1e6)
+    assert cost["input_cache_creation"] == pytest.approx(300 * 0.10 * 1.25 / 1e6)
+    assert cost["output"] == pytest.approx(10 * 0.50 / 1e6)
+    assert cost["total"] == pytest.approx(sum(v for k, v in cost.items() if k != "total"))
 
 
 def test_a_broken_tracer_does_not_break_the_run() -> None:

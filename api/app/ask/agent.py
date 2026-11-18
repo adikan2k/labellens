@@ -12,6 +12,13 @@ refusal of medical or dietary advice: the marker is removed and `refused` is set
 
 Thinking is off: these are short lookups where latency matters more, and Haiku 5.5 accepts
 thinking off at the default effort.
+
+Prompt caching: the system prompt is one text block with an ephemeral cache_control marker.
+Tools render before the system prompt, so that one marker caches the tool definitions and the
+system prompt together (about 2,200 tokens, over Haiku 5.5's 512-token minimum). Every later
+call of the run, and of any run within the 5-minute TTL, reads that prefix at a tenth of the
+input price instead of paying for it again. tool_choice switching to none does not break it.
+See evals/results/ask_caching.md for the measured effect.
 """
 
 from __future__ import annotations
@@ -28,7 +35,7 @@ from psycopg_pool import PoolTimeout
 from api.app.ask.prompts import PROMPT_VERSION, REFUSAL_MARKER, TOOL_DEFINITIONS, system_prompt
 from api.app.ask.tools import TOOL_NAMES, Citations, Tools
 from api.app.ask.tracing import Tracer
-from api.app.config import embedding_price_per_mtok, price_per_mtok
+from api.app.config import embedding_price_per_mtok, input_cost_usd, price_per_mtok
 
 MAX_TOOL_CALLS = 6
 MAX_TURNS = MAX_TOOL_CALLS + 2  # parallel calls can use the budget in fewer turns
@@ -73,19 +80,30 @@ class Answer:
 
 @dataclass
 class Usage:
+    """Token counts for a run. input_tokens is every input token, cached or not; the two cache
+    counts say how many of them were read from or written to the prompt cache."""
+
     input_tokens: int = 0
     output_tokens: int = 0
     embedding_tokens: int = 0
     model_calls: int = 0
+    cache_read_input_tokens: int = 0
+    cache_creation_input_tokens: int = 0
+
+    @property
+    def uncached_input_tokens(self) -> int:
+        return self.input_tokens - self.cache_read_input_tokens - self.cache_creation_input_tokens
 
     def cost(self, model: str, embeddings_model: str) -> float:
-        price_in, price_out = price_per_mtok(model)
+        _, price_out = price_per_mtok(model)
         embed = embedding_price_per_mtok(embeddings_model)
-        return (
-            self.input_tokens * price_in
-            + self.output_tokens * price_out
-            + self.embedding_tokens * embed
-        ) / 1e6
+        cost_in = input_cost_usd(
+            model,
+            self.uncached_input_tokens,
+            self.cache_read_input_tokens,
+            self.cache_creation_input_tokens,
+        )
+        return cost_in + (self.output_tokens * price_out + self.embedding_tokens * embed) / 1e6
 
 
 def finalize(text: str, citations: Citations) -> Answer:
@@ -143,6 +161,7 @@ class Agent:
     tool_names: tuple[str, ...] = TOOL_NAMES
     max_tool_calls: int = MAX_TOOL_CALLS
     name: str = "ask"
+    cache_prompt: bool = True  # off only to measure the difference (scripts/measure_ask_caching.py)
 
     def run(self, question: str, tools: Tools, *, timeout: float | None = None) -> Run:
         deadline = time.monotonic() + timeout if timeout else None
@@ -184,7 +203,9 @@ class Run:
                 "tools": list(agent.tool_names),
             },
         )
-        system = system_prompt(agent.tool_names)
+        system: str | list[dict[str, Any]] = system_prompt(agent.tool_names)
+        if agent.cache_prompt:
+            system = [{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}]
         definitions = [TOOL_DEFINITIONS[name] for name in agent.tool_names]
         messages: list[dict[str, Any]] = [{"role": "user", "content": self.question}]
         try:
@@ -212,22 +233,31 @@ class Run:
                 )
                 response = self._create(params)
                 usage = response.usage
-                tokens_in = (
-                    usage.input_tokens
-                    + (getattr(usage, "cache_read_input_tokens", 0) or 0)
-                    + (getattr(usage, "cache_creation_input_tokens", 0) or 0)
-                )
-                self.usage.input_tokens += tokens_in
+                uncached = usage.input_tokens
+                cache_read = getattr(usage, "cache_read_input_tokens", 0) or 0
+                cache_write = getattr(usage, "cache_creation_input_tokens", 0) or 0
+                self.usage.input_tokens += uncached + cache_read + cache_write
+                self.usage.cache_read_input_tokens += cache_read
+                self.usage.cache_creation_input_tokens += cache_write
                 self.usage.output_tokens += usage.output_tokens
                 self.usage.model_calls += 1
                 content = [_block(b) for b in response.content]
-                price_in, price_out = price_per_mtok(agent.model)
+                _, price_out = price_per_mtok(agent.model)
+                cost = {
+                    "input": input_cost_usd(agent.model, uncached),
+                    "input_cache_read": input_cost_usd(agent.model, 0, cache_read=cache_read),
+                    "input_cache_creation": input_cost_usd(agent.model, 0, cache_write=cache_write),
+                    "output": usage.output_tokens * price_out / 1e6,
+                }
                 generation.end(
                     output=content,
-                    usage_details={"input": tokens_in, "output": usage.output_tokens},
-                    cost_details={
-                        "total": (tokens_in * price_in + usage.output_tokens * price_out) / 1e6
+                    usage_details={
+                        "input": uncached,
+                        "input_cache_read": cache_read,
+                        "input_cache_creation": cache_write,
+                        "output": usage.output_tokens,
                     },
+                    cost_details=cost | {"total": sum(cost.values())},
                     metadata={"stop_reason": response.stop_reason},
                 )
 

@@ -65,6 +65,16 @@ MODEL_PRICES: dict[str, tuple[float, float]] = {
 }
 
 
+# Prompt caching, as multiples of the model's input price. A cache read costs a tenth of it on
+# Haiku 5.5 and a twentieth on Sonnet 5.5 ($0.10 against $2.00); a write with the default
+# 5-minute TTL costs 1.25 times it on both. Check against current pricing.
+CACHE_READ_MULTIPLIERS: dict[str, float] = {
+    "claude-haiku-5-5": 0.10,
+    "claude-sonnet-5-5": 0.05,
+}
+CACHE_WRITE_MULTIPLIER = 1.25
+
+
 # US dollars per million tokens for the embeddings model (decision 0001).
 EMBEDDING_PRICES: dict[str, float] = {"voyage-4-lite": 0.02}
 
@@ -79,6 +89,18 @@ def price_per_mtok(model: str) -> tuple[float, float]:
     if model not in MODEL_PRICES:
         raise ValueError(f"No price for {model} in api/app/config.py; add it before a paid run.")
     return MODEL_PRICES[model]
+
+
+def input_cost_usd(model: str, uncached: int, cache_read: int = 0, cache_write: int = 0) -> float:
+    """US dollars for a request's input tokens: uncached at the input price, cache reads and
+    writes at their multiples of it."""
+    price_in, _ = price_per_mtok(model)
+    if model not in CACHE_READ_MULTIPLIERS:
+        raise ValueError(f"No cache price for {model} in api/app/config.py; add it.")
+    weighted = (
+        uncached + cache_read * CACHE_READ_MULTIPLIERS[model] + cache_write * CACHE_WRITE_MULTIPLIER
+    )
+    return weighted * price_in / 1e6
 
 
 @lru_cache
