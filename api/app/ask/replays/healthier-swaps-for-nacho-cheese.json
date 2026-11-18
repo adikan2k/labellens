@@ -1,0 +1,73 @@
+{
+  "question": "Healthier swaps for Nacho Cheese Doritos",
+  "steps": [
+    {
+      "index": 1,
+      "tool": "query_sql",
+      "summary": "Find the barcode for Nacho Cheese Doritos.",
+      "row_count": 5,
+      "duration_ms": 211
+    },
+    {
+      "index": 2,
+      "tool": "query_graph",
+      "summary": "Find healthier swaps for Nacho Cheese Flavored Doritos.",
+      "row_count": 5,
+      "duration_ms": 234
+    }
+  ],
+  "answer": {
+    "text": "Healthier swaps for Nacho Cheese Flavored Doritos (Doritos, Nutri-Score D) [1]:\n\n- Doritos Reduced Fat Wild White Nacho: Nutri-Score C, no additives instead of 8, none flagged by Open Food Facts [2]\n- Doritos Spicy Nacho: Nutri-Score C, no additives instead of 8, none flagged by Open Food Facts [3]\n\nThree other swaps are listed under restaurant brands (McAlister's Deli, Firehouse Subs, Quiznos) with the same Nutri-Score C and fewer additives [4][5][6]. These are menu items, not packaged retail products, so they may not be what you want.\n\nThe swap rule compares category, name and Nutri-Score, so these are label-based matches, not a judgment on what is best for you.",
+    "citations": [
+      {
+        "n": 1,
+        "kind": "row",
+        "ref": "0028400516464",
+        "label": "Nacho Cheese Flavored Doritos (Doritos)",
+        "url": "/products/0028400516464"
+      },
+      {
+        "n": 2,
+        "kind": "row",
+        "ref": "0028400675222",
+        "label": "Doritos reduced fat wild white nacho (Doritos)",
+        "url": "/products/0028400675222"
+      },
+      {
+        "n": 3,
+        "kind": "row",
+        "ref": "0028400325080",
+        "label": "Spicy Nacho (Doritos)",
+        "url": "/products/0028400325080"
+      },
+      {
+        "n": 4,
+        "kind": "row",
+        "ref": "1417864589048008238",
+        "label": "McAlister's Deli, Doritos Nacho Cheese Tortilla Chips (McAlister's Deli)",
+        "url": "/products/1417864589048008238"
+      },
+      {
+        "n": 5,
+        "kind": "row",
+        "ref": "24829334469397682890464",
+        "label": "Firehouse Subs, Doritos Nacho Cheese (Firehouse Subs)",
+        "url": "/products/24829334469397682890464"
+      },
+      {
+        "n": 6,
+        "kind": "row",
+        "ref": "3227850248334332628",
+        "label": "Quiznos, Doritos Nacho Cheese (Quiznos)",
+        "url": "/products/3227850248334332628"
+      }
+    ],
+    "refused": false
+  },
+  "recorded": {
+    "model": "claude-haiku-5-5",
+    "prompt_version": "ask-v1",
+    "cost_usd": 0.001499,
+    "duration_ms": 3778
+  }
+}

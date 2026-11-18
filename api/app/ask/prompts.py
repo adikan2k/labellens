@@ -65,8 +65,8 @@ LabelLens only covers US food labels from Open Food Facts, without calling tools
 
 Style: plain English, short (under 150 words). Name products with their brand. Give \
 nutrients per 100 g, as the data stores them. A short list with "- " at the start of each \
-line is fine; no headings, tables or bold. When rows repeat the same product in different \
-pack sizes, list it once.
+line is fine; no headings, tables or bold. If rows repeat the same name and brand, list \
+that product once; rows with different names are different products.
 
 One question, one answer: the person cannot reply. Do not ask them questions or offer to \
 look something else up; if the question is ambiguous, answer the most likely reading and \
@@ -120,11 +120,19 @@ Name or brand search: use the indexed expression
 plainto_tsquery('english', 'granola')
 rather than ILIKE on every row.
 
+One product is often listed several times (pack sizes, reformulations). To list products, \
+keep one row per name and brand with distinct on, as here.
+
 Example: cereals under 5 g sugar without colours, best known first:
-  select p.code, p.name, p.brand, p.sugars_100g, p.nutriscore_grade from products p
-  where p.category_id = 'breakfast-cereals' and p.sugars_100g < 5
-    and not exists (select 1 from additives a where a.additive_id = any(p.additive_ids)
-                    and a.function ilike '%color%')
+  select code, name, brand, sugars_100g, nutriscore_grade from (
+    select distinct on (lower(p.name), lower(p.brand))
+           p.code, p.name, p.brand, p.sugars_100g, p.nutriscore_grade, p.rank_pos
+    from products p
+    where p.category_id = 'breakfast-cereals' and p.sugars_100g < 5
+      and not exists (select 1 from additives a where a.additive_id = any(p.additive_ids)
+                      and a.function ilike '%color%')
+    order by lower(p.name), lower(p.brand), p.rank_pos
+  ) p
   order by p.rank_pos limit 10""",
     "input_schema": {
         "type": "object",

@@ -1,0 +1,73 @@
+{
+  "question": "What is carrageenan and why is it in yogurt?",
+  "steps": [
+    {
+      "index": 1,
+      "tool": "search_explainers",
+      "summary": "Look up what carrageenan is and why it is used in food.",
+      "row_count": 5,
+      "duration_ms": 585
+    },
+    {
+      "index": 2,
+      "tool": "query_graph",
+      "summary": "Find yogurt products that contain carrageenan.",
+      "row_count": 15,
+      "duration_ms": 1332
+    }
+  ],
+  "answer": {
+    "text": "Carrageenan (E407) is a gel-forming substance extracted from red seaweed. It is used to thicken, stabilize, and keep ingredients evenly mixed in foods [1]. This description is an AI-written explainer.\n\nIn yogurt, it helps keep the texture smooth and stops the ingredients from separating. Open Food Facts lists its functions as carrier, emulsifier, humectant, stabilizer, and thickener, and flags it as high overexposure risk [2].\n\nYogurts in the graph that list carrageenan include:\n- Ratio Yogurt, Strawberry [3]\n- Oikos Triple Zero [4]\n- Activia [5]\n- Activia Yogurt Peach [6]\n\nThe graph holds 58 carrageenan products in the yogurt category, so this is a partial list.",
+    "citations": [
+      {
+        "n": 1,
+        "kind": "explainer",
+        "ref": "en:e407",
+        "label": "Carrageenan",
+        "url": null
+      },
+      {
+        "n": 2,
+        "kind": "node",
+        "ref": "Additive:en:e407",
+        "label": "E407 Carrageenan",
+        "url": null
+      },
+      {
+        "n": 3,
+        "kind": "node",
+        "ref": "Product:0070470164854",
+        "label": "ratio Yogurt - Strawberry",
+        "url": "/graph?code=0070470164854"
+      },
+      {
+        "n": 4,
+        "kind": "node",
+        "ref": "Product:0036632008374",
+        "label": "Oikos Triple Zero",
+        "url": "/graph?code=0036632008374"
+      },
+      {
+        "n": 5,
+        "kind": "node",
+        "ref": "Product:0036632035769",
+        "label": "Activia",
+        "url": "/graph?code=0036632035769"
+      },
+      {
+        "n": 6,
+        "kind": "node",
+        "ref": "Product:0036632026200",
+        "label": "Activia Yogurt Peach",
+        "url": "/graph?code=0036632026200"
+      }
+    ],
+    "refused": false
+  },
+  "recorded": {
+    "model": "claude-haiku-5-5",
+    "prompt_version": "ask-v1",
+    "cost_usd": 0.00112,
+    "duration_ms": 4678
+  }
+}
