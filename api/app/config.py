@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
+    # The website, for links from MCP tool results and the card to product pages
+    public_web_url: str = "http://localhost:3000"
+
     # Neo4j AuraDB Free
     neo4j_uri: str | None = None
     neo4j_user: str | None = None
@@ -49,6 +52,8 @@ class Settings(BaseSettings):
     ask_daily_spend_cap_usd: float = 0.50
     # A run stops here; Cloud Run's request timeout (60 s) leaves room to send the error.
     ask_timeout_seconds: float = 45.0
+    # MCP requests per client per minute, per instance (in memory; decision 0008)
+    mcp_rate_limit_per_minute: int = 60
 
 
 # US dollars per million input and output tokens at standard rates (the Batch API halves

@@ -1,0 +1,30 @@
+{"id": "search-01", "request": "Can you look up Honey Nut Cheerios for me?", "tool": "search_products", "args": {"query_words": ["honey", "nut", "cheerios"]}}
+{"id": "search-02", "request": "Find some KIND bars", "tool": "search_products", "args": {"query_words": ["kind"]}}
+{"id": "search-03", "request": "What Chobani yogurts are in LabelLens?", "tool": "search_products", "args": {"query_words": ["chobani"]}}
+{"id": "search-04", "request": "Is Heinz ketchup in there?", "tool": "search_products", "args": {"query_words": ["heinz", "ketchup"]}}
+{"id": "search-05", "request": "search for goldfish crackers", "tool": "search_products", "args": {"query_words": ["goldfish"]}}
+{"id": "search-06", "request": "Show me Skippy peanut butters", "tool": "search_products", "args": {"query_words": ["skippy"]}}
+{"id": "search-07", "request": "How healthy is Nutella, according to its label?", "tool": "search_products", "args": {"query_words": ["nutella"]}}
+{"id": "search-08", "request": "I'm curious what Ben & Jerry's ice creams LabelLens has", "tool": "search_products", "args": {"query_words": ["jerry"]}}
+{"id": "product-01", "request": "Show me the nutrition label for barcode 0016000123991.", "tool": "get_product", "args": {"code": "0016000123991"}}
+{"id": "product-02", "request": "What's in product 0044000060237?", "tool": "get_product", "args": {"code": "0044000060237"}}
+{"id": "product-03", "request": "Pull up the label for 0009800895007", "tool": "get_product", "args": {"code": "0009800895007"}}
+{"id": "product-04", "request": "I just scanned 0030000010402 at the store. What's its Nutri-Score?", "tool": "get_product", "args": {"code": "0030000010402"}}
+{"id": "product-05", "request": "How much sugar per 100 g is in 0041192100437?", "tool": "get_product", "args": {"code": "0041192100437"}}
+{"id": "product-06", "request": "Does 0038000138416 contain any additives?", "tool": "get_product", "args": {"code": "0038000138416"}}
+{"id": "product-07", "request": "Give me the full label of UPC 044000031114", "tool": "get_product", "args": {"code": "0044000031114"}}
+{"id": "product-08", "request": "Is 0013000006057 an ultra-processed food?", "tool": "get_product", "args": {"code": "0013000006057"}}
+{"id": "swaps-01", "request": "Find me a healthier alternative to 0028400516464", "tool": "find_swaps", "args": {"code": "0028400516464"}}
+{"id": "swaps-02", "request": "What could I eat instead of Lucky Charms (barcode 0016000123991)?", "tool": "find_swaps", "args": {"code": "0016000123991"}}
+{"id": "swaps-03", "request": "Better swaps for barcode 0044000060237, please", "tool": "find_swaps", "args": {"code": "0044000060237"}}
+{"id": "swaps-04", "request": "My kid loves 0014100085478. Is there something similar but better for him?", "tool": "find_swaps", "args": {"code": "0014100085478"}}
+{"id": "swaps-05", "request": "Suggest a cereal with a better Nutri-Score than 0041192100437", "tool": "find_swaps", "args": {"code": "0041192100437"}}
+{"id": "swaps-06", "request": "Any ice cream that's a better pick than 0076840100477?", "tool": "find_swaps", "args": {"code": "0076840100477"}}
+{"id": "swaps-07", "request": "swap ideas for nutella, barcode 0009800895007", "tool": "find_swaps", "args": {"code": "0009800895007"}}
+{"id": "additive-01", "request": "What is E471?", "tool": "explain_additive", "args": {"additive_id": "en:e471", "names": ["mono- and diglycerides of fatty acids", "mono and diglycerides"]}}
+{"id": "additive-02", "request": "Why is there carrageenan in my yogurt?", "tool": "explain_additive", "args": {"additive_id": "en:e407", "names": ["carrageenan"]}}
+{"id": "additive-03", "request": "What does MSG actually do in food?", "tool": "explain_additive", "args": {"additive_id": "en:e621", "names": ["monosodium glutamate"]}}
+{"id": "additive-04", "request": "What's E150a doing in my cola?", "tool": "explain_additive", "args": {"additive_id": "en:e150a", "names": ["plain caramel", "caramel color", "caramel colour"]}}
+{"id": "additive-05", "request": "Tell me about the additive tartrazine", "tool": "explain_additive", "args": {"additive_id": "en:e102", "names": ["tartrazine"]}}
+{"id": "none-01", "request": "What's the capital of Australia?", "tool": null, "args": {}}
+{"id": "none-02", "request": "Write me a haiku about autumn leaves.", "tool": null, "args": {}}

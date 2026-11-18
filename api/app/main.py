@@ -26,6 +26,7 @@ from api.app import swaps as swaps_module
 from api.app.ask import service as ask_module
 from api.app.config import Settings, get_settings
 from api.app.db import UNAVAILABLE, Database, DatabaseNotConfigured, DictConnection
+from api.app.mcp.server import create_mcp
 from api.app.schemas import (
     AskRequest,
     Error,
@@ -68,7 +69,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         app.state.ask = _open_ask(app, settings)
         try:
-            yield
+            # A mounted route's own lifespan never runs, so the MCP session manager runs here.
+            async with app.state.mcp.server.session_manager.run():
+                yield
         finally:
             app.state.db.close()
             app.state.graph.close()
@@ -76,6 +79,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 app.state.ask.readonly.close()
 
     app = FastAPI(title="LabelLens API", version=API_VERSION, lifespan=lifespan)
+    # The MCP server reads app.state.db per call; the pool opens in the lifespan.
+    app.state.mcp = create_mcp(
+        lambda: app.state.db,
+        settings.public_web_url,
+        per_minute=settings.mcp_rate_limit_per_minute,
+    )
+    # Exactly /mcp: no slash redirect, and other paths keep the API's own JSON errors.
+    app.router.routes.append(app.state.mcp.route)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,

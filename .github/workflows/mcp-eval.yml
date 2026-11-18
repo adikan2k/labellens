@@ -1,0 +1,47 @@
+name: MCP eval
+
+# Tool selection on 30 natural requests (docs/SPEC.md phase 6): fails below 90%.
+# Results are cached by model and tool-definition hash in evals/cache/mcp_runs.jsonl, so a
+# change that leaves the definitions alone replays the committed runs for $0. A change to a
+# description or the instructions asks the model again: about half a cent.
+on:
+  pull_request:
+    paths:
+      - api/app/mcp/**
+      - evals/datasets/mcp.jsonl
+      - evals/runners/mcp_eval.py
+      - .github/workflows/mcp-eval.yml
+  push:
+    branches: [main]
+    paths:
+      - api/app/mcp/**
+      - evals/datasets/mcp.jsonl
+      - evals/runners/mcp_eval.py
+      - .github/workflows/mcp-eval.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mcp-eval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tool-selection:
+    name: MCP tool selection (90% target)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Run the eval
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: uv run python -m evals.runners.mcp_eval --limit 30 --yes --min-score 0.9
+      - name: Report
+        if: always()
+        run: cat evals/results/mcp_tools.md >> "$GITHUB_STEP_SUMMARY" || true

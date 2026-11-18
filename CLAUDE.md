@@ -32,6 +32,9 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - Ask eval dataset (truth queries on the local Postgres and dev graph): `uv run python -m evals.datasets.build_ask`
 - Ask eval, agent against the explainer-only baseline: `uv run python -m evals.runners.ask_eval --limit 50` (add `--yes`; cached per prompt version, so reruns cost $0)
 - Replays served past the daily cap (the /ask page's example questions): `uv run python scripts/record_replays.py` (add `--yes`)
+- MCP tool-selection eval (30 requests, target 90%; cached per tool definitions; CI runs it on server changes): `uv run python -m evals.runners.mcp_eval --limit 30` (add `--yes --min-score 0.9`)
+- Preview the MCP label card without Claude (a local stand-in host on the local database): `uv run python scripts/card_preview.py --serve 8765`, then open http://localhost:8765
+- MCP server: mounted on the API at `/mcp`; in Claude, add it as a custom connector with the API URL plus `/mcp` (no OAuth)
 - Category eval (needs `evals/datasets/category_gold.csv`): `uv run python -m evals.runners.category_accuracy --limit 200` (add `--yes`; variants `--name-only`, `--model eval`, `--tagged-sample 1000`)
 - Search latency eval: `uv run python -m evals.runners.search_latency --base-url <api url> --label public`
 - Graph and swap latency eval: `uv run python -m evals.runners.graph_latency --base-url <api url> --label public`

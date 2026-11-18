@@ -1,0 +1,38 @@
+{
+  "measured_at": "2026-11-18T07:30:23+00:00",
+  "model": "claude-haiku-5-5",
+  "tools_hash": "bf89c412071d0815",
+  "cost_usd": 0.005705,
+  "n": 30,
+  "score": 0.9666666666666667,
+  "tool_score": 0.9666666666666667,
+  "by_tool": {
+    "search_products": {
+      "n": 8,
+      "tool_right": 8,
+      "passed": 8
+    },
+    "get_product": {
+      "n": 8,
+      "tool_right": 8,
+      "passed": 8
+    },
+    "find_swaps": {
+      "n": 7,
+      "tool_right": 7,
+      "passed": 7
+    },
+    "explain_additive": {
+      "n": 5,
+      "tool_right": 4,
+      "passed": 4
+    },
+    "no tool": {
+      "n": 2,
+      "tool_right": 2,
+      "passed": 2
+    }
+  },
+  "input_tokens": 44256,
+  "output_tokens": 2558
+}
