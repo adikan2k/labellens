@@ -21,13 +21,15 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - Pipeline in Dagster: `uv run dagster dev -m pipeline.dagster.definitions` (set `DAGSTER_HOME` to keep run history)
 - Run report after a build: `uv run python -m pipeline.report` (writes `pipeline/reports/<date>.md`)
 - Rebuild the test fixture: `uv run python scripts/make_fixture.py`
-- Local Postgres for tests and dev (Docker Desktop running): `docker compose up -d postgres`
+- Local Postgres and Neo4j for tests and dev (Docker Desktop running): `docker compose up -d postgres neo4j neo4j-test` (tests use `neo4j-test`; `neo4j` holds the dev graph)
 - Load the serving tables: `uv run python -m pipeline.load.serving --dry-run` (size only), then without `--dry-run` (reads `DATABASE_URL`; `--database-url postgresql://labellens:labellens@localhost:54329/labellens` for local)
-- API locally: `uv run fastapi dev api/app/main.py` (set `DATABASE_URL`)
+- Load the graph into Neo4j: `uv run python -m pipeline.load.graph --dry-run` (counts against the caps), then without `--dry-run` (reads `NEO4J_*`; local dev graph: `bolt://localhost:57687`, user `neo4j`, password `labellens-local`); `--ping` keeps AuraDB Free awake
+- API locally: `uv run fastapi dev api/app/main.py` (set `DATABASE_URL`, and `NEO4J_*` for the graph)
 - Deploy the API: `uv run python scripts/deploy_api.py --project <id> --web-origin <vercel url>` prints the commands; add `--yes` to run them
 - Enrichment (paid; prints the estimate, sends only with `--yes`; reruns cost $0 from the committed outputs in `pipeline/enrich/outputs/`): `uv run python -m pipeline.enrich.categories --limit <n>` and `uv run python -m pipeline.enrich.explainers --limit <n>`, then `dbt build` again
 - Category eval (needs `evals/datasets/category_gold.csv`): `uv run python -m evals.runners.category_accuracy --limit 200` (add `--yes`; variants `--name-only`, `--model eval`, `--tagged-sample 1000`)
 - Search latency eval: `uv run python -m evals.runners.search_latency --base-url <api url> --label public`
+- Graph and swap latency eval: `uv run python -m evals.runners.graph_latency --base-url <api url> --label public`
 - Lighthouse eval (needs Node and Chrome): `uv run python -m evals.runners.lighthouse --base-url https://labellens-beige.vercel.app`
 - Regenerate web API types after changing `docs/openapi.yaml`: `pnpm -C web gen:api`
 - Web: `pnpm -C web dev`, `pnpm -C web lint`, `pnpm -C web typecheck`, `pnpm -C web test`
