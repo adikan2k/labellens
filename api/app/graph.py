@@ -22,28 +22,39 @@ PER_HUB = 6
 HUB_ORDER = ("Brand", "Category", "Additive", "Ingredient")
 KINDS = ("Product", "Brand", "Category", "Additive", "Ingredient")
 
-CENTER_QUERY = """
+# One round trip: the product's links, its category's parent and, at depth 2, the hubs with
+# their best-ranked other products. (Two queries cost a second trip from Cloud Run to Aura.)
+NEIGHBORHOOD_QUERY = """
 MATCH (p:Product {code: $code})
-OPTIONAL MATCH (p)-[r]->(n)
-WITH p, collect(CASE WHEN n IS NULL THEN null ELSE {
-    type: type(r), rank: r.rank, label: labels(n)[0], key: coalesce(n.code, n.id),
-    name: n.name, grade: n.grade, e_number: n.e_number, explainer: n.explainer
-} END) AS links
-OPTIONAL MATCH (p)-[:IN]->(:Category)-[:CHILD_OF]->(parent:Category)
-RETURN p {.code, .name, .grade} AS product, links, parent {.id, .name} AS parent
-"""
-
-HUBS_QUERY = """
-MATCH (p:Product {code: $code})-[]->(n)
-CALL (p, n) {
-    MATCH (o:Product)-[r]->(n)
-    WHERE o <> p
-    WITH o, type(r) AS type
-    ORDER BY o.rank
-    LIMIT $per_hub
-    RETURN collect({code: o.code, name: o.name, grade: o.grade, type: type}) AS others
+CALL (p) {
+    OPTIONAL MATCH (p)-[r]->(n)
+    RETURN collect(CASE WHEN n IS NULL THEN null ELSE {
+        type: type(r), rank: r.rank, label: labels(n)[0], key: coalesce(n.code, n.id),
+        name: n.name, grade: n.grade, e_number: n.e_number, explainer: n.explainer
+    } END) AS links
 }
-RETURN labels(n)[0] AS label, coalesce(n.code, n.id) AS key, COUNT { (n)<--() } AS degree, others
+CALL (p) {
+    OPTIONAL MATCH (p)-[:IN]->(:Category)-[:CHILD_OF]->(parent:Category)
+    RETURN parent {.id, .name} AS parent
+}
+CALL (p) {
+    OPTIONAL MATCH (p)-[]->(n)
+    WHERE $depth >= 2
+    CALL (p, n) {
+        OPTIONAL MATCH (o:Product)-[r]->(n)
+        WHERE o <> p
+        WITH o, type(r) AS type
+        ORDER BY o.rank
+        LIMIT $per_hub
+        RETURN collect(CASE WHEN o IS NULL THEN null ELSE
+            {code: o.code, name: o.name, grade: o.grade, type: type} END) AS others
+    }
+    RETURN collect(CASE WHEN n IS NULL THEN null ELSE {
+        label: labels(n)[0], key: coalesce(n.code, n.id), degree: COUNT { (n)<--() },
+        others: others
+    } END) AS hubs
+}
+RETURN p {.code, .name, .grade} AS product, links, parent, hubs
 """
 
 
@@ -170,8 +181,8 @@ class Graph:
 
     def neighborhood(self, code: str, depth: int) -> dict[str, Any] | None:
         """The neighbourhood, or None if the graph does not hold this product."""
-        rows = self._read(CENTER_QUERY, code=code)
+        rows = self._read(NEIGHBORHOOD_QUERY, code=code, depth=depth, per_hub=PER_HUB)
         if not rows:
             return None
-        hubs = self._read(HUBS_QUERY, code=code, per_hub=PER_HUB) if depth >= 2 else None
-        return assemble(rows[0], hubs)
+        row = rows[0]
+        return assemble(row, row["hubs"] if depth >= 2 else None)
