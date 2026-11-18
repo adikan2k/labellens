@@ -19,6 +19,7 @@ import {
 import {
   ASK_AI_NOTE,
   ASK_EXAMPLES,
+  ASK_PRIVACY_NOTE,
   ASK_REFUSED_NOTE,
   ASK_REPLAY_NOTE,
   ASK_UNAVAILABLE,
@@ -111,6 +112,7 @@ export function AskPanel() {
             }
           }}
           placeholder="Which cereals have under 5 g sugar?"
+          aria-describedby={`${inputId}-privacy`}
           className="panel type-body block w-full resize-y rounded-none px-3 py-2 placeholder:text-ink-muted"
         />
         <div className="flex items-baseline justify-between gap-4 pt-3">
@@ -125,6 +127,9 @@ export function AskPanel() {
             Enter to ask, Shift+Enter for a new line
           </span>
         </div>
+        <p id={`${inputId}-privacy`} className="type-small pt-3 text-ink-muted">
+          {ASK_PRIVACY_NOTE} <Link href="/about#your-questions">What happens to your questions</Link>
+        </p>
       </form>
       <div className="pt-6">
         <p className="type-small text-ink-muted">Or try one of these:</p>

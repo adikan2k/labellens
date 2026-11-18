@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import Link from "next/link";
+
 import { Rule } from "@/components/label/primitives";
+import { ASK_LIMITS, EVAL_RESULTS, MCP_URL, REPO_URL as REPO, repoFileUrl } from "@/lib/copy";
 
 export const metadata: Metadata = { title: "About" };
-
-const REPO = "https://github.com/adikan2k/labellens";
 
 export default function AboutPage() {
   return (
@@ -47,7 +48,7 @@ export default function AboutPage() {
             Categories come from the product&rsquo;s Open Food Facts tags, mapped to 26 categories.
             Where the tags give none, an AI model suggests one from the product&rsquo;s name, brand
             and ingredients, and the product page says so. Its accuracy against 200 products
-            labelled by hand is in the{" "}
+            labelled by a second, larger AI model is in the{" "}
             <a href={`${REPO}/tree/main/evals/results`}>eval results</a>.
           </li>
           <li>
@@ -62,6 +63,80 @@ export default function AboutPage() {
           <a href={`${REPO}/tree/main/pipeline/reports`}>pipeline run reports</a>, and the code is
           on <a href={REPO}>GitHub</a>.
         </p>
+      </Section>
+
+      <Section title="Ask a question">
+        <p>
+          On <Link href="/ask">Ask a question</Link>, an AI agent built on Anthropic&rsquo;s Claude
+          answers in plain English. It looks things up step by step, in the product tables, the
+          food graph and the additive explainers, and every answer cites the products it used. It
+          does not give medical or dietary advice.
+        </p>
+        <p className="pt-3">
+          It is a free demo, so it has limits: {ASK_LIMITS.perHour} questions an hour from each
+          visitor, and about ${ASK_LIMITS.dailySpendUsd.toFixed(2)} of model use a day for everyone.
+          Past that, the example questions show recorded runs until the next day (UTC). A question
+          that takes longer than {ASK_LIMITS.timeoutSeconds} seconds stops with a message.
+        </p>
+        <p className="pt-3">
+          On 50 test questions with known answers, the agent scored 0.98 for facts against 0.26 for
+          a version that could only search the explainers. The{" "}
+          <a href={repoFileUrl("evals/results/ask_agent.md")}>full results</a> list every question.
+        </p>
+      </Section>
+
+      <Section title="Use it in Claude">
+        <p>
+          LabelLens is also a connector for Claude. Claude can search products, show a label card,
+          find better swaps and explain an additive from inside a conversation.
+        </p>
+        <p className="pt-3">
+          In Claude, add a custom connector with this address. It needs no sign-in.
+        </p>
+        <p className="type-data-value panel mt-3 px-3 py-2 break-all">{MCP_URL}</p>
+        <p className="pt-3">
+          The connector receives only what Claude sends to its tools, such as a search term or a
+          barcode. Your conversation stays between you and Claude.
+        </p>
+      </Section>
+
+      <Section title="How it’s measured">
+        <p>
+          Each number below comes from an eval in the repository, run against the live data. The
+          file says how it was measured, when, and what it cost.
+        </p>
+        <dl className="pt-3">
+          {EVAL_RESULTS.map((result) => (
+            <div key={result.file} className="border-b border-rule-light py-3">
+              <dt className="type-data-label">
+                <a href={repoFileUrl(result.file)}>{result.name}</a>
+              </dt>
+              <dd className="pt-1">{result.headline}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+
+      <Section title="What happens to your questions" id="your-questions">
+        <ul className="list-disc space-y-2 pl-6">
+          <li>
+            Your question goes to Anthropic, whose model writes the answer. When the agent searches
+            the additive explainers, it also goes to Voyage AI, which turns it into numbers to find
+            the closest ones.
+          </li>
+          <li>
+            The question, the agent&rsquo;s steps and the answer are kept in the trace log
+            (Langfuse), so mistakes can be found and fixed. On Langfuse&rsquo;s free plan they can
+            be viewed for 30 days and are not deleted after that.
+          </li>
+          <li>
+            LabelLens&rsquo;s own database keeps no question text. For each question it records the
+            time, the cost, how long it took, and a keyed hash of your network address, which
+            enforces the hourly limit and cannot be read back as the address without the key.
+          </li>
+          <li>There are no accounts, no cookies for tracking and no ads.</li>
+        </ul>
+        <p className="pt-3">So don&rsquo;t put names, health details or anything private in a question.</p>
       </Section>
 
       <Section title="What LabelLens does not do">
@@ -95,9 +170,9 @@ export default function AboutPage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({ title, id, children }: { title: string; id?: string; children: ReactNode }) {
   return (
-    <section className="pt-12">
+    <section id={id} className="scroll-mt-8 pt-12">
       <h2 className="type-heading pb-2">{title}</h2>
       <Rule weight="thin" className="mb-3" />
       {children}

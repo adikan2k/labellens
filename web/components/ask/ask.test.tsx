@@ -2,7 +2,7 @@ import { act, cleanup, fireEvent, render, screen, within } from "@testing-librar
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { AskAnswer, AskStep } from "@/lib/ask";
-import { ASK_AI_NOTE, ASK_REFUSED_NOTE, ASK_REPLAY_NOTE } from "@/lib/copy";
+import { ASK_AI_NOTE, ASK_PRIVACY_NOTE, ASK_REFUSED_NOTE, ASK_REPLAY_NOTE } from "@/lib/copy";
 
 const askQuestion = vi.fn();
 vi.mock("@/lib/ask", async (original) => ({
@@ -213,5 +213,14 @@ describe("AskPanel", () => {
       fireEvent.keyDown(box, { key: "Enter" });
     });
     expect(askQuestion).toHaveBeenCalledTimes(1);
+  });
+
+  test("the question box says where questions go before anything is sent", () => {
+    render(<AskPanel />);
+    const box = screen.getByLabelText("Your question");
+    const note = document.getElementById(box.getAttribute("aria-describedby") ?? "");
+    expect(note?.textContent).toBe(`${ASK_PRIVACY_NOTE} What happens to your questions`);
+    const link = screen.getByRole("link", { name: "What happens to your questions" });
+    expect(link.getAttribute("href")).toBe("/about#your-questions");
   });
 });
