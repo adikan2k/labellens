@@ -57,9 +57,17 @@ class Tracer:
         if not (public_key and secret_key):
             return cls()
         try:
-            from langfuse import Langfuse
+            from langfuse import Langfuse, is_langfuse_span
 
-            return cls(Langfuse(public_key=public_key, secret_key=secret_key, base_url=base_url))
+            # Only our own spans: the Anthropic SDK and FastAPI emit OpenTelemetry spans too,
+            # which would duplicate every model call (and its cost) and add request spans.
+            client = Langfuse(
+                public_key=public_key,
+                secret_key=secret_key,
+                base_url=base_url,
+                should_export_span=is_langfuse_span,
+            )
+            return cls(client)
         except Exception:
             log.warning("Langfuse: could not start the client; tracing is off", exc_info=True)
             return cls()
@@ -72,7 +80,15 @@ class Tracer:
         if self.client is None:
             return Observation()
         try:
-            return Observation(self.client.start_observation(name=name, as_type="agent", **fields))
+            # A trace of its own, always sampled. Without it the run inherits the request's
+            # context, and on Cloud Run that is Google's `traceparent`, sampled for only a
+            # few requests: the rest of the runs were never recorded.
+            own_trace = {"trace_id": self.client.create_trace_id()}
+            return Observation(
+                self.client.start_observation(
+                    trace_context=own_trace, name=name, as_type="agent", **fields
+                )
+            )
         except Exception:
             log.warning("Langfuse: could not start the trace", exc_info=True)
             return Observation()

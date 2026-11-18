@@ -198,8 +198,15 @@ class RecordingLangfuse:
         self.log: list[tuple[str, ...]] = []
         self.root: Recorded | None = None
         self.flushed = 0
+        self.trace_contexts: list[dict[str, str]] = []
 
-    def start_observation(self, *, name: str, as_type: str = "span", **fields: Any) -> Recorded:
+    def create_trace_id(self) -> str:
+        return f"{len(self.trace_contexts) + 1:032x}"
+
+    def start_observation(
+        self, *, name: str, as_type: str = "span", trace_context: Any = None, **fields: Any
+    ) -> Recorded:
+        self.trace_contexts.append(trace_context)
         self.root = Recorded(self.log, name, as_type, fields)
         return self.root
 
@@ -234,6 +241,26 @@ def test_a_broken_tracer_does_not_break_the_run() -> None:
     _, events = _events(_agent(client, tracer), StubTools())
     assert events[-1].text == "Done."  # type: ignore[union-attr]
     tracer.flush()  # logged, not raised
+
+
+def test_each_run_is_a_trace_of_its_own() -> None:
+    """Never a child of the request's context: on Cloud Run that is Google's traceparent,
+    sampled for only a few requests, and the other runs were silently not recorded."""
+    langfuse = RecordingLangfuse()
+    for _ in range(2):
+        _events(_agent(ScriptedClient(text("Hi.")), Tracer(langfuse)), StubTools())
+    assert langfuse.trace_contexts == [{"trace_id": f"{1:032x}"}, {"trace_id": f"{2:032x}"}]
+
+
+def test_only_our_own_spans_are_exported(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The Anthropic SDK's own spans would count every model call's cost twice."""
+    import langfuse
+
+    made: dict[str, Any] = {}
+    monkeypatch.setattr(langfuse, "Langfuse", lambda **kw: made.update(kw) or object())
+    assert Tracer.from_keys("pk", "sk", "https://us.cloud.langfuse.com").enabled
+    assert made["should_export_span"] is langfuse.is_langfuse_span
+    assert made["base_url"] == "https://us.cloud.langfuse.com"
 
 
 def test_tracing_is_off_without_keys() -> None:
