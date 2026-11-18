@@ -130,6 +130,8 @@ The search box is the hero. No marketing section above it.
 
 The product count in the placeholder comes from `/stats/overview`, never hard-coded.
 
+**Scanner.** On devices with a camera, "Scan a barcode" sits on its own line under the "Try:" line, as an underlined text button like the examples. It opens a panel (2 px `ink` border, square) right under that line, above the results: the live camera picture at full panel width, one `type-small` line under it that says what is happening ("Point the camera at the barcode. The picture stays on this device."), and a "Cancel" button. A read goes straight to the product page; a barcode the snapshot lacks says so, with a link to add the product on Open Food Facts. No scanning animation or overlay, so reduced motion needs nothing special. Focus moves to "Cancel" when the panel opens and back to "Scan a barcode" when it closes; Escape closes it.
+
 ### Product page
 
 ```

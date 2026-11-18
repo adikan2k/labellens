@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, ViewTransition } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore, ViewTransition } from "react";
 
 import { GradeChip } from "@/components/label/primitives";
 import { ApiError, searchProducts, type SearchResult } from "@/lib/api";
-import { NO_MATCH, WAKING_UP } from "@/lib/copy";
+import { NO_MATCH, SCAN, WAKING_UP } from "@/lib/copy";
+
+import { BarcodeScanner } from "./barcode-scanner";
 
 const DEBOUNCE_MS = 150;
 const EXAMPLES = ["Cheerios", "Oreo", "Coca-Cola"];
@@ -96,6 +98,8 @@ export function LiveSearch({ productCount }: { productCount: number | null }) {
         ))}
       </p>
 
+      <ScanLine />
+
       <div id={statusId} role="status" aria-live="polite" className="type-small pt-6">
         {state.kind === "done" && results.length === 0 && <p>{NO_MATCH}</p>}
         {state.kind === "done" && results.length > 0 && (
@@ -130,6 +134,41 @@ export function LiveSearch({ productCount }: { productCount: number | null }) {
         </ol>
       )}
     </div>
+  );
+}
+
+const noSubscription = () => () => {};
+const hasCamera = () => typeof navigator.mediaDevices?.getUserMedia === "function";
+
+/** "Scan a barcode", only where the browser can reach a camera, and its panel when open. */
+function ScanLine() {
+  // False on the server and during hydration, then the real answer: no mismatch, no effect.
+  const camera = useSyncExternalStore(noSubscription, hasCamera, () => false);
+  const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  if (!camera) return null;
+  return (
+    <>
+      <p className="type-small pt-2">
+        <button
+          ref={buttonRef}
+          type="button"
+          aria-expanded={open}
+          className="cursor-pointer underline underline-offset-2"
+          onClick={() => setOpen((was) => !was)}
+        >
+          {SCAN.button}
+        </button>
+      </p>
+      {open && (
+        <BarcodeScanner
+          onClose={() => {
+            setOpen(false);
+            buttonRef.current?.focus();
+          }}
+        />
+      )}
+    </>
   );
 }
 

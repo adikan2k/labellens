@@ -19,6 +19,18 @@ export function missingValues(names: string[]): string | null {
 
 export const SWAP_RULE =
   "Same category, a better Nutri-Score, and no additive that Open Food Facts flags for high overexposure risk.";
+export const SCAN = {
+  button: "Scan a barcode",
+  pointing: "Point the camera at the barcode. The picture stays on this device.",
+  starting: "Starting the camera…",
+  blocked:
+    "Camera access is blocked. Allow it in your browser's settings, or type the barcode instead.",
+  noCamera: "No camera was found. Type the barcode instead.",
+  readerFailed: "The barcode reader didn't load. Type the barcode instead.",
+  lookingUp: (code: string) => `Looking up ${code}…`,
+  missing: (code: string) => `${code} isn't in the US snapshot.`,
+  addIt: "Add it to Open Food Facts",
+} as const;
 export const COMPARE_INTRO =
   "Two products' labels side by side, per 100 g. Differences are the second against the first.";
 export const COMPARE_WITH = "Compare with another product";
