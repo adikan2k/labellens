@@ -118,6 +118,15 @@ models:
         data_tests: [not_null]
       - name: function
         description: What it does, from the taxonomy classes ("Antioxidant, sequestrant").
+      - name: overexposure_risk
+        description: Open Food Facts' EFSA overexposure risk (high, moderate, no), when recorded.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["high", "moderate", "no"]
+      - name: flagged
+        description: On the swap rule's flag list (overexposure_risk = high).
+        data_tests: [not_null]
       - name: explainer
         description: Plain-English note written by the model once per additive (phase 3).
         data_tests:
@@ -129,6 +138,32 @@ models:
               config:
                 severity: warn
                 where: "product_count >= 100"
+
+  - name: dim_product_flags
+    description: Per product, its additive count and whether any additive is flagged.
+    data_tests:
+      - row_count_between:
+          arguments:
+            min_rows: "{{ var('min_products') }}"
+            max_rows: "{{ var('max_products') }}"
+    columns:
+      - name: code
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: code
+      - name: additive_count
+        data_tests:
+          - not_null
+          - in_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+      - name: has_flagged_additive
+        data_tests: [not_null]
 
   - name: bridge_product_additives
     description: Which additives each product contains.
