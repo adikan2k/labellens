@@ -89,3 +89,24 @@ describe("design pass rules (DESIGN.md sections 1, 3 and 4)", () => {
     expect(offending).toEqual([]);
   });
 });
+
+describe("scale on large screens (DESIGN.md, Type)", () => {
+  const css = readFileSync(join(WEB, "app", "globals.css"), "utf-8");
+
+  test("type, spacing and the heavy and medium rules are rem, so they scale together", () => {
+    const sizes = [...css.matchAll(/@utility type-[\w-]+ \{[^}]*\}/g)].map((m) => m[0]);
+    expect(sizes.length).toBeGreaterThanOrEqual(8);
+    for (const block of sizes) {
+      expect(block).toMatch(/font-size: [\d.]+rem;/);
+      expect(block).toMatch(/line-height: [\d.]+rem;/);
+    }
+    expect([...css.matchAll(/--spacing-\d+: ([^;]+);/g)].every((m) => m[1].endsWith("rem"))).toBe(true);
+    expect(css).toMatch(/--rule-heavy: [\d.]+rem;/);
+    expect(css).toMatch(/--rule-medium: [\d.]+rem;/);
+  });
+
+  test("the base grows at 1600 and 2200 px, as a percentage", () => {
+    expect(css).toMatch(/min-width: 1600px\)\s*\{\s*html\s*\{\s*font-size: 112.5%;/);
+    expect(css).toMatch(/min-width: 2200px\)\s*\{\s*html\s*\{\s*font-size: 125%;/);
+  });
+});

@@ -19,6 +19,13 @@ export function missingValues(names: string[]): string | null {
 
 export const SWAP_RULE =
   "Same category, a better Nutri-Score, and no additive that Open Food Facts flags for high overexposure risk.";
+/** The other ways into the site, under the empty home search. */
+export const HOME_WAYS_IN = [
+  { href: "/compare", title: "Compare two products", note: "Their labels side by side, per 100 g" },
+  { href: "/graph", title: "Explore the graph", note: "Products, brands and the ingredients they share" },
+  { href: "/ask", title: "Ask a question", note: "An agent that answers from the data and cites it" },
+] as const;
+
 export const SCAN = {
   button: "Scan a barcode",
   pointing: "Point the camera at the barcode. The picture stays on this device.",
