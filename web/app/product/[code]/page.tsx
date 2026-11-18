@@ -11,8 +11,10 @@ import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SettleChip } from "@/components/product/settle-chip";
 import type { Product, Swap } from "@/lib/api";
 import { cachedProduct, cachedSwaps } from "@/lib/cached";
+import { compareHref } from "@/lib/compare";
 import {
   AI_CATEGORY_NOTE,
+  COMPARE_WITH,
   noSwapsReason,
   SWAP_RULE,
   SWAPS_UNAVAILABLE,
@@ -130,7 +132,7 @@ function ProductLayout({ product, swaps }: { product: Product; swaps: Swap[] | n
             <p className="type-body pt-3">{SWAPS_UNAVAILABLE}</p>
           ) : swaps.length > 0 ? (
             <>
-              <SwapList swaps={swaps} />
+              <SwapList swaps={swaps} from={product.code} />
               <p className="type-small pt-3 text-ink-muted">{SWAP_RULE}</p>
             </>
           ) : (
@@ -158,6 +160,9 @@ function ProductLayout({ product, swaps }: { product: Product; swaps: Swap[] | n
           <a href={product.off_url} className="type-data-value">
             Open in Open Food Facts
           </a>
+          <Link href={compareHref([product.code])} className="type-data-value">
+            {COMPARE_WITH}
+          </Link>
           {product.in_graph && (
             <Link href={`/graph?code=${product.code}`} className="type-data-value">
               Explore in the graph

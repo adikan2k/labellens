@@ -19,7 +19,10 @@ export function missingValues(names: string[]): string | null {
 
 export const SWAP_RULE =
   "Same category, a better Nutri-Score, and no additive that Open Food Facts flags for high overexposure risk.";
-export const SWAPS_UNAVAILABLE = "Swaps are not available right now. Try again in a minute.";
+export const COMPARE_INTRO =
+  "Two products' labels side by side, per 100 g. Differences are the second against the first.";
+export const COMPARE_WITH = "Compare with another product";
+export const SWAPS_UNAVAILABLE ="Swaps are not available right now. Try again in a minute.";
 
 /** Why a product has no swaps, from what the swap rule needs. */
 export function noSwapsReason(product: {

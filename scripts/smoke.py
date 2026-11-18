@@ -26,7 +26,15 @@ CODE = "0016000123991"  # Lucky Charms: in the serving tables, the graph and the
 # Nacho Cheese Doritos: has swaps. Lucky Charms may have none, which is a valid answer.
 SWAP_CODE = "0028400516464"
 UNKNOWN = "0000000000000"
-PAGES = ("/", "/dashboard", "/graph", "/ask", "/about", f"/product/{CODE}")
+PAGES = (
+    "/",
+    "/dashboard",
+    "/graph",
+    "/ask",
+    "/about",
+    f"/product/{CODE}",
+    f"/compare?codes={CODE},{SWAP_CODE}",
+)
 MCP_VERSION = "2026-07-28"
 MCP_TOOLS = {"search_products", "get_product", "find_swaps", "explain_additive"}
 TIMEOUT = 30.0  # Cloud Run scales to zero; a cold start takes a few seconds

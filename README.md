@@ -21,6 +21,7 @@ It's built as one end-to-end system: a tested dbt pipeline, AI enrichment throug
 
 - **Search and product pages.** Name, brand or barcode search with results as you type. Each page shows a Nutrition Facts panel per 100 g, the Nutri-Score and NOVA group, and additives with a short explainer. A flagged additive is marked when Open Food Facts flags it for a high overexposure risk.
 - **Better swaps.** Similar products in the same category with a better Nutri-Score, no flagged additive and a real barcode, each with the reason it's better.
+- **Compare.** Two products' labels side by side, per 100 g, with the difference on every row and their additives split into shared and unique. Open it from any product page or straight from a swap.
 - **Dashboard.** The US packaged-food landscape: grades, processing and additives by category.
 - **Graph explorer.** 27,662 products and their brands, categories, additives and ingredients in Neo4j.
 - **Ask.** A Claude Haiku agent with three tools: read-only SQL, fixed Cypher templates, and vector search over explainers. It streams each step, cites the rows it used and refuses medical advice. Limits: 10 questions an hour per visitor and $0.50 a day overall, after which it serves recorded runs.
