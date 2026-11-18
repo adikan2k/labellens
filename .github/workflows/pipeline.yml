@@ -1,10 +1,17 @@
 name: Pipeline
 
-# The full pipeline, weekly and on demand: snapshot the Open Food Facts export, build and
-# test the marts, write the run report, then load the serving tables into Neon and the graph
-# into Neo4j. Needs the repository secrets DATABASE_URL (Neon's pooled connection string) and
-# NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD to publish. Enrichment is never run here (it costs
-# money); the build reads the committed outputs in pipeline/enrich/outputs.
+# The weekly data canary: snapshot the Open Food Facts export, build and test the marts,
+# check the loads against their caps (dry runs, no connection) and upload the run report.
+# Nothing is published on schedule: new data would outdate the committed AI enrichment
+# (pipeline/enrich/outputs) and the ask eval's truth facts. Publishing to Neon and Neo4j is a
+# manual workflow_dispatch with publish: true, and needs the repository secrets DATABASE_URL
+# (Neon's pooled connection string) and NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD. Enrichment is
+# never run here (it costs money); the build reads the committed outputs.
+#
+# Disk: a runner starts with about 14 GB free; the export is 8 GB and the DuckDB file grows to
+# about 11 GB. So the preinstalled toolchains we never use go first, and the export is deleted
+# once base_off__us_products (the only model that reads it) is built. The rest of the build
+# runs with the snapshot folder pinned, since the newest-snapshot lookup needs food.parquet.
 
 on:
   schedule:
@@ -12,9 +19,9 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: "Load the new tables into Neon"
+        description: "Load the new tables into Neon and the graph into Neo4j"
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: read
@@ -26,8 +33,16 @@ concurrency:
 jobs:
   pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
+    env:
+      DBT: uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt
     steps:
+      - name: Free disk
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup
+          df -h /
+
       - uses: actions/checkout@v7
       # setup-uv publishes exact tags only (no floating v10), so pin the commit.
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
@@ -36,24 +51,53 @@ jobs:
       - run: uv sync --locked
 
       - name: Snapshot the export (about 8 GB)
-        run: uv run python -m pipeline.ingest.snapshot
+        run: |
+          uv run python -m pipeline.ingest.snapshot
+          snapshot=$(ls -d data/raw/*/ | sort | tail -n 1)
+          echo "SNAPSHOT=${snapshot%/}" >> "$GITHUB_ENV"
+          du -sh data/raw/*
+          df -h /
 
-      - name: Build and test the marts
-        run: uv run dbt build --project-dir pipeline/dbt --profiles-dir pipeline/dbt
+      - name: Build base_off__us_products from the export
+        run: |
+          $DBT --select base_off__us_products
+          df -h /
+
+      - name: Delete the export
+        run: |
+          rm -f "$SNAPSHOT/food.parquet"
+          ls -la "$SNAPSHOT"
+          df -h /
+
+      - name: Build and test the rest of the marts
+        run: |
+          $DBT --exclude base_off__us_products --vars "{snapshot_dir: '$SNAPSHOT'}"
+          du -sh data/labellens.duckdb
+          df -h /
 
       - name: Run report
-        run: uv run python -m pipeline.report
+        run: |
+          uv run python -m pipeline.report
+          cat pipeline/reports/*.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check the loads against their caps (dry runs)
+        run: |
+          uv run python -m pipeline.load.serving --dry-run | tee -a load-dry-run.txt
+          uv run python -m pipeline.load.graph --dry-run | tee -a load-dry-run.txt
 
       - uses: actions/upload-artifact@v7
+        if: always()
         with:
           name: run-report
+          if-no-files-found: ignore
           path: |
             pipeline/reports/*.md
+            load-dry-run.txt
             data/raw/*/manifest.json
             data/raw/*/additives.manifest.json
 
       - name: Load into Neon
-        if: github.event_name == 'schedule' || inputs.publish
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
@@ -64,7 +108,7 @@ jobs:
           uv run python -m pipeline.load.serving
 
       - name: Load the graph into Neo4j
-        if: github.event_name == 'schedule' || inputs.publish
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
         env:
           NEO4J_URI: ${{ secrets.NEO4J_URI }}
           NEO4J_USER: ${{ secrets.NEO4J_USER }}

@@ -51,9 +51,16 @@ class Build:
     tmp: Path
 
 
-def run_dbt(command: str, tmp: Path, vars_: dict[str, object], *select: str) -> Run:
+def run_dbt(
+    command: str,
+    tmp: Path,
+    vars_: dict[str, object],
+    *select: str,
+    exclude: tuple[str, ...] = (),
+    target_name: str | None = None,
+) -> Run:
     """Run dbt as a person would, from the repo root, into tmp/fixture.duckdb."""
-    target = tmp / f"target-{command}"
+    target = tmp / (target_name or f"target-{command}")
     args = [
         _dbt_executable(), command,
         "--project-dir", str(DBT_DIR),
@@ -64,6 +71,8 @@ def run_dbt(command: str, tmp: Path, vars_: dict[str, object], *select: str) -> 
     ]  # fmt: skip
     if select:
         args += ["--select", *select]
+    if exclude:
+        args += ["--exclude", *exclude]
     env = {
         **os.environ,
         "LABELLENS_DUCKDB": str(tmp / "fixture.duckdb"),

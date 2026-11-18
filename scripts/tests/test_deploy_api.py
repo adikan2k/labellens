@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from scripts import deploy_api
 
 ENV_FILE = Path("env.yaml")
@@ -69,3 +71,50 @@ def test_runtime_service_account_reads_the_secret() -> None:
     grant = next(c for title, c in _plan().items() if title.startswith("Let Cloud Run read"))
     assert "--member=serviceAccount:123456-compute@developer.gserviceaccount.com" in grant
     assert "--role=roles/secretmanager.secretAccessor" in grant
+
+
+def test_build_and_deploy_only_skips_the_one_time_steps() -> None:
+    full = _plan()
+    plan = dict(
+        deploy_api.commands(
+            "my-project", "us-east4", "20261117-1200", "", ENV_FILE, build_and_deploy_only=True
+        )
+    )
+    assert list(plan) == list(deploy_api.PER_DEPLOY)
+    for title in plan:  # the same build and deploy as a full run
+        assert plan[title] == full[title]
+    skipped = set(full) - set(plan)
+    assert "Enable the APIs" in skipped and "Keep only the two newest images" in skipped
+    assert not any("add-iam-policy-binding" in c for c in plan.values())
+
+
+def test_per_deploy_titles_match_the_plan() -> None:
+    titles = [title for title, _ in deploy_api.commands("p", "r", "t", "1", ENV_FILE)]
+    assert set(deploy_api.PER_DEPLOY) <= set(titles)
+
+
+def test_build_and_deploy_only_never_describes_the_project(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    calls: list[list[str]] = []
+
+    class Done:
+        returncode = 0
+        stdout = "labellens-database-url\nlabellens-neo4j-password\n"
+
+    def fake_run(command: list[str], **kwargs: object) -> Done:
+        calls.append(command)
+        return Done()
+
+    monkeypatch.setattr(deploy_api, "_gcloud", lambda: "gcloud")
+    monkeypatch.setattr(deploy_api.subprocess, "run", fake_run)
+    argv = ["--project", "p", "--web-origin", "https://x.vercel.app", "--build-and-deploy-only"]
+    assert deploy_api.main(argv) == 0
+    assert not any("describe" in c for c in calls)  # the deploy account needs no project read
+    assert [c[1:3] for c in calls] == [["secrets", "list"]]  # names only, without --yes
+    printed = capsys.readouterr().out
+    assert "# Build and push the image" in printed and "# Enable the APIs" not in printed
+
+    calls.clear()
+    assert deploy_api.main([*argv, "--yes"]) == 0
+    assert [c[1:3] for c in calls] == [["secrets", "list"], ["builds", "submit"], ["run", "deploy"]]

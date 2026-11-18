@@ -2,6 +2,12 @@
 
     uv run python scripts/deploy_api.py --project my-project --web-origin https://labellens.vercel.app
     uv run python scripts/deploy_api.py --project my-project --web-origin ... --yes
+    uv run python scripts/deploy_api.py ... --build-and-deploy-only --yes   # CI, after the first
+
+--build-and-deploy-only skips the one-time steps (APIs, image repository, cleanup policy,
+secret grants) and runs only the image build and the Cloud Run deploy. The GitHub workflow
+.github/workflows/deploy-api.yml uses it with the keyless deploy account that
+scripts/setup_ci_deploy.py creates; that account may list secret names but never read them.
 
 Before the first run: install the Google Cloud CLI, `gcloud auth login`, and create the
 secrets in SECRETS in Secret Manager (at least `labellens-database-url`, Neon's pooled
@@ -67,6 +73,10 @@ def env_file_text(values: dict[str, str]) -> str:
     return "".join(f"{k}: {json.dumps(v)}\n" for k, v in values.items() if v)
 
 
+# Titles of the steps --build-and-deploy-only keeps; everything else runs once per project.
+PER_DEPLOY = ("Build and push the image", "Deploy to Cloud Run (public, read-only API)")
+
+
 def commands(
     project: str,
     region: str,
@@ -74,6 +84,8 @@ def commands(
     project_number: str,
     env_file: Path,
     secrets: dict[str, str] | None = None,
+    *,
+    build_and_deploy_only: bool = False,
 ) -> list[tuple[str, list[str]]]:
     image = image_name(project, region, tag)
     runtime_account = f"{project_number}-compute@developer.gserviceaccount.com"
@@ -94,7 +106,7 @@ def commands(
         for name in secrets.values()
     ]
     mounted = ",".join(f"{env}={name}:latest" for env, name in secrets.items())
-    return [
+    plan = [
         ("Enable the APIs", ["gcloud", "services", "enable", *APIS, f"--project={project}"]),
         (
             "Create the image repository (fails harmlessly if it exists)",
@@ -158,6 +170,9 @@ def commands(
             ],
         ),
     ]
+    if build_and_deploy_only:
+        return [(title, command) for title, command in plan if title in PER_DEPLOY]
+    return plan
 
 
 def _gcloud() -> str:
@@ -179,16 +194,26 @@ def main(argv: list[str] | None = None) -> int:
         parser.add_argument(
             f"--{name.lower().replace('_', '-')}", help=f"default: {name} from .env"
         )
+    parser.add_argument(
+        "--build-and-deploy-only",
+        action="store_true",
+        help="skip the one-time setup steps: build the image and deploy it (CI)",
+    )
     parser.add_argument("--yes", action="store_true", help="run the commands, not just print them")
     args = parser.parse_args(argv)
 
     gcloud = _gcloud()
-    number = subprocess.run(
-        [gcloud, "projects", "describe", args.project, "--format=value(projectNumber)"],
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
+    # The project number names the runtime account in the secret grants, a one-time step.
+    number = (
+        ""
+        if args.build_and_deploy_only
+        else subprocess.run(
+            [gcloud, "projects", "describe", args.project, "--format=value(projectNumber)"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    )
 
     existing = set(
         subprocess.run(
@@ -220,7 +245,15 @@ def main(argv: list[str] | None = None) -> int:
         env_file = Path(tmp) / "env.yaml"
         env_file.write_text(env_file_text(plain), "utf-8")
         print(f"Plain settings: {', '.join(k for k, v in plain.items() if v)}")
-        plan = commands(args.project, args.region, args.tag, number, env_file, secrets)
+        plan = commands(
+            args.project,
+            args.region,
+            args.tag,
+            number,
+            env_file,
+            secrets,
+            build_and_deploy_only=args.build_and_deploy_only,
+        )
         for title, command in plan:
             print(f"\n# {title}\n{' '.join(command)}", flush=True)
             if not args.yes:

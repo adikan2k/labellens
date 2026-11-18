@@ -1,0 +1,73 @@
+name: Deploy API
+
+# Builds the API image with Cloud Build and deploys it to Cloud Run on every merge that
+# changes the API, then runs the production smoke test. Keyless: GitHub's OIDC token is
+# exchanged through Workload Identity Federation for the deploy service account, which only
+# this repository's main branch may use. One-time setup, including the repository variables
+# read below: scripts/setup_ci_deploy.py. Secrets stay in Secret Manager; this workflow never
+# sees one.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - api/**
+      - pyproject.toml
+      - uv.lock
+      - deploy/**
+      - scripts/deploy_api.py
+      - .github/workflows/deploy-api.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write # the OIDC token for Workload Identity Federation
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the setup
+        env:
+          PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+        run: |
+          if [ -z "$PROVIDER" ]; then
+            echo "::error::Repository variables are not set; run scripts/setup_ci_deploy.py once."
+            exit 1
+          fi
+      # setup-uv publishes exact tags only (no floating v10), so pin the commit.
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked --no-default-groups
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Build and deploy
+        env:
+          PROJECT: ${{ vars.GCP_PROJECT_ID }}
+          REGION: ${{ vars.GCP_REGION }}
+          WEB_ORIGIN: ${{ vars.WEB_ORIGIN }}
+          NEO4J_URI: ${{ vars.NEO4J_URI }}
+          NEO4J_USER: ${{ vars.NEO4J_USER }}
+          LANGFUSE_PUBLIC_KEY: ${{ vars.LANGFUSE_PUBLIC_KEY }}
+          LANGFUSE_BASE_URL: ${{ vars.LANGFUSE_BASE_URL }}
+        run: >-
+          uv run --no-sync python scripts/deploy_api.py
+          --project "$PROJECT" --region "$REGION" --web-origin "$WEB_ORIGIN"
+          --tag "$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
+          --build-and-deploy-only --yes
+
+  smoke:
+    needs: deploy
+    uses: ./.github/workflows/smoke.yml
