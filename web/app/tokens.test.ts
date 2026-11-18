@@ -62,3 +62,14 @@ describe("design tokens", () => {
     expect(offending).toEqual([]);
   });
 });
+
+
+describe("design pass rules (DESIGN.md sections 1, 3 and 4)", () => {
+  const css = readFileSync(join(WEB, "app", "globals.css"), "utf-8");
+  const reduced = css.slice(css.indexOf("prefers-reduced-motion: reduce"));
+
+  test("the search box's clear button is ink, not the browser's blue", () => {
+    const rule = css.slice(css.indexOf("::-webkit-search-cancel-button"));
+    expect(rule.slice(0, rule.indexOf("}"))).toContain("background-color: var(--color-ink)");
+  });
+});
