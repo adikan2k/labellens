@@ -141,9 +141,9 @@ function ResultRow({ product }: { product: SearchResult }) {
     >
       <span className="min-w-0">
         <ViewTransition name={`name-${product.code}`} share="morph" default="none">
-          <span className="type-data-value block truncate">{product.name}</span>
+          <span className="type-data-value block break-words">{product.name}</span>
         </ViewTransition>
-        <span className="type-small block truncate text-ink-muted">
+        <span className="type-small block break-words text-ink-muted">
           {product.brand ?? "Brand not listed"}
         </span>
       </span>

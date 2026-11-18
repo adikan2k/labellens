@@ -60,8 +60,8 @@ export function BarChart({ bars }: { bars: Bar[] }) {
   return (
     <ul aria-hidden="true" className="space-y-2">
       {bars.map((bar) => (
-        <li key={bar.label} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto] items-center gap-3">
-          <span className="type-data-label truncate">{bar.label}</span>
+        <li key={bar.label} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_auto] items-center gap-3">
+          <span className="type-data-label break-words">{bar.label}</span>
           <span className="block h-4">
             <Grow
               className={`h-4 ${bar.grade ? GRADE_BG[bar.grade] : "bg-ink"}`}
@@ -92,8 +92,8 @@ export function GradeStacks({ stacks }: { stacks: Stack[] }) {
       </ul>
       <ul className="space-y-2">
         {stacks.map((stack) => (
-          <li key={stack.label} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] items-center gap-3">
-            <span className="type-data-label truncate">{stack.label}</span>
+          <li key={stack.label} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] items-center gap-3">
+            <span className="type-data-label break-words">{stack.label}</span>
             <Grow className="flex h-4">
               {grades.map((g) =>
                 stack.parts[g] ? (
@@ -112,17 +112,17 @@ export function GradeStacks({ stacks }: { stacks: Stack[] }) {
   );
 }
 
-/** The chart's data as a table, on request (DESIGN.md quality floor). */
+/** The chart's data as a table, on request (DESIGN.md quality floor), in the data row roles. */
 export function DataTable({ caption, headers, rows }: { caption: string; headers: string[]; rows: (string | number)[][] }) {
   return (
     <details className="pt-4">
       <summary className="type-small cursor-pointer underline underline-offset-2">Show the numbers</summary>
-      <table className="type-small mt-3 w-full">
+      <table className="mt-3 w-full">
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr className="border-b border-ink">
             {headers.map((h, i) => (
-              <th key={h} scope="col" className={`py-1 font-bold ${i ? "text-right" : "text-left"}`}>
+              <th key={h} scope="col" className={`type-data-label py-1 ${i ? "text-right" : "text-left"}`}>
                 {h}
               </th>
             ))}
@@ -133,11 +133,11 @@ export function DataTable({ caption, headers, rows }: { caption: string; headers
             <tr key={String(row[0])} className="border-b border-rule-light">
               {row.map((cell, i) =>
                 i === 0 ? (
-                  <th key={i} scope="row" className="py-1 text-left font-normal">
+                  <th key={i} scope="row" className="type-data-label py-1 text-left">
                     {cell}
                   </th>
                 ) : (
-                  <td key={i} className="py-1 text-right tabular-nums">
+                  <td key={i} className="type-data-value py-1 text-right">
                     {cell}
                   </td>
                 ),

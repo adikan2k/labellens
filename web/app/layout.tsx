@@ -3,6 +3,7 @@ import { Archivo } from "next/font/google";
 
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { ROOT_TITLE, SITE_DESCRIPTION } from "@/lib/metadata";
 
 import "./globals.css";
 
@@ -14,8 +15,8 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
-  title: "LabelLens",
-  description: "Search US packaged foods and see their labels explained, from Open Food Facts data.",
+  title: ROOT_TITLE,
+  description: SITE_DESCRIPTION,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

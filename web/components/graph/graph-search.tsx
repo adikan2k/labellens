@@ -55,8 +55,8 @@ export function GraphSearch() {
                 className="flex items-center justify-between gap-4 border-b border-rule-light py-2 no-underline"
               >
                 <span className="min-w-0">
-                  <span className="type-data-value block truncate">{product.name}</span>
-                  <span className="type-small block truncate text-ink-muted">
+                  <span className="type-data-value block break-words">{product.name}</span>
+                  <span className="type-small block break-words text-ink-muted">
                     {product.brand ?? "Brand not listed"}
                   </span>
                 </span>

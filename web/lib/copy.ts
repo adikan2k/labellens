@@ -57,3 +57,72 @@ export function retryIn(seconds: number | null): string {
   const minutes = Math.max(1, Math.round(seconds / 60));
   return `Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`;
 }
+
+/** One line under the ask box; the About page's "What happens to your questions" says more. */
+export const ASK_PRIVACY_NOTE =
+  "Questions go to Anthropic and Voyage AI to answer them and are kept in our trace log (Langfuse), which does not delete them on its free plan. Don’t include personal details.";
+
+export const REPO_URL = "https://github.com/adikan2k/labellens";
+export const MCP_URL = "https://labellens-api-1036759996795.us-east4.run.app/mcp";
+
+/** The ask agent's public limits, from api/app/config.py. */
+export const ASK_LIMITS = {
+  perHour: 10,
+  dailySpendUsd: 0.5,
+  timeoutSeconds: 45,
+};
+
+export type EvalResult = {
+  name: string;
+  /** The number that matters, in a sentence a shopper can read. */
+  headline: string;
+  /** Path from the repository root; the About page links it on GitHub. */
+  file: string;
+};
+
+/** Every eval in evals/results/, newest numbers as committed. Tests check each file exists. */
+export const EVAL_RESULTS: EvalResult[] = [
+  {
+    name: "Ask agent",
+    headline:
+      "Fact score 0.98 on 43 answerable questions, against 0.26 for an explainer-only baseline. All 5 requests for advice refused.",
+    file: "evals/results/ask_agent.md",
+  },
+  {
+    name: "Category suggestions",
+    headline:
+      "90.0% of 200 products put in the right category (target 90%). The labels were written by an AI model, not a person.",
+    file: "evals/results/category_accuracy_claude-haiku-5-5-full-silver.md",
+  },
+  {
+    name: "Claude connector tool choice",
+    headline: "Claude picked the right tool with the right arguments for 29 of 30 requests (target 90%).",
+    file: "evals/results/mcp_tools.md",
+  },
+  {
+    name: "Search speed",
+    headline: "95% of searches answered within 193 ms on the public API (target 300 ms).",
+    file: "evals/results/search_latency_public.md",
+  },
+  {
+    name: "Graph and swaps speed",
+    headline:
+      "95% of graph neighbourhoods within 406 ms and swap lists within 233 ms on the public API (target 1 s).",
+    file: "evals/results/graph_latency_public.md",
+  },
+  {
+    name: "Page speed",
+    headline: "Lighthouse performance 100 on home, 98 on a product page and 100 on the dashboard (target 90).",
+    file: "evals/results/lighthouse.md",
+  },
+  {
+    name: "Waking up",
+    headline: "The first search after a quiet spell takes about 4 seconds; the next ones about 0.1 s.",
+    file: "evals/results/cold_start.md",
+  },
+];
+
+/** A link to a file in the repository on GitHub. */
+export function repoFileUrl(path: string): string {
+  return `${REPO_URL}/blob/main/${path}`;
+}

@@ -1,8 +1,12 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { Rule } from "@/components/label/primitives";
 import { LiveSearch } from "@/components/search/live-search";
 import { cachedStats } from "@/lib/cached";
+import { HOME_TITLE } from "@/lib/metadata";
+
+export const metadata: Metadata = { title: { absolute: HOME_TITLE } };
 
 export default function Home() {
   return (
