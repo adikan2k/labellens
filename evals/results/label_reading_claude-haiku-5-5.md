@@ -1,17 +1,19 @@
 # Label reading: claude-haiku-5-5
 
-2026-11-18T23:22:02+00:00 · model `claude-haiku-5-5` · prompt `label-v2` · 30 labels · $0.0195 · p50 1.5 s per label
+2026-11-18T23:37:48+00:00 · model `claude-haiku-5-5` · prompt `label-v3` · 30 labels · $0.0195 · p50 1.4 s per label
 
 Open Food Facts photos (ingredients and nutrition panel) of the most-scanned products in the US data, two at most per category, 22 with English labels and 8 in other languages, read by the same code as `POST /label`. Dataset: `evals/datasets/labels.jsonl` (`evals/datasets/build_labels.py`). Photos: Open Food Facts contributors, CC BY-SA.
 
-Two truths. **Open Food Facts as is** scores against its own data, which contributors enter. **Checked against the photos** applies `evals/datasets/labels_audit.json`: values corrected where the photo shows Open Food Facts is wrong, labels left out whose photo is of something else or unreadable, and nutrients the label does not print not scored (27 such values, stored by Open Food Facts as 0). The corrections were made by reading each photo; they are listed below to check.
+Two truths. **Open Food Facts as is** scores against its own data, which contributors enter. **Checked against the photos** applies `evals/datasets/labels_audit.json`: values corrected where the photo shows Open Food Facts is wrong, labels left out whose photo is of something else or unreadable, and nutrients the label does not print not scored (26 such values, stored by Open Food Facts as 0). The corrections were made by reading each photo; they are listed below to check.
+
+Read the additive figures with one caution: the prompt (v1 to v3) and the list of US label names in `api/app/additives.py` (cellulose gum, soy lecithin and so on) were improved after earlier runs on these same 30 labels showed what was missed, so they are tuned to this set. The nutrient figures barely moved between prompt versions.
 
 | Measure | Open Food Facts as is | Checked against the photos |
 | --- | --- | --- |
-| Nutrient values right (within 10%) | 71% (64–76%) of 204 | 98% (95–99%) of 158 |
+| Nutrient values right (within 10%) | 71% (65–77%) of 204 | 98% (95–99%) of 159 |
 | Labels with every nutrient right | 33% (19–51%) of 30 | 85% (68–94%) of 27 |
-| Additives found that are on the label (precision) | 64% (48–77%) of 39 | 95% (83–99%) of 38 |
-| Additives on the label that were found (recall) | 86% (69–95%) of 29 | 90% (77–96%) of 40 |
+| Additives found that are on the label (precision) | 63% (48–76%) of 43 | 93% (81–98%) of 42 |
+| Additives on the label that were found (recall) | 93% (78–98%) of 29 | 98% (87–100%) of 40 |
 | Photos read as a food label | 97% (83–99%) | 100% (88–100%) |
 
 ## Checked against the photos, by nutrient
@@ -23,8 +25,8 @@ Two truths. **Open Food Facts as is** scores against its own data, which contrib
 | Saturated fat | 100% (86–100%) of 23 |
 | Salt | 96% (80–99%) of 24 |
 | Fiber | 92% (67–99%) of 13 |
-| Sugars | 100% (86–100%) of 23 |
-| Protein | 96% (80–99%) of 25 |
+| Sugars | 96% (80–99%) of 24 |
+| Protein | 100% (87–100%) of 25 |
 
 ## Checked against the photos, by label language
 
@@ -52,12 +54,10 @@ Ranges in brackets are 95% confidence intervals (Wilson score): with this few ca
 
 ## Misses, checked against the photos
 
-- **label-08** Cream cheese (Original, `6111246721278`): Protein: read 3.1, truth 10.0
+- **label-08** Cream cheese (Original, `6111246721278`): Sugars: read 3.1, truth 0.0
 - **label-09** White Ciabattin (Jason's Sourdough, `5025125000006`): additives not in the truth: E170
 - **label-11** Eau (Aïn lfrane, `6111251420166`): Salt: read None, truth 0.001
 - **label-12** Dark chocolate 50% Cocoa (Fin Carré, `20005832`): Fiber: read 8.5, truth 7.5
-- **label-13** Purified Drinking Water (Great Value, `0078742040370`): additives missed: E500
-- **label-15** Coconut Water (The Vita Coco Company Inc., `0898999000503`): additives missed: E300
-- **label-20** Ancient Grains Probiotic Granola (Kirkland Signature, `0096619194261`): additives missed: E306
-- **label-23** Prince (LU, `7622210449283`): additives not in the truth: E340
+- **label-17** High Quality Protein (Fairlife, `0811620022118`): additives not in the truth: E307
+- **label-23** Prince (LU, `7622210449283`): additives not in the truth: E471
 - **label-26** Jben (Jaouda, `6111242106949`): additives missed: E407

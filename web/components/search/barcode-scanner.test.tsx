@@ -101,7 +101,7 @@ describe("BarcodeScanner", () => {
     searchProducts.mockResolvedValue(results("0123456789999"));
     render(<BarcodeScanner onClose={() => {}} />);
     await screen.findByText(/isn't in the US snapshot/);
-    const link = screen.getByRole("link", { name: SCAN.addIt });
+    const link = screen.getByRole("link", { name: /add it to open food facts/i });
     expect(link.getAttribute("href")).toContain("code=0123456789012");
     expect(push).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Scan again" })).toBeTruthy();

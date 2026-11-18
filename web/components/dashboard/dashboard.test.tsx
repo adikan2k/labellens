@@ -183,6 +183,7 @@ describe("the home intro under the empty search", async () => {
     expect(screen.queryByRole("region", { name: "What the data says" })).toBeNull();
     const ways = screen.getByRole("region", { name: "More ways in" });
     expect(Array.from(ways.querySelectorAll("a")).map((a) => a.getAttribute("href"))).toEqual([
+      "/label",
       "/compare",
       "/graph",
       "/ask",

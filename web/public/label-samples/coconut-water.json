@@ -1,0 +1,178 @@
+{
+  "is_food_label": true,
+  "label": {
+    "name": "Coconut Water",
+    "brand": null,
+    "barcode": null,
+    "category_id": "juices",
+    "category_name": "Juices and fruit drinks",
+    "basis": "per_serving",
+    "serving_size_g": 240.0,
+    "conversion_note": "Converted from per serving (240 g or ml) to per 100 g or ml.",
+    "nutrition": {
+      "energy_kcal_100g": 18.75,
+      "sugars_100g": 4.58,
+      "salt_100g": 0.08,
+      "fat_100g": 0.0,
+      "saturated_fat_100g": 0.0,
+      "fiber_100g": 0.0,
+      "proteins_100g": 0.0
+    },
+    "ingredients": [
+      {
+        "ingredient_id": "en:coconut-water",
+        "name": "Coconut water",
+        "rank": 1,
+        "explainer": {
+          "text": "Coconut water is the clear liquid found inside young green coconuts. It is used as a flavored base or mixer in beverages.",
+          "ai_generated": true
+        }
+      },
+      {
+        "ingredient_id": "en:vitamin-c",
+        "name": "Vitamin C",
+        "rank": 2,
+        "explainer": {
+          "text": "Ascorbic acid, a form of vitamin C that is often produced synthetically, and is used as an antioxidant to slow browning and spoilage in foods.",
+          "ai_generated": true
+        }
+      }
+    ],
+    "additives": [
+      {
+        "additive_id": "en:e300",
+        "e_number": "E300",
+        "name": "Ascorbic acid",
+        "function": "Antioxidant, sequestrant",
+        "explainer": {
+          "text": "A vitamin C compound that is used to slow oxidation in food and to bind metal ions that could otherwise cause discoloration or spoilage.",
+          "ai_generated": true
+        },
+        "flagged": false
+      }
+    ],
+    "unmatched_additives": []
+  },
+  "match": {
+    "how": "name",
+    "product": {
+      "code": "0898999000503",
+      "name": "Coconut Water",
+      "brand": "The Vita Coco Company Inc.",
+      "category_main": "juices",
+      "nutriscore_grade": "c",
+      "nova_group": 1,
+      "image_url": "https://images.openfoodfacts.org/images/products/089/899/900/0503/front_en.236.400.jpg",
+      "category_name": "Juices and fruit drinks",
+      "category_source": "off_tags",
+      "completeness": 0.9875,
+      "nutrition": {
+        "energy_kcal_100g": 13.0,
+        "sugars_100g": 2.2,
+        "salt_100g": 0.08,
+        "fat_100g": 0.0,
+        "saturated_fat_100g": 0.0,
+        "fiber_100g": 0.0,
+        "proteins_100g": 0.0
+      },
+      "additives": [],
+      "ingredients": [
+        {
+          "ingredient_id": "en:coconut-water",
+          "name": "Coconut water",
+          "rank": 1,
+          "explainer": {
+            "text": "Coconut water is the clear liquid found inside young green coconuts. It is used as a flavored base or mixer in beverages.",
+            "ai_generated": true
+          }
+        },
+        {
+          "ingredient_id": "en:e300",
+          "name": "Ascorbic acid",
+          "rank": 2,
+          "explainer": {
+            "text": "A vitamin C compound that is used to slow oxidation in food and to bind metal ions that could otherwise cause discoloration or spoilage.",
+            "ai_generated": true
+          }
+        }
+      ],
+      "off_url": "https://world.openfoodfacts.org/product/0898999000503",
+      "in_graph": true
+    }
+  },
+  "suggestions": [
+    {
+      "product": {
+        "code": "0041331027786",
+        "name": "Coconut Water",
+        "brand": "Goya",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": "https://images.openfoodfacts.org/images/products/004/133/102/7786/front_en.4.400.jpg"
+      },
+      "reason": "Nutri-Score A instead of C · no additives, the same · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0041331027793",
+        "name": "Pure Coconut Water",
+        "brand": "Goya",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": "https://images.openfoodfacts.org/images/products/004/133/102/7793/front_en.4.400.jpg"
+      },
+      "reason": "Nutri-Score A instead of C · no additives, the same · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0016229918705",
+        "name": "Coconut Water With Chocolate",
+        "brand": "Foco",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 3,
+        "image_url": null
+      },
+      "reason": "Nutri-Score A instead of C · no additives, the same · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0033844003463",
+        "name": "Coconut Water",
+        "brand": "Badia",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": null
+      },
+      "reason": "Nutri-Score A instead of C · no additives, the same · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0036800392878",
+        "name": "Coconut Water",
+        "brand": "Full Circle Market",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": null
+      },
+      "reason": "Nutri-Score A instead of C · no additives, the same · none flagged by Open Food Facts",
+      "additive_count": 0
+    }
+  ],
+  "suggestions_kind": "swaps",
+  "source": {
+    "name": "Open Food Facts",
+    "url": "https://world.openfoodfacts.org",
+    "licence": "ODbL-1.0",
+    "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "snapshot_date": "2026-11-17"
+  }
+}

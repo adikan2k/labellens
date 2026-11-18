@@ -30,7 +30,8 @@ export default function AboutPage() {
         </p>
         <p className="pt-3">
           Each page shows the date of the snapshot it uses. Product photos are linked from Open Food
-          Facts, not copied.
+          Facts, not copied, apart from the four sample label photos on the Read a label page,
+          which are credited there (CC BY-SA).
         </p>
       </Section>
 
@@ -116,6 +117,29 @@ export default function AboutPage() {
             </div>
           ))}
         </dl>
+      </Section>
+
+      <Section title="Read a label from a photo">
+        <p>
+          On <Link href="/label">Read a label</Link>, you photograph a pack&rsquo;s ingredients or
+          nutrition panel and the same Claude model reads what is printed. LabelLens then does the
+          arithmetic itself (per serving to per 100 g, sodium to salt), explains the additives it
+          knows, and looks for the product and for better-graded ones like it. It works for packs
+          LabelLens has never seen, in any language the model can read.
+        </p>
+        <p className="pt-3">
+          On 30 real label photos from Open Food Facts, checked against the photos themselves, it
+          read 98% of nutrient values correctly (95&ndash;99%) and got every value right on 85% of
+          labels (68&ndash;94%). The{" "}
+          <a href={repoFileUrl("evals/results/label_reading_claude-haiku-5-5.md")}>full results</a>{" "}
+          list every miss. It can still misread a blurry or curved label, so check what it shows
+          against the pack. {ASK_LIMITS.perHour} labels an hour from each visitor, within the same
+          daily budget as questions.
+        </p>
+        <p className="pt-3">
+          Your photos go to Anthropic to be read, and LabelLens does not keep them. What was read
+          (the text, not the photo) is kept in the trace log like a question is.
+        </p>
       </Section>
 
       <Section title="What happens to your questions" id="your-questions">

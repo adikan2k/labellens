@@ -360,3 +360,31 @@ def test_ready_reports_what_a_demo_has_left(serving_url: str, ip: str, cleanup: 
     assert body["label_reads_left"] == 10 and body["questions_left"] == 10
     assert body["daily_cap_usd"] == 0.5 and body["spent_today_usd"] >= 0
     assert body["source"]["name"] == "Open Food Facts"
+
+
+def test_ingredient_names_are_tried_bare_and_by_their_brackets() -> None:
+    from api.app.label.service import name_forms
+
+    assert name_forms("ascorbic acid (vitamin c)") == [
+        "ascorbic acid (vitamin c)",
+        "ascorbic acid",
+        "vitamin c",
+    ]
+    assert name_forms("sugar") == ["sugar"]
+
+
+def test_additives_the_model_left_out_are_found_among_the_ingredients(
+    serving_url: str, known: dict[str, Any]
+) -> None:
+    """By exact name or alias only: "salt" must not become an additive."""
+    from api.app.label.service import explain
+
+    with DictConnection.connect(serving_url, row_factory=dict_row) as pg:
+        name = pg.execute(
+            "select name from serving.additives where additive_id = %s", [known["additive_id"]]
+        ).fetchone()
+        assert name
+        label = reading(ingredients=["salt", f"{name['name']} (to keep it fresh)"], additives=[])
+        explained = explain(pg, label)
+    assert [a["additive_id"] for a in explained["additives"]] == [known["additive_id"]]
+    assert explained["unmatched_additives"] == []

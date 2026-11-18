@@ -1,0 +1,259 @@
+{
+  "is_food_label": true,
+  "label": {
+    "name": null,
+    "brand": "fairlife",
+    "barcode": "811620020",
+    "category_id": "milk",
+    "category_name": "Milk, cream and plant milks",
+    "basis": "per_serving",
+    "serving_size_g": 340.0,
+    "conversion_note": "Converted from per serving (340 g or ml) to per 100 g or ml.",
+    "nutrition": {
+      "energy_kcal_100g": 44.12,
+      "sugars_100g": 0.59,
+      "salt_100g": 0.17,
+      "fat_100g": 0.74,
+      "saturated_fat_100g": 0.44,
+      "fiber_100g": 0.29,
+      "proteins_100g": 8.82
+    },
+    "ingredients": [
+      {
+        "ingredient_id": "label:1",
+        "name": "Filtered lowfat grade A milk",
+        "rank": 1,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "label:2",
+        "name": "Alkalized cocoa",
+        "rank": 2,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "label:3",
+        "name": "Natural flavors",
+        "rank": 3,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "label:4",
+        "name": "Cellulose gel",
+        "rank": 4,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "en:cellulose-gum",
+        "name": "Cellulose gum",
+        "rank": 5,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "en:salt",
+        "name": "Salt",
+        "rank": 6,
+        "explainer": {
+          "text": "Salt is a mineral compound, mainly sodium chloride, mined or evaporated from seawater. It is used to season food and to enhance and preserve flavor.",
+          "ai_generated": true
+        }
+      },
+      {
+        "ingredient_id": "en:carrageenan",
+        "name": "Carrageenan",
+        "rank": 7,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "en:lactase",
+        "name": "Lactase enzyme",
+        "rank": 8,
+        "explainer": {
+          "text": "An enzyme produced by microorganisms that breaks down lactose, the sugar in milk, into simpler sugars in dairy products.",
+          "ai_generated": true
+        }
+      },
+      {
+        "ingredient_id": "label:9",
+        "name": "Monk fruit juice concentrate",
+        "rank": 9,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "label:10",
+        "name": "Acesulfame potassium",
+        "rank": 10,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "en:sucralose",
+        "name": "Sucralose",
+        "rank": 11,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "label:12",
+        "name": "Stevia leaf extract",
+        "rank": 12,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "label:13",
+        "name": "Vitamin A palmitate",
+        "rank": 13,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "label:14",
+        "name": "Vitamin D3",
+        "rank": 14,
+        "explainer": null
+      }
+    ],
+    "additives": [
+      {
+        "additive_id": "en:e460",
+        "e_number": "E460",
+        "name": "Cellulose",
+        "function": "Carrier, emulsifier, humectant, stabilizer, thickener",
+        "explainer": {
+          "text": "A plant-derived polymer of glucose that forms the structural fiber of plant cell walls, used as a thickener, stabilizer and carrier in foods.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e466",
+        "e_number": "E466",
+        "name": "Sodium carboxy methyl cellulose",
+        "function": "Emulsifier, humectant, stabilizer, thickener",
+        "explainer": {
+          "text": "Sodium carboxy methyl cellulose is a modified plant cellulose in the form of a sodium salt, used to thicken, stabilize, and retain moisture in foods.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e407",
+        "e_number": "E407",
+        "name": "Carrageenan",
+        "function": "Carrier, emulsifier, humectant, stabilizer, thickener",
+        "explainer": {
+          "text": "A gel-forming substance extracted from red seaweed, used to thicken, stabilize and hold ingredients evenly mixed in foods.",
+          "ai_generated": true
+        },
+        "flagged": true
+      },
+      {
+        "additive_id": "en:e950",
+        "e_number": "E950",
+        "name": "Acesulfame K",
+        "function": "Sweetener",
+        "explainer": {
+          "text": "A calorie-free artificial sweetener made from acetoacetic acid and potassium, used to add sweetness to foods and drinks.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e955",
+        "e_number": "E955",
+        "name": "Sucralose",
+        "function": "Sweetener",
+        "explainer": {
+          "text": "Sucralose is a synthetic sweetener made by chemically modifying sugar, providing sweetness with no significant calories in the amounts used.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e960",
+        "e_number": "E960",
+        "name": "Steviol glycosides",
+        "function": "Sweetener",
+        "explainer": {
+          "text": "A group of sweet compounds extracted from the leaves of the stevia plant, used as a high-intensity, low-calorie sweetener in foods and drinks.",
+          "ai_generated": true
+        },
+        "flagged": false
+      }
+    ],
+    "unmatched_additives": []
+  },
+  "match": null,
+  "suggestions": [
+    {
+      "product": {
+        "code": "0850030464040",
+        "name": "Almond unsweetened",
+        "brand": "Organic",
+        "category_main": "milk",
+        "nutriscore_grade": "a",
+        "nova_group": 3,
+        "image_url": "https://images.openfoodfacts.org/images/products/085/003/046/4040/front_en.11.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0041415018631",
+        "name": "Reduced Fat Grade A Milk",
+        "brand": "Publix",
+        "category_main": "milk",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": "https://images.openfoodfacts.org/images/products/004/141/501/8631/front_en.19.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0024182025064",
+        "name": "Organic Soymilk",
+        "brand": "Eden",
+        "category_main": "milk",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": "https://images.openfoodfacts.org/images/products/002/418/202/5064/front_en.26.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0850026212327",
+        "name": "almond + coconut CREAMER",
+        "brand": "nut pods",
+        "category_main": "milk",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": "https://images.openfoodfacts.org/images/products/085/002/621/2327/front_en.18.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0860010591215",
+        "name": "Oat whole protein milk",
+        "brand": "Whole Moon",
+        "category_main": "milk",
+        "nutriscore_grade": "a",
+        "nova_group": 4,
+        "image_url": "https://images.openfoodfacts.org/images/products/086/001/059/1215/front_en.33.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    }
+  ],
+  "suggestions_kind": "category",
+  "source": {
+    "name": "Open Food Facts",
+    "url": "https://world.openfoodfacts.org",
+    "licence": "ODbL-1.0",
+    "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "snapshot_date": "2026-11-17"
+  }
+}

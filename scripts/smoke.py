@@ -34,6 +34,7 @@ PAGES = (
     "/about",
     f"/product/{CODE}",
     f"/compare?codes={CODE},{SWAP_CODE}",
+    "/label",
 )
 MCP_VERSION = "2026-07-28"
 MCP_TOOLS = {"search_products", "get_product", "find_swaps", "explain_additive"}
@@ -99,6 +100,14 @@ def health(c: httpx.Client, api: str, web: str) -> str:
     body = _json(c.get(f"{api}/health"))
     expect(body.get("status") == "ok", f"status is {body.get('status')!r}")
     return f"api {body['versions']['api']}, snapshot {body['source'].get('snapshot_date')}"
+
+
+def ready(c: httpx.Client, api: str, web: str) -> str:
+    """Free: builds the ask agent and the label reader, and says both are configured."""
+    body = _json(c.get(f"{api}/ready"))
+    expect(body.get("ask_configured") is True, "the ask agent is not configured")
+    expect(body.get("label_configured") is True, "the label reader is not configured")
+    return f"${body.get('spent_today_usd')} of ${body.get('daily_cap_usd')} spent today"
 
 
 def search(c: httpx.Client, api: str, web: str) -> str:
@@ -185,6 +194,7 @@ def checks(expect_unknown_404: bool) -> list[tuple[str, CheckFn]]:
         (f"api /products/{SWAP_CODE}/swaps", swaps_of(SWAP_CODE, required=True)),
         ("api /graph/neighborhood", graph),
         ("api POST /ask (too short)", ask_rejects_short),
+        ("api /ready", ready),
         ("mcp tools/list", mcp_tools),
         ("mcp tools/call get_product", mcp_get_product),
     ]

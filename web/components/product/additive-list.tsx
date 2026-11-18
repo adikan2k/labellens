@@ -15,6 +15,9 @@ export function AdditiveList({ additives }: { additives: Additive[] }) {
                   <span className="type-data-value pr-2">{additive.e_number}</span>
                 )}
                 {additive.name}
+                {additive.flagged && (
+                  <span className="type-small block">Flagged by Open Food Facts</span>
+                )}
               </span>
             }
           >

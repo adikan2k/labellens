@@ -155,6 +155,7 @@ The product count in the placeholder comes from `/stats/overview`, never hard-co
 │                                                            │
 │   More ways in                                  (heading)  │
 │   ─────────────────────────────────────────── rule-thin    │
+│   Read a label from a photo   Any pack, even unknown →     │
 │   Compare two products   Their labels side by side   →     │
 │   Explore the graph      What shares an ingredient   →     │
 │   Ask a question         An agent that cites its rows →    │
@@ -163,7 +164,7 @@ The product count in the placeholder comes from `/stats/overview`, never hard-co
 - The findings are the dashboard's own headings, computed from the same numbers; each links to its chart. They need the API; if it is asleep the section is left out, never shown empty.
 - Rows are `type-data-label` (finding or name) with `type-small` `ink-muted` descriptions, separated by `rule-hair`.
 
-**Scanner.** On devices with a camera, "Scan a barcode" sits on its own line under the "Try:" line, as an underlined text button like the examples. It opens a panel (2 px `ink` border, square) right under that line, above the results: the live camera picture at full panel width, one `type-small` line under it that says what is happening ("Point the camera at the barcode. The picture stays on this device."), and a "Cancel" button. A read goes straight to the product page; a barcode the snapshot lacks says so, with a link to add the product on Open Food Facts. No scanning animation or overlay, so reduced motion needs nothing special. Focus moves to "Cancel" when the panel opens and back to "Scan a barcode" when it closes; Escape closes it.
+**Scanner.** On devices with a camera, "Scan a barcode" sits on its own line under the "Try:" line, as an underlined text button like the examples, followed by a link, "or photograph the label", to Read a label. It opens a panel (2 px `ink` border, square) right under that line, above the results: the live camera picture at full panel width, one `type-small` line under it that says what is happening ("Point the camera at the barcode. The picture stays on this device."), and a "Cancel" button. A read goes straight to the product page; a barcode the snapshot lacks says so, with links to photograph its label instead and to add the product on Open Food Facts. No scanning animation or overlay, so reduced motion needs nothing special. Focus moves to "Cancel" when the panel opens and back to "Scan a barcode" when it closes; Escape closes it.
 
 ### Product page
 
@@ -234,6 +235,39 @@ Labels never overlap. A label shows only where it clears every other label, cove
 ### Ask
 
 A single column: the question box, then each agent step as a row in a label-style panel (tool name, what it looked up, row count), then the answer with numbered citations that link to the rows.
+
+### Read a label
+
+`/label`. The photo step is a single column on the reading width; the result uses the product page's layout, because it is a product page for a pack LabelLens may not know.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ Read a label                                     (title)   │
+│ ████████████████████████████████████████████ rule-heavy    │
+│ Photograph the ingredients, the nutrition panel, or both.  │
+│ ┌ panel ──────────────┐ ┌ panel ──────────────┐            │
+│ │ [photo]             │ │ [photo]             │  up to 2   │
+│ │ Remove              │ │ Remove              │            │
+│ └─────────────────────┘ └─────────────────────┘            │
+│ [ Add a photo ]  [ Read the label ]   (button, primary)    │
+│ Photos go to Anthropic to be read...          (small)      │
+│ Or try a sample: Cereal · Soda · Cookies      (small)      │
+├────────────────────────────────────────────────────────────┤
+│ Name as read   (display)        │  Nutrition Facts panel    │
+│ Brand, category                 │  per 100 g, as on the     │
+│ Read by AI from your photo...   │  product page; the        │
+│ Additives (n), Ingredients (n)  │  conversion note under it │
+│ Looks like X in our data        │                           │
+│  └ Compare table: your label vs X                           │
+│ Better swaps / Well-graded <category>                       │
+└────────────────────────────────────────────────────────────┘
+```
+
+- Photo tiles are panels with the photo at full tile width (`object-contain`, square) and a "Remove" text button. On a phone, "Add a photo" opens the camera; on a desktop, a file picker, and a photo can be dropped onto the tiles.
+- While it reads, one `type-body` line says so; nothing animates. The result then prints with the product page's motion.
+- What was read is labelled as read by AI from the photo, every time. A product match is "Looks like", never "This is". A value the label does not print reads "Not listed".
+- A flagged additive says "Flagged by Open Food Facts" in text, as on the MCP card, here and on the product page.
+- A sample result says "Recorded example" above it.
 
 ### MCP card (inside Claude)
 

@@ -22,6 +22,15 @@ GET: dict[str, Any] = {
     f"/products/{CODE}": {"product": PRODUCT, "source": SOURCE},
     f"/products/{CODE}/swaps": {"code": CODE, "swaps": []},  # none is a valid answer
     f"/products/{smoke.SWAP_CODE}/swaps": {"code": smoke.SWAP_CODE, "swaps": [{"product": {}}]},
+    "/ready": {
+        "ask_configured": True,
+        "label_configured": True,
+        "questions_left": 10,
+        "label_reads_left": 10,
+        "spent_today_usd": 0.02,
+        "daily_cap_usd": 0.5,
+        "source": SOURCE,
+    },
     "/graph/neighborhood": {
         "center": f"Product:{CODE}",
         "nodes": [{"id": f"Product:{CODE}"}, {"id": "Brand:x"}],
@@ -108,7 +117,7 @@ def test_a_healthy_deployment_passes_every_check(stub: tuple[Stub, str]) -> None
     _, base = stub
     results, printed = _run(base)
     assert all(r.ok for r in results), printed
-    assert len(results) == 9 + len(smoke.PAGES)
+    assert len(results) == 10 + len(smoke.PAGES)
     assert len(printed.splitlines()) == len(results) + 1  # one line per check, then a total
     assert printed.rstrip().endswith(f"{len(results)}/{len(results)} checks passed.")
 

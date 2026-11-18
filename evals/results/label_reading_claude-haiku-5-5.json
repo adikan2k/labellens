@@ -1,9 +1,9 @@
 {
-  "measured_at": "2026-11-18T23:22:02+00:00",
+  "measured_at": "2026-11-18T23:37:48+00:00",
   "model": "claude-haiku-5-5",
-  "prompt_version": "label-v2",
-  "cost_usd": 0.019463,
-  "p50_s": 1.528,
+  "prompt_version": "label-v3",
+  "cost_usd": 0.019475,
+  "p50_s": 1.4,
   "as_is": {
     "audited": false,
     "labels": 30,
@@ -11,7 +11,7 @@
     "not_printed": 0,
     "read_as_food": 29,
     "labels_all_right": 10,
-    "nutrients_right": 144,
+    "nutrients_right": 145,
     "nutrients_known": 204,
     "per_nutrient": {
       "energy_kcal_100g": [
@@ -39,7 +39,7 @@
         30
       ],
       "proteins_100g": [
-        22,
+        23,
         30
       ]
     },
@@ -48,7 +48,7 @@
         "labels": 22,
         "right": 7,
         "n": 150,
-        "k": 103
+        "k": 104
       },
       "other": {
         "labels": 8,
@@ -58,26 +58,26 @@
       }
     },
     "additives": {
-      "true_positive": 25,
-      "predicted": 39,
+      "true_positive": 27,
+      "predicted": 43,
       "actual": 29
     },
     "intervals": {
       "nutrients": [
-        0.64,
-        0.7641
+        0.6451,
+        0.7687
       ],
       "labels_all_right": [
         0.1923,
         0.5122
       ],
       "additive_precision": [
-        0.4842,
-        0.7726
+        0.4786,
+        0.7562
       ],
       "additive_recall": [
-        0.6944,
-        0.945
+        0.7804,
+        0.9809
       ]
     }
   },
@@ -98,11 +98,11 @@
         "why": "The 'nutrition' photo is a screenshot of a chatbot's answer, not a label."
       }
     ],
-    "not_printed": 27,
+    "not_printed": 26,
     "read_as_food": 27,
     "labels_all_right": 23,
-    "nutrients_right": 155,
-    "nutrients_known": 158,
+    "nutrients_right": 156,
+    "nutrients_known": 159,
     "per_nutrient": {
       "energy_kcal_100g": [
         25,
@@ -126,10 +126,10 @@
       ],
       "sugars_100g": [
         23,
-        23
+        24
       ],
       "proteins_100g": [
-        24,
+        25,
         25
       ]
     },
@@ -137,8 +137,8 @@
       "en": {
         "labels": 20,
         "right": 16,
-        "n": 116,
-        "k": 113
+        "n": 117,
+        "k": 114
       },
       "other": {
         "labels": 7,
@@ -148,26 +148,26 @@
       }
     },
     "additives": {
-      "true_positive": 36,
-      "predicted": 38,
+      "true_positive": 39,
+      "predicted": 42,
       "actual": 40
     },
     "intervals": {
       "nutrients": [
-        0.9457,
-        0.9935
+        0.946,
+        0.9936
       ],
       "labels_all_right": [
         0.6752,
         0.9408
       ],
       "additive_precision": [
-        0.8271,
-        0.9854
+        0.8099,
+        0.9754
       ],
       "additive_recall": [
-        0.7695,
-        0.9604
+        0.8712,
+        0.9956
       ]
     }
   }

@@ -330,6 +330,11 @@ def to_markdown(
         f"print not scored ({audited['not_printed']} such values, stored by Open Food Facts as "
         "0). The corrections were made by reading each photo; they are listed below to check.",
         "",
+        "Read the additive figures with one caution: the prompt (v1 to v3) and the list of US "
+        "label names in `api/app/additives.py` (cellulose gum, soy lecithin and so on) were "
+        "improved after earlier runs on these same 30 labels showed what was missed, so they "
+        "are tuned to this set. The nutrient figures barely moved between prompt versions.",
+        "",
         "| Measure | Open Food Facts as is | Checked against the photos |",
         "| --- | --- | --- |",
     ]

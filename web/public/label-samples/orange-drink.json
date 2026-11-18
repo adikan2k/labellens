@@ -1,0 +1,236 @@
+{
+  "is_food_label": true,
+  "label": {
+    "name": "مشروب بعصير و لب البرتقال",
+    "brand": null,
+    "barcode": null,
+    "category_id": "juices",
+    "category_name": "Juices and fruit drinks",
+    "basis": "per_100g",
+    "serving_size_g": 250.0,
+    "conversion_note": null,
+    "nutrition": {
+      "energy_kcal_100g": 37.0,
+      "sugars_100g": 9.0,
+      "salt_100g": 0.12,
+      "fat_100g": 0.0,
+      "saturated_fat_100g": 0.0,
+      "fiber_100g": null,
+      "proteins_100g": 0.0
+    },
+    "ingredients": [
+      {
+        "ingredient_id": "en:water",
+        "name": "Water",
+        "rank": 1,
+        "explainer": {
+          "text": "Water is the liquid used as a base or solvent in food. It dissolves and carries other ingredients and helps set the texture of a product.",
+          "ai_generated": true
+        }
+      },
+      {
+        "ingredient_id": "en:orange-juice",
+        "name": "Orange juice",
+        "rank": 2,
+        "explainer": {
+          "text": "Liquid pressed from oranges, a citrus fruit, used as a natural sweet and tangy juice ingredient in beverages and foods.",
+          "ai_generated": true
+        }
+      },
+      {
+        "ingredient_id": "en:orange-pulp",
+        "name": "Orange pulp",
+        "rank": 3,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "en:sugar",
+        "name": "Sugar",
+        "rank": 4,
+        "explainer": {
+          "text": "Sugar is a sweet carbohydrate, usually extracted and refined from sugar cane or sugar beets. It sweetens food and adds bulk and browning in cooking.",
+          "ai_generated": true
+        }
+      },
+      {
+        "ingredient_id": "label:5",
+        "name": "Sweeteners",
+        "rank": 5,
+        "explainer": null
+      },
+      {
+        "ingredient_id": "label:6",
+        "name": "Natural flavors",
+        "rank": 6,
+        "explainer": null
+      }
+    ],
+    "additives": [
+      {
+        "additive_id": "en:e300",
+        "e_number": "E300",
+        "name": "Ascorbic acid",
+        "function": "Antioxidant, sequestrant",
+        "explainer": {
+          "text": "A vitamin C compound that is used to slow oxidation in food and to bind metal ions that could otherwise cause discoloration or spoilage.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e330",
+        "e_number": "E330",
+        "name": "Citric acid",
+        "function": "Antioxidant, sequestrant",
+        "explainer": {
+          "text": "A weak organic acid found naturally in citrus fruits, used to add tartness and to act as an antioxidant and sequestrant in foods.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e440",
+        "e_number": "E440",
+        "name": "Pectins",
+        "function": "Emulsifier, stabilizer, thickener",
+        "explainer": {
+          "text": "Pectins are naturally occurring plant fibers, typically extracted from fruit peel, that form gels and thicken foods such as jams and jellies.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e445",
+        "e_number": "E445",
+        "name": "Glycerol esters of wood rosin",
+        "function": "Emulsifier, stabilizer",
+        "explainer": {
+          "text": "An emulsifier and stabilizer made by esterifying glycerol with rosin acids obtained from pine wood resin, used in beverages and other foods.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e414",
+        "e_number": "E414",
+        "name": "Acacia gum",
+        "function": "Carrier, emulsifier, stabilizer, thickener",
+        "explainer": {
+          "text": "Acacia gum is a natural gum harvested from the sap of acacia trees, used to carry flavors, emulsify mixtures, and thicken foods.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e950",
+        "e_number": "E950",
+        "name": "Acesulfame K",
+        "function": "Sweetener",
+        "explainer": {
+          "text": "A calorie-free artificial sweetener made from acetoacetic acid and potassium, used to add sweetness to foods and drinks.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e954",
+        "e_number": "E954",
+        "name": "Saccharin and its salts",
+        "function": "Sweetener",
+        "explainer": {
+          "text": "Saccharin is a synthetic sweetener made from chemical compounds, used to add a sweet taste to foods and drinks with few calories.",
+          "ai_generated": true
+        },
+        "flagged": false
+      },
+      {
+        "additive_id": "en:e160a",
+        "e_number": "E160a",
+        "name": "Carotene",
+        "function": "Color",
+        "explainer": {
+          "text": "A natural orange pigment from the carotene family, used to give foods yellow to orange coloring.",
+          "ai_generated": true
+        },
+        "flagged": false
+      }
+    ],
+    "unmatched_additives": []
+  },
+  "match": null,
+  "suggestions": [
+    {
+      "product": {
+        "code": "0810003515513",
+        "name": "Farm-Front Taste Grows Here",
+        "brand": "Once Upon a Farm Organics",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": "https://images.openfoodfacts.org/images/products/081/000/351/5513/front_en.15.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0194346266173",
+        "name": "Orange Juice",
+        "brand": "Great Value",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 4,
+        "image_url": "https://images.openfoodfacts.org/images/products/019/434/626/6173/front_en.5.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0041331027786",
+        "name": "Coconut Water",
+        "brand": "Goya",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 1,
+        "image_url": "https://images.openfoodfacts.org/images/products/004/133/102/7786/front_en.4.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0041800349005",
+        "name": "STRAWBERRY KIWI",
+        "brand": "Welch's",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 4,
+        "image_url": "https://images.openfoodfacts.org/images/products/004/180/034/9005/front_en.12.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    },
+    {
+      "product": {
+        "code": "0099482532727",
+        "name": "Organic Orange Peach Mango Juice",
+        "brand": "365 Whole Foods Market",
+        "category_main": "juices",
+        "nutriscore_grade": "a",
+        "nova_group": 4,
+        "image_url": "https://images.openfoodfacts.org/images/products/009/948/253/2727/front_en.3.400.jpg"
+      },
+      "reason": "Nutri-Score A · no additives · none flagged by Open Food Facts",
+      "additive_count": 0
+    }
+  ],
+  "suggestions_kind": "category",
+  "source": {
+    "name": "Open Food Facts",
+    "url": "https://world.openfoodfacts.org",
+    "licence": "ODbL-1.0",
+    "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "snapshot_date": "2026-11-17"
+  }
+}

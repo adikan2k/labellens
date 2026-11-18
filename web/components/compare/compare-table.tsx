@@ -10,6 +10,7 @@ import {
   processing,
   type CompareRow,
 } from "@/lib/compare";
+import { PHOTO_CODE } from "@/lib/label";
 import { productTitle } from "@/lib/metadata";
 
 /** Two products in one label panel (DESIGN.md, "Compare"): a real table, ruled like a label. */
@@ -90,12 +91,16 @@ function RuleRow({ weight }: { weight: "heavy" | "medium" | "thin" }) {
 function ProductHead({ product }: { product: Product }) {
   return (
     <th scope="col" className="px-2 py-3 text-right align-bottom last:pr-[0px]">
-      <Link
-        href={`/product/${product.code}`}
-        className="type-data-value block break-words no-underline hover:underline"
-      >
-        {product.name}
-      </Link>
+      {product.code === PHOTO_CODE ? (
+        <span className="type-data-value block break-words">{product.name}</span>
+      ) : (
+        <Link
+          href={`/product/${product.code}`}
+          className="type-data-value block break-words no-underline hover:underline"
+        >
+          {product.name}
+        </Link>
+      )}
       <span className="type-small block break-words text-ink-muted">
         {product.brand ?? "Brand not listed"}
       </span>

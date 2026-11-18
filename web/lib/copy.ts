@@ -21,10 +21,42 @@ export const SWAP_RULE =
   "Same category, a better Nutri-Score, and no additive that Open Food Facts flags for high overexposure risk.";
 /** The other ways into the site, under the empty home search. */
 export const HOME_WAYS_IN = [
+  { href: "/label", title: "Read a label from a photo", note: "Any pack, even one LabelLens has never seen" },
   { href: "/compare", title: "Compare two products", note: "Their labels side by side, per 100 g" },
   { href: "/graph", title: "Explore the graph", note: "Products, brands and the ingredients they share" },
   { href: "/ask", title: "Ask a question", note: "An agent that answers from the data and cites it" },
 ] as const;
+
+/** The /label page: reading a food label from a photo. */
+export const LABEL = {
+  intro:
+    "Photograph the ingredients, the nutrition panel, or both. LabelLens reads the label with AI and explains it from its data on a million US products.",
+  addPhoto: "Add a photo",
+  addAnother: "Add another photo",
+  read: "Read the label",
+  reading: "Reading the label…",
+  remove: "Remove",
+  privacy:
+    "Photos go to Anthropic to be read and are not kept by LabelLens. What was read is kept in our trace log (Langfuse), which does not delete it on its free plan.",
+  readByAi: "Read by AI from your photo. Check it against the pack.",
+  notALabel:
+    "That doesn't look like a food label. Try a photo of the ingredients or the nutrition panel.",
+  looksLike: "Looks like this product in our data",
+  noMatch: "Not found in the US data",
+  unmatchedAdditives: (names: string[]) =>
+    `Also on the label, with no entry in LabelLens: ${names.join(", ")}.`,
+  swapsHeading: "Better swaps",
+  categoryHeading: (category: string | null) =>
+    `Well-graded products in ${category ? category.toLowerCase() : "this category"}`,
+  categoryNote:
+    "Products in the same category with Nutri-Score A or B and no additive Open Food Facts flags. The photo matched no product, so these are not swaps for it.",
+  barcodeMissing: (code: string) => `The barcode ${code} isn't in the US data.`,
+  sampleIntro: "Or try a sample label:",
+  sampleNote: "Recorded example: this sample was read once and saved, so it costs nothing to show.",
+  sampleCredit: "Sample photos: Open Food Facts contributors, CC BY-SA.",
+  unavailable: "The label reader is not available right now. Try again later.",
+  tooMany: "Two photos at most: the ingredients and the nutrition panel.",
+} as const;
 
 export const SCAN = {
   button: "Scan a barcode",
@@ -37,6 +69,8 @@ export const SCAN = {
   lookingUp: (code: string) => `Looking up ${code}…`,
   missing: (code: string) => `${code} isn't in the US snapshot.`,
   addIt: "Add it to Open Food Facts",
+  photographInstead: "Photograph its label instead",
+  orPhotograph: "or photograph the label",
 } as const;
 export const COMPARE_INTRO =
   "Two products' labels side by side, per 100 g. Differences are the second against the first.";
@@ -136,6 +170,12 @@ export const EVAL_RESULTS: EvalResult[] = [
     name: "Page speed",
     headline: "Lighthouse performance 100 on home, 98 on a product page and 100 on the dashboard (target 90).",
     file: "evals/results/lighthouse.md",
+  },
+  {
+    name: "Reading labels",
+    headline:
+      "98% of nutrient values read correctly from 30 real label photos (95–99%), checked against the photos; every value right on 85% of labels.",
+    file: "evals/results/label_reading_claude-haiku-5-5.md",
   },
   {
     name: "Waking up",
