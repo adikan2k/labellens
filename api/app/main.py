@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
+from api.app import graph as graph_module
 from api.app import products
 from api.app import search as search_module
 from api.app import swaps as swaps_module
@@ -25,6 +26,7 @@ from api.app.config import Settings, get_settings
 from api.app.db import UNAVAILABLE, Database, DatabaseNotConfigured, DictConnection
 from api.app.schemas import (
     Error,
+    GraphNeighborhood,
     Health,
     ProductResponse,
     SearchResponse,
@@ -36,6 +38,7 @@ from api.app.schemas import (
 
 API_VERSION = "0.3.0"
 WAKING_UP = "Search is waking up. Try again in a few seconds."
+GRAPH_UNAVAILABLE = "The graph is waking up or being reloaded. Try again in a minute."
 
 
 def get_connection(request: Request) -> Iterator[DictConnection]:
@@ -52,10 +55,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI):
         url = settings.database_url.get_secret_value() if settings.database_url else None
         app.state.db = Database.open(url, timeout=settings.db_pool_timeout)
+        if not hasattr(app.state, "graph"):  # tests may set one
+            password = (
+                settings.neo4j_password.get_secret_value() if settings.neo4j_password else None
+            )
+            app.state.graph = graph_module.Graph.open(
+                settings.neo4j_uri, settings.neo4j_user, password
+            )
         try:
             yield
         finally:
             app.state.db.close()
+            app.state.graph.close()
 
     app = FastAPI(title="LabelLens API", version=API_VERSION, lifespan=lifespan)
     app.add_middleware(
@@ -89,6 +100,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     for exc_class in UNAVAILABLE:  # Neon waking from idle, or unreachable
         app.add_exception_handler(exc_class, unavailable)
+
+    @app.exception_handler(graph_module.GraphUnavailable)
+    async def graph_unavailable(request: Request, exc: Exception) -> JSONResponse:
+        return error(request, 503, GRAPH_UNAVAILABLE)
 
     @app.exception_handler(DatabaseNotConfigured)
     async def not_configured(request: Request, exc: DatabaseNotConfigured) -> JSONResponse:
@@ -146,6 +161,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(404, f"No product with barcode {code} in this snapshot.")
         response.headers["Cache-Control"] = "public, max-age=3600"
         return SwapsResponse(code=code, swaps=found, source=source(request))  # type: ignore[arg-type]
+
+    @app.get(
+        "/graph/neighborhood",
+        responses={404: {"model": Error}, 422: {"model": Error}, 503: {"model": Error}},
+    )
+    def neighborhood(
+        request: Request,
+        response: Response,
+        code: Annotated[str, Query(min_length=1, max_length=32)],
+        depth: Annotated[int, Query(ge=1, le=2)] = 1,
+    ) -> GraphNeighborhood:
+        found = request.app.state.graph.neighborhood(code, depth)
+        if found is None:
+            raise HTTPException(404, f"The graph does not hold a product with barcode {code}.")
+        response.headers["Cache-Control"] = "public, max-age=3600"
+        return GraphNeighborhood(**found, source=source(request))
 
     @app.get("/stats/overview", responses={503: {"model": Error}})
     def stats(request: Request, response: Response, conn: Conn) -> StatsOverview:

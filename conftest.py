@@ -4,6 +4,8 @@
 - serving_url: a throwaway Postgres database with the fixture loaded into the serving schema.
   Needs the test Postgres (docker compose up -d postgres). Locally the database tests are
   skipped with that hint when it is not running; in CI (CI=true) they fail instead.
+- neo4j_driver: a driver for the test Neo4j (docker compose up -d neo4j), same skip-or-fail
+  rule. The test Neo4j holds one database, so tests using it replace its contents.
 """
 
 from __future__ import annotations
@@ -17,6 +19,12 @@ import pytest
 from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
 from pipeline.tests.support import FIXTURE_VARS, Build, run_dbt, test_database_url
+
+TEST_NEO4J = (
+    os.environ.get("TEST_NEO4J_URI", "bolt://localhost:57687"),
+    os.environ.get("TEST_NEO4J_USER", "neo4j"),
+    os.environ.get("TEST_NEO4J_PASSWORD", "labellens-local"),
+)
 
 
 @pytest.fixture(scope="session")
@@ -54,3 +62,22 @@ def serving_url(pg_admin_url: str, dbt_fixture: Build) -> Iterator[str]:
     finally:
         with psycopg.connect(pg_admin_url, autocommit=True) as admin:
             admin.execute(f'drop database if exists "{name}" with (force)')  # type: ignore[arg-type]
+
+
+@pytest.fixture(scope="session")
+def neo4j_driver() -> Iterator[object]:
+    from neo4j import GraphDatabase
+    from neo4j.exceptions import DriverError, Neo4jError
+
+    uri, user, password = TEST_NEO4J
+    driver = GraphDatabase.driver(uri, auth=(user, password), connection_timeout=3)
+    try:
+        driver.verify_connectivity()
+    except (DriverError, Neo4jError, OSError) as error:
+        driver.close()
+        message = f"Test Neo4j not reachable at {uri}: run `docker compose up -d neo4j`."
+        if os.environ.get("CI"):
+            pytest.fail(f"{message} ({error})")
+        pytest.skip(message)
+    yield driver
+    driver.close()

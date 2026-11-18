@@ -125,6 +125,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/GraphNeighborhood" }
         "404": { $ref: "#/components/responses/NotFound" }
+        "503": { $ref: "#/components/responses/Unavailable" }
 
   /ask:
     post:
@@ -510,12 +511,19 @@ components:
 
     GraphNode:
       type: object
-      required: [id, kind, name]
+      required: [id, kind, name, nutriscore_grade, detail]
       properties:
-        id: { type: string }
+        id:
+          type: string
+          description: Kind and key, e.g. "Product:0016000275287" or "Brand:general mills".
         kind: { type: string, enum: [Product, Brand, Category, Additive, Ingredient] }
         name: { type: string }
         nutriscore_grade: { $ref: "#/components/schemas/NutriscoreGrade" }
+        detail:
+          type: [string, "null"]
+          description: >
+            For additives and ingredients, their explainer (written by AI from Open Food
+            Facts data); otherwise null.
 
     GraphEdge:
       type: object
