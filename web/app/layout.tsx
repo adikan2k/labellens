@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo } from "next/font/google";
+import { Suspense } from "react";
 
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
@@ -29,7 +30,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>
-        <RouteFocus />
+        {/* usePathname is request data: under Cache Components it needs its own boundary. */}
+        <Suspense fallback={null}>
+          <RouteFocus />
+        </Suspense>
         <Footer />
       </body>
     </html>
