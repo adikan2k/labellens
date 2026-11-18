@@ -15,6 +15,10 @@ mapped as (
 
 suggested as (
     select code, category_id from {{ ref('stg_enrich__categories') }}
+),
+
+barcodes as (
+    select * from {{ ref('int_product_barcodes') }}
 )
 
 select
@@ -30,6 +34,7 @@ select
     p.nova_group,
     p.image_url,
     p.off_url,
+    barcodes.gtin_valid,
     p.completeness,
     p.scans,
     p.lang,
@@ -37,3 +42,4 @@ select
 from products as p
 left join mapped using (code)
 left join suggested using (code)
+join barcodes using (code)

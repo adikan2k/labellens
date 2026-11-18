@@ -6,6 +6,7 @@ from pathlib import Path
 
 import psycopg
 import pytest
+from psycopg.conninfo import conninfo_to_dict
 
 from pipeline.load import serving
 from pipeline.tests.support import Build
@@ -17,7 +18,7 @@ def _connect(url: str) -> psycopg.Connection:
 
 
 def test_role_name_matches_the_loader() -> None:
-    assert script.ROLE == serving.READONLY_ROLE
+    assert script.ROLE == serving.PRODUCTION_READONLY_ROLE
 
 
 def test_reads_exactly_the_public_tables(readonly_url: str) -> None:
@@ -77,8 +78,9 @@ def test_grants_and_run_log_survive_a_reload(
 
 
 def test_existing_role_needs_rotate(pg_admin_url: str, readonly_role: str) -> None:
+    name = conninfo_to_dict(readonly_role)["user"]  # this run's role, which exists
     with pytest.raises(SystemExit, match="--rotate"):
-        script.create_role(pg_admin_url)
+        script.create_role(pg_admin_url, str(name))
 
 
 def test_role_url_swaps_only_the_credentials() -> None:

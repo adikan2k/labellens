@@ -17,6 +17,9 @@ WORD = re.compile(r"[^\W_]+", re.UNICODE)
 BARCODE = re.compile(r"^[\d\s-]+$")
 MAX_WORDS = 8
 MIN_BARCODE_DIGITS = 3
+# One product is often listed several times (pack sizes, reformulations): text search fetches
+# this many times the limit in rank order and keeps the first row per name and brand.
+OVERFETCH = 4
 IMAGE_BASE = "https://images.openfoodfacts.org/images/products/"
 
 COLUMNS = "code, name, brand, category_id, nutriscore_grade, nova_group, image_path"
@@ -93,6 +96,21 @@ def search(conn: DictConnection, q: str, limit: int) -> list[dict[str, Any]]:
     query = to_tsquery(q)
     if query is None:
         return []
-    rows = conn.execute(TEXT_SQL, {"query": query, "limit": limit}).fetchall()
+    rows = conn.execute(TEXT_SQL, {"query": query, "limit": limit * OVERFETCH}).fetchall()
     query_words = words(q)
-    return [{**summary(r), "match": _match(r, query_words)} for r in rows]
+    return [{**summary(r), "match": _match(r, query_words)} for r in one_per_product(rows, limit)]
+
+
+def one_per_product(rows: list[Any], limit: int) -> list[Any]:
+    """The best-ranked row per name and brand, ignoring case, in the order given."""
+    seen: set[tuple[str, str]] = set()
+    kept = []
+    for row in rows:
+        key = ((row["name"] or "").casefold().strip(), (row["brand"] or "").casefold().strip())
+        if key in seen:
+            continue
+        seen.add(key)
+        kept.append(row)
+        if len(kept) == limit:
+            break
+    return kept

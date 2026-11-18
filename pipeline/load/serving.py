@@ -63,7 +63,9 @@ SCHEMA, NEXT, OLD = "serving", "serving_next", "serving_old"
 MAX_LOAD_BYTES = 800_000_000
 MAX_DATABASE_BYTES = 1_000_000_000
 SWAP_LOCK_TIMEOUT = "30s"
-READONLY_ROLE = "labellens_readonly"
+PRODUCTION_READONLY_ROLE = "labellens_readonly"
+# The role the grants go to; tests point it at a role of their own (conftest.py).
+READONLY_ROLE = PRODUCTION_READONLY_ROLE
 READONLY_TABLES = ("products", "additives", "ingredients", "categories", "explainers")
 BATCH = 20_000
 NUTRIENTS = [
@@ -109,6 +111,8 @@ create table {NEXT}.products (
     ingredient_ids text[] not null,
     additive_count smallint not null,
     has_flagged boolean not null,
+    -- A real GS1 barcode; swaps offer only these (not restaurant menu items)
+    gtin_valid boolean not null,
     in_graph boolean not null,
     rank_pos integer not null
 );
@@ -179,9 +183,11 @@ INDEXES = f"""
 create index products_search on {NEXT}.products
     using gin (to_tsvector('english'::regconfig, name || ' ' || coalesce(brand, '')));
 create index products_rank on {NEXT}.products (rank_pos);
--- Swaps: same category, better grade, no flagged additive, fewest additives, then rank.
+-- Swaps: same category, better grade, no flagged additive, a real barcode, an ingredient list,
+-- fewest additives, then rank.
 create index products_swaps on {NEXT}.products
-    (category_id, nutriscore_grade, additive_count, rank_pos) where not has_flagged;
+    (category_id, nutriscore_grade, additive_count, rank_pos)
+    where not has_flagged and gtin_valid and cardinality(ingredient_ids) > 0;
 """
 
 PRODUCTS_SQL = f"""
@@ -212,6 +218,7 @@ select
     coalesce(i.ids, []::varchar[]) as ingredient_ids,
     flags.additive_count,
     flags.has_flagged_additive as has_flagged,
+    p.gtin_valid,
     g.code is not null as in_graph,
     r.rank_pos
 from dim_products as p
@@ -262,7 +269,7 @@ PRODUCT_COLUMNS = [
     "code", "name", "brand", "category_id", "category_source", "nutriscore_grade", "nova_group",
     "completeness",
     "scans", "image_path", *NUTRIENTS, "additive_ids", "ingredient_ids", "additive_count",
-    "has_flagged", "in_graph", "rank_pos",
+    "has_flagged", "gtin_valid", "in_graph", "rank_pos",
 ]  # fmt: skip
 
 

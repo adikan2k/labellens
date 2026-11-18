@@ -40,9 +40,14 @@ def role_url(admin_url: str, role: str, password: str) -> str:
     return urlunsplit((parts.scheme, netloc, parts.path, parts.query, parts.fragment))
 
 
-def create_role(admin_url: str, role: str = ROLE, *, rotate: bool = False) -> str:
-    """Create (or, with rotate, re-password) the role. Returns its connection URL."""
-    password = secrets.token_urlsafe(24)
+def create_role(
+    admin_url: str, role: str = ROLE, *, rotate: bool = False, password: str | None = None
+) -> str:
+    """Create (or, with rotate, re-password) the role. Returns its connection URL.
+
+    The password is random unless given. Tests make a role of their own per run (conftest.py).
+    """
+    password = password or secrets.token_urlsafe(24)
     with psycopg.connect(admin_url, autocommit=True, prepare_threshold=None) as pg:
         exists = pg.execute("select 1 from pg_roles where rolname = %s", [role]).fetchone()
         name = sql.Identifier(role)

@@ -1,5 +1,5 @@
 {
-  "measured_at": "2026-11-18T08:11:49+00:00",
+  "measured_at": "2026-11-18T08:41:42+00:00",
   "model": "claude-haiku-5-5",
   "judge_model": "claude-sonnet-5-5",
   "judge_cost_usd": 0.0,
@@ -18,8 +18,8 @@
       "scope_right": 2,
       "scope_total": 2,
       "errors": 0,
-      "cost_usd": 0.044,
-      "latency_p50_ms": 2458,
+      "cost_usd": 0.0441,
+      "latency_p50_ms": 2623,
       "latency_p95_ms": 4551,
       "fact_score_ci95": [
         0.93,
@@ -75,9 +75,9 @@
       "scope_right": 2,
       "scope_total": 2,
       "errors": 0,
-      "cost_usd": 0.0152,
+      "cost_usd": 0.0155,
       "latency_p50_ms": 1279,
-      "latency_p95_ms": 2668,
+      "latency_p95_ms": 2797,
       "fact_score_ci95": [
         0.14,
         0.395

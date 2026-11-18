@@ -159,6 +159,7 @@ def _cleaning_section(r: Report) -> list[str]:
     )
     capped = r.one("select count(*) from stg_off__products where completeness_raw > 1")
     unnamed = r.one("select count(*) from dim_products where name is null")
+    not_gtin = r.one("select count(*) from dim_products where not gtin_valid")
 
     lines = [
         "## Cleaning",
@@ -170,6 +171,8 @@ def _cleaning_section(r: Report) -> list[str]:
         + ", ".join(f"{g if g is not None else 'missing'} {_n(n)}" for g, n in grades)
         + ".",
         f"- Completeness above 1, capped at 1: {_n(capped)}.",
+        f"- Codes that are not real GS1 barcodes (kept, never offered as swaps): {_n(not_gtin)} "
+        f"({_pct(not_gtin, products)}).",
         "",
         "Impossible nutrient values blanked in `fct_nutrition` (below 0, above 100 g, "
         "or above 900 kcal per 100 g):",
