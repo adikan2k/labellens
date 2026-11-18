@@ -2,7 +2,9 @@
 
 SPEC's rule: same category, a better grade, no additive on the flag list, ranked by
 Nutri-Score then fewest additives. The flag list is Open Food Facts' own: additives its
-taxonomy marks as high overexposure risk (dim_additives.flagged).
+taxonomy marks as high overexposure risk (dim_additives.flagged). Candidates must also have a
+real GS1 barcode (serving.products.gtin_valid): Open Food Facts lists restaurant menu items
+and shop-weighed goods under 16-24 digit codes, and those are not swaps anyone can buy.
 
 Same category alone is too broad: "Sauces, dressings and condiments" would offer marinara
 as a swap for mayonnaise. So candidates must also be similar by name, in tiers, each used
@@ -45,6 +47,7 @@ where to_tsvector('english'::regconfig, name || ' ' || coalesce(brand, ''))
   and category_id = %(category)s
   and nutriscore_grade < %(grade)s
   and not has_flagged
+  and gtin_valid
   and code <> %(code)s
 order by nutriscore_grade, additive_count, rank_pos
 limit %(fetch)s

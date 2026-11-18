@@ -60,7 +60,8 @@ def test_swaps_are_better_unflagged_same_category_and_ranked(
         for r in _rows(
             serving_url,
             "select code, name, brand, category_id, nutriscore_grade, additive_count, "
-            "has_flagged, rank_pos from serving.products where code = any(%(codes)s)",
+            "has_flagged, gtin_valid, rank_pos from serving.products "
+            "where code = any(%(codes)s)",
             {"codes": codes},
         )
     }
@@ -69,6 +70,7 @@ def test_swaps_are_better_unflagged_same_category_and_ranked(
         assert row["category_id"] == poor["category_id"]
         assert row["nutriscore_grade"] < poor["nutriscore_grade"]
         assert not row["has_flagged"]
+        assert row["gtin_valid"], "a swap must have a real barcode (not a menu item)"
         assert row["code"] != poor["code"]
         assert swap["additive_count"] == row["additive_count"]
         assert swap["reason"].endswith("none flagged by Open Food Facts")
