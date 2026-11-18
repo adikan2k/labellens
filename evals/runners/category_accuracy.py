@@ -110,6 +110,7 @@ class Report:
     missing: list[str] = field(default_factory=list)
     cost_usd: float = 0.0
     target: float = TARGET
+    against: str = "gold"  # "gold": your labels (accuracy); "tags": OFF's tags (agreement)
 
 
 def _table(s: Scores) -> str:
@@ -118,17 +119,19 @@ def _table(s: Scores) -> str:
 
 def to_markdown(report: Report, names: dict[str, str]) -> str:
     o = report.overall
+    gold = report.against == "gold"
+    truth = "Gold label" if gold else "Tag category"
     verdict = "meets" if o.accuracy >= report.target else "misses"
     lines = [
-        f"# Category accuracy: {report.label}",
+        f"# Category {'accuracy' if gold else 'agreement with tags'}: {report.label}",
         "",
         f"Measured {report.measured_at}: `{report.model}`, prompt `{report.prompt_version}`, "
         f"inputs: {report.inputs}. Cost ${report.cost_usd:.4f} (0 when every answer was "
         "cached).",
         "",
-        "| | Accuracy |",
+        "| | Accuracy |" if gold else "| | Agreement |",
         "| --- | ---: |",
-        f"| **All gold products** | **{_table(o)}** |",
+        f"| **All {'gold products' if gold else 'sampled products'}** | **{_table(o)}** |",
     ]
     for name, s in report.halves.items():
         lines.append(f"| {name} half | {_table(s)} |")
@@ -139,24 +142,31 @@ def to_markdown(report: Report, names: dict[str, str]) -> str:
             f"| Baseline: Open Food Facts' tags, where they give a category | "
             f"{_table(report.tag_baseline)} |"
         )
-    lines += [
-        "",
-        f"Target: {report.target:.0%}. This run **{verdict}** it. "
-        f"Invalid answers (counted wrong): {o.invalid}.",
-    ]
+    lines.append("")
+    if gold:
+        lines.append(
+            f"Target: {report.target:.0%}. This run **{verdict}** it. "
+            f"Invalid answers (counted wrong): {o.invalid}."
+        )
+    else:
+        lines.append(
+            "Agreement, not accuracy: Open Food Facts' tags and our tag mapping make mistakes "
+            "of their own, so a disagreement is not always the model's error. The 90% target "
+            f"applies to the gold labels. Invalid answers: {o.invalid}."
+        )
     if report.missing:
         lines.append(f"Gold products not in the current data (skipped): {len(report.missing)}.")
     lines += [
         "",
         "## Most common confusions",
         "",
-        "| Gold label | Model said | Count |",
+        f"| {truth} | Model said | Count |",
         "| --- | --- | ---: |",
         *[f"| {names.get(t, t)} | {names.get(p, p)} | {c} |" for t, p, c in o.confusions],
         "",
         "## By category",
         "",
-        "| Category | Gold products | Recall | Precision |",
+        f"| Category | {'Gold products' if gold else 'Sampled products'} | Recall | Precision |",
         "| --- | ---: | ---: | ---: |",
         *[
             f"| {names.get(k, k)} | {v['support']} | {v['recall']:.0%} | {v['precision']:.0%} |"
@@ -235,6 +245,7 @@ def main(argv: list[str] | None = None) -> int:
         overall=score(pairs),
         missing=[c for c in truth if c not in predicted],
         cost_usd=round(summary.cost, 4),
+        against="tags" if args.tagged_sample else "gold",
     )
     if not args.tagged_sample:
         report.halves = {
