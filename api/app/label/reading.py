@@ -16,7 +16,7 @@ from api.app.config import input_cost_usd, price_per_mtok, thinking_off
 from api.app.label.categories import LEAF_CATEGORIES
 from api.app.label.images import Image
 
-PROMPT_VERSION = "label-v2"
+PROMPT_VERSION = "label-v3"
 MAX_TOKENS = 1500
 CALL_SECONDS = 30.0
 
@@ -41,8 +41,10 @@ class LabelReading(BaseModel):
     is_food_label: bool = Field(
         description="True if the photos show the packaging of a food or drink product."
     )
-    name: str | None = Field(description="The product name as printed, if visible.")
-    brand: str | None = Field(description="The brand as printed, if visible.")
+    name: str | None = Field(
+        description="The product name as printed on the pack; null if none is visible."
+    )
+    brand: str | None = Field(description="The brand as printed; null if none is visible.")
     barcode: str | None = Field(description="The barcode's digits if printed legibly, else null.")
     basis: Literal["per_100g", "per_serving", "unknown"] = Field(
         description="Which column the nutrition values come from. Prefer a per 100 g (or "
@@ -83,6 +85,9 @@ Copy what is printed. Never estimate, convert or fill in a value that is not leg
 - Additives: only the additives in the ingredient list. Give each as its E-number when you
   know it, even if the label prints only the name (xanthan gum is E415, sodium benzoate is
   E211, citric acid is E330); otherwise give the name as printed.
+- Name and brand: only as printed on the pack. If no product name or brand is visible, use
+  null. Don't compose a name from the ingredients or the legal description, and never give a
+  brand that isn't printed (a bottler's or distributor's name is not the brand).
 - If the photos are not of food or drink packaging, set is_food_label to false and leave the
   rest empty or null.
 

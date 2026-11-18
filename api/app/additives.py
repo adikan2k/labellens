@@ -32,13 +32,28 @@ limit 1
 """
 
 
-# Abbreviations US labels and shoppers use in place of the name (Open Food Facts has none).
+# What US labels and shoppers call an additive when it isn't Open Food Facts' own name.
 ALIASES = {
     "msg": "e621",  # monosodium glutamate
     "bha": "e320",  # butylated hydroxyanisole
     "bht": "e321",  # butylated hydroxytoluene
     "tbhq": "e319",  # tert-butylhydroquinone
     "edta": "e385",  # calcium disodium EDTA
+    "acesulfame potassium": "e950",
+    "ace-k": "e950",
+    "baking soda": "e500",
+    "sodium bicarbonate": "e500",
+    "cellulose gel": "e460",
+    "cellulose gum": "e466",
+    "lecithin": "e322",
+    "soy lecithin": "e322",
+    "soya lecithin": "e322",
+    "sunflower lecithin": "e322",
+    "mixed tocopherols": "e306",
+    "tocopherols": "e306",
+    "stevia extract": "e960",
+    "stevia leaf extract": "e960",
+    "vitamin c": "e300",
 }
 
 

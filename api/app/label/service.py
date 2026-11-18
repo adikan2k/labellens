@@ -115,6 +115,17 @@ def match_product(conn: DictConnection, reading: LabelReading) -> tuple[str, str
     return None
 
 
+_PARENS = re.compile(r"\(([^)]*)\)")
+
+
+def name_forms(name: str) -> list[str]:
+    """An ingredient name as printed, without its brackets, and what the brackets hold:
+    "ascorbic acid (vitamin c)" gives all three."""
+    outside = " ".join(_PARENS.sub(" ", name).split())
+    inside = [" ".join(part.split()) for part in _PARENS.findall(name)]
+    return [form for form in dict.fromkeys([name, outside, *inside]) if form]
+
+
 def _fold(item: dict[str, Any]) -> dict[str, Any]:
     out = dict(item)
     text = out.pop("explainer", None)
@@ -151,8 +162,19 @@ def explain(conn: DictConnection, reading: LabelReading) -> dict[str, Any]:
             unmatched.append(term)
         else:
             found.setdefault(row["additive_id"], row)
-    for row in conn.execute(ADDITIVE_NAMES_SQL, {"names": lowered}).fetchall():
+    # The model sometimes leaves an additive out of its list, so the ingredients are checked
+    # too: by exact name or a known alias only (never the fuzzy word match, which would turn
+    # "salt" into some additive with salt in its name).
+    forms = [form for name in lowered for form in name_forms(name)]
+    for form in forms:
+        if form in additives_module.ALIASES:
+            row = additives_module.get_additive(conn, form)
+            if row is not None:
+                found.setdefault(row["additive_id"], row)
+    for row in conn.execute(ADDITIVE_NAMES_SQL, {"names": forms}).fetchall():
         found.setdefault(row["additive_id"], row)
+    known_names = {row["name"].casefold() for row in found.values()}
+    unmatched = [t for t in unmatched if t.casefold() not in known_names]
     additives = [_fold(row) | {"flagged": bool(row["flagged"])} for row in found.values()]
     return {"ingredients": ingredients, "additives": additives, "unmatched_additives": unmatched}
 
