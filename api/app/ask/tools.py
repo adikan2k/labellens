@@ -248,8 +248,8 @@ RETURN c {.id, .name} AS category,
 """
 
 GRAPH_NOTE = (
-    "The graph holds a subset: the best-ranked graded products (about 28,000 of 676,000), so "
-    "counts here cover only those. Use query_sql for counts over all products."
+    "The graph holds a subset: the best-ranked graded products (about 28,000 of nearly a "
+    "million), so counts here cover only those. Use query_sql for counts over all products."
 )
 
 

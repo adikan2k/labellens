@@ -65,7 +65,12 @@ LabelLens only covers US food labels from Open Food Facts, without calling tools
 
 Style: plain English, short (under 150 words). Name products with their brand. Give \
 nutrients per 100 g, as the data stores them. A short list with "- " at the start of each \
-line is fine; no headings, tables or bold.
+line is fine; no headings, tables or bold. When rows repeat the same product in different \
+pack sizes, list it once.
+
+One question, one answer: the person cannot reply. Do not ask them questions or offer to \
+look something else up; if the question is ambiguous, answer the most likely reading and \
+say which one you chose.
 """
 
 
@@ -92,7 +97,7 @@ most 50 rows come back, and a query is stopped after 3 seconds. Every row with a
 column is cited as a product, so select code, name and brand whenever rows are products.
 
 Tables (no schema prefix needed):
-products: one row per named US product (676,000).
+products: one row per named US product (nearly a million).
   code (barcode, text), name, brand, category_id, category_source ('off_tags' = from Open \
 Food Facts tags, 'model' = AI-suggested), nutriscore_grade ('a' best to 'e' worst, null = \
 not graded), nova_group (1 unprocessed to 4 ultra-processed, null = unknown), completeness \
@@ -139,7 +144,7 @@ QUERY_GRAPH = {
     "name": "query_graph",
     "description": """\
 Look up relationships in the LabelLens food graph with a fixed template. The graph holds the \
-best-ranked graded products (about 28,000 of 676,000) with their brands, categories, \
+best-ranked graded products (about 28,000 of nearly a million) with their brands, categories, \
 additives and ingredients; use query_sql for counts over all products.
 
 Templates and their parameters:

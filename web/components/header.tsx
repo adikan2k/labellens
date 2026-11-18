@@ -3,6 +3,7 @@ import Link from "next/link";
 const LINKS = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/graph", label: "Graph" },
+  { href: "/ask", label: "Ask" },
   { href: "/about", label: "About" },
 ];
 
@@ -17,7 +18,7 @@ export function Header() {
         LabelLens
       </Link>
       <nav aria-label="Main">
-        <ul className="flex gap-6">
+        <ul className="flex gap-4 sm:gap-6">
           {LINKS.map((link) => (
             <li key={link.href}>
               <Link href={link.href} className="type-small">

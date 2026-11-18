@@ -37,3 +37,23 @@ export function noSwapsReason(product: {
   }
   return "No similar product in this category scores better without a flagged additive.";
 }
+
+export const ASK_EXAMPLES = [
+  "Breakfast cereals under 5 g sugar without artificial colours",
+  "Healthier swaps for Nacho Cheese Doritos",
+  "What is carrageenan and why is it in yogurt?",
+];
+export const ASK_AI_NOTE =
+  "Answers are written by AI from Open Food Facts data. Check them against the sources.";
+export const ASK_REFUSED_NOTE =
+  "LabelLens doesn’t give medical or dietary advice. A doctor or registered dietitian can.";
+export const ASK_REPLAY_NOTE = "Recorded example run. Live answers come back tomorrow (UTC).";
+export const ASK_WAKING_UP = "The ask agent is waking up. Try again in a few seconds.";
+export const ASK_UNAVAILABLE = "The ask agent is not available right now. Try again later.";
+
+/** "Try again in about 12 minutes." from a Retry-After in seconds. */
+export function retryIn(seconds: number | null): string {
+  if (!seconds) return "Try again later.";
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  return `Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+}
