@@ -19,6 +19,14 @@ The API reads only what is loaded here, in schema `serving`:
   explainer search. Vectors whose text no longer matches the current explainer are left out.
   About 1,000 rows, so exact search is fast and there is no vector index.
 
+Two things outside the swap:
+
+- The read-only role (scripts/create_readonly_role.py), which the ask agent's SQL tool uses,
+  gets USAGE on `serving` and SELECT on READONLY_TABLES, granted on the new schema before it
+  is swapped in. Not stats or meta, and nothing outside `serving`.
+- Schema `app` holds what the API writes (app.ask_runs: the ask agent's run log, which backs
+  its rate limit and daily spend cap). It is created if missing and never swapped or dropped.
+
 Safety: the size is estimated from DuckDB before connecting, and the load stops above 800 MB
 (Neon's free plan blocks writes past 1 GB). Tables are built in `serving_next` and swapped in
 with one transaction, so readers never see a half-loaded table. If old plus new would pass
@@ -55,6 +63,8 @@ SCHEMA, NEXT, OLD = "serving", "serving_next", "serving_old"
 MAX_LOAD_BYTES = 800_000_000
 MAX_DATABASE_BYTES = 1_000_000_000
 SWAP_LOCK_TIMEOUT = "30s"
+READONLY_ROLE = "labellens_readonly"
+READONLY_TABLES = ("products", "additives", "ingredients", "categories", "explainers")
 BATCH = 20_000
 NUTRIENTS = [
     "energy_kcal_100g",
@@ -136,6 +146,30 @@ create table {NEXT}.meta (
     key text primary key,
     value text not null
 );
+"""
+
+# The API's own tables. Rows carry a keyed hash of the client address, never the address.
+APP_DDL = """
+create schema if not exists app;
+revoke all on schema app from public;
+create table if not exists app.ask_runs (
+    id bigint generated always as identity primary key,
+    created_at timestamptz not null default now(),
+    client_hash text not null,
+    outcome text not null default 'running',
+    model text,
+    prompt_version text,
+    input_tokens integer not null default 0,
+    output_tokens integer not null default 0,
+    embedding_tokens integer not null default 0,
+    cost_usd numeric(10, 6) not null default 0,
+    tool_calls smallint not null default 0,
+    duration_ms integer,
+    replay boolean not null default false,
+    refused boolean not null default false
+);
+create index if not exists ask_runs_client on app.ask_runs (client_hash, created_at);
+create index if not exists ask_runs_created on app.ask_runs (created_at);
 """
 
 # Built after the bulk copy, which is much faster than maintaining them during it.
@@ -455,6 +489,17 @@ def _drop_old(pg: psycopg.Connection, log=print) -> bool:
         return False
 
 
+def _grant_readonly(pg: psycopg.Connection, schema: str, log=print) -> bool:
+    if not pg.execute("select 1 from pg_roles where rolname = %s", [READONLY_ROLE]).fetchone():
+        log(f"Role {READONLY_ROLE} does not exist yet: scripts/create_readonly_role.py makes it.")
+        return False
+    role = sql.Identifier(READONLY_ROLE)
+    pg.execute(sql.SQL("grant usage on schema {} to {}").format(sql.Identifier(schema), role))
+    tables = sql.SQL(", ").join(sql.Identifier(schema, t) for t in READONLY_TABLES)
+    pg.execute(sql.SQL("grant select on {} to {}").format(tables, role))
+    return True
+
+
 def load(
     duckdb_path: Path,
     database_url: str,
@@ -479,6 +524,7 @@ def load(
         stats, meta = _stats(con), _meta(con)
         with psycopg.connect(database_url, autocommit=True, prepare_threshold=None) as pg:
             _drop_old(pg, log)  # a leftover from a load that found readers on it
+            pg.execute(cast("LiteralString", APP_DDL))
             current = pg.execute("select pg_database_size(current_database())").fetchone()[0]  # type: ignore[index]
             live = _schema_exists(pg, SCHEMA)
             if live and current + est.total > MAX_DATABASE_BYTES:
@@ -523,6 +569,7 @@ def load(
                     )
             pg.execute(cast("LiteralString", INDEXES))
             pg.execute(f"analyze {NEXT}.products")
+            _grant_readonly(pg, NEXT, log)  # grants follow the schema through the rename
             log(f"Loaded and indexed in {time.perf_counter() - started:.0f} s")
 
             if not _drop_old(pg, log):

@@ -2,6 +2,8 @@
 
 - dbt_fixture: one dbt build of the committed fixture per test session.
 - fixture_embeddings: the fixture's explainers embedded by the fake Voyage (no network).
+- readonly_role: the ask agent's read-only role in the test Postgres (roles are cluster-wide;
+  each session gives it a new password). readonly_url: that role on the serving_url database.
 - serving_url: a throwaway Postgres database with the fixture loaded into the serving schema.
   Needs the test Postgres (docker compose up -d postgres). Locally the database tests are
   skipped with that hint when it is not running; in CI (CI=true) they fail instead.
@@ -70,7 +72,16 @@ def pg_admin_url() -> str:
 
 
 @pytest.fixture(scope="session")
-def serving_url(pg_admin_url: str, dbt_fixture: Build, fixture_embeddings: Path) -> Iterator[str]:
+def readonly_role(pg_admin_url: str) -> str:
+    from scripts.create_readonly_role import create_role
+
+    return create_role(pg_admin_url, rotate=True)
+
+
+@pytest.fixture(scope="session")
+def serving_url(
+    pg_admin_url: str, dbt_fixture: Build, fixture_embeddings: Path, readonly_role: str
+) -> Iterator[str]:
     from pipeline.load import serving
 
     assert dbt_fixture.run.returncode == 0, dbt_fixture.run.output[-3000:]
@@ -103,3 +114,8 @@ def neo4j_driver() -> Iterator[object]:
         pytest.skip(message)
     yield driver
     driver.close()
+
+
+@pytest.fixture(scope="session")
+def readonly_url(serving_url: str, readonly_role: str) -> str:
+    return make_conninfo(readonly_role, dbname=conninfo_to_dict(serving_url)["dbname"])
