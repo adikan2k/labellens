@@ -27,6 +27,11 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - API locally: `uv run fastapi dev api/app/main.py` (set `DATABASE_URL`, and `NEO4J_*` for the graph)
 - Deploy the API: `uv run python scripts/deploy_api.py --project <id> --web-origin <vercel url>` prints the commands; add `--yes` to run them
 - Enrichment (paid; prints the estimate, sends only with `--yes`; reruns cost $0 from the committed outputs in `pipeline/enrich/outputs/`): `uv run python -m pipeline.enrich.categories --limit <n>` and `uv run python -m pipeline.enrich.explainers --limit <n>`, then `dbt build` again
+- Explainer embeddings for the ask agent (Voyage; prints the estimate, sends only with `--yes`, resumes): `uv run python -m pipeline.enrich.embeddings --limit <n>`, then reload the serving tables
+- Read-only database role for the ask agent's SQL tool (once per database; writes `DATABASE_URL_READONLY` to `.env` without printing it; `--rotate` for a new password): `uv run python scripts/create_readonly_role.py`
+- Ask eval dataset (truth queries on the local Postgres and dev graph): `uv run python -m evals.datasets.build_ask`
+- Ask eval, agent against the explainer-only baseline: `uv run python -m evals.runners.ask_eval --limit 50` (add `--yes`; cached per prompt version, so reruns cost $0)
+- Replays served past the daily cap (the /ask page's example questions): `uv run python scripts/record_replays.py` (add `--yes`)
 - Category eval (needs `evals/datasets/category_gold.csv`): `uv run python -m evals.runners.category_accuracy --limit 200` (add `--yes`; variants `--name-only`, `--model eval`, `--tagged-sample 1000`)
 - Search latency eval: `uv run python -m evals.runners.search_latency --base-url <api url> --label public`
 - Graph and swap latency eval: `uv run python -m evals.runners.graph_latency --base-url <api url> --label public`

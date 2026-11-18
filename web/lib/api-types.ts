@@ -635,6 +635,7 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["Unavailable"];
         };
     };
     mcp: {

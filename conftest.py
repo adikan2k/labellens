@@ -1,6 +1,9 @@
 """Session fixtures shared by pipeline and API tests.
 
 - dbt_fixture: one dbt build of the committed fixture per test session.
+- fixture_embeddings: the fixture's explainers embedded by the fake Voyage (no network).
+- readonly_role: the ask agent's read-only role in the test Postgres (roles are cluster-wide;
+  each session gives it a new password). readonly_url: that role on the serving_url database.
 - serving_url: a throwaway Postgres database with the fixture loaded into the serving schema.
   Needs the test Postgres (docker compose up -d postgres). Locally the database tests are
   skipped with that hint when it is not running; in CI (CI=true) they fail instead.
@@ -13,6 +16,7 @@ from __future__ import annotations
 import os
 import uuid
 from collections.abc import Iterator
+from pathlib import Path
 
 import psycopg
 import pytest
@@ -34,6 +38,26 @@ def dbt_fixture(tmp_path_factory: pytest.TempPathFactory) -> Build:
 
 
 @pytest.fixture(scope="session")
+def fixture_embeddings(dbt_fixture: Build) -> Path:
+    from pipeline.enrich import embeddings
+    from pipeline.tests.fake_voyage import FakeVoyageServer
+
+    assert dbt_fixture.run.returncode == 0, dbt_fixture.run.output[-3000:]
+    path = dbt_fixture.tmp / "explainer_embeddings.parquet"
+    embeddings.run(
+        embeddings.load_texts(dbt_fixture.db),
+        voyage_factory=FakeVoyageServer().client,
+        model="voyage-4-lite",
+        price_per_mtok=0.02,
+        store=path,
+        limit=10_000,
+        yes=True,
+        log=lambda *_: None,
+    )
+    return path
+
+
+@pytest.fixture(scope="session")
 def pg_admin_url() -> str:
     url = test_database_url()
     try:
@@ -48,7 +72,16 @@ def pg_admin_url() -> str:
 
 
 @pytest.fixture(scope="session")
-def serving_url(pg_admin_url: str, dbt_fixture: Build) -> Iterator[str]:
+def readonly_role(pg_admin_url: str) -> str:
+    from scripts.create_readonly_role import create_role
+
+    return create_role(pg_admin_url, rotate=True)
+
+
+@pytest.fixture(scope="session")
+def serving_url(
+    pg_admin_url: str, dbt_fixture: Build, fixture_embeddings: Path, readonly_role: str
+) -> Iterator[str]:
     from pipeline.load import serving
 
     assert dbt_fixture.run.returncode == 0, dbt_fixture.run.output[-3000:]
@@ -57,7 +90,7 @@ def serving_url(pg_admin_url: str, dbt_fixture: Build) -> Iterator[str]:
         admin.execute(f'create database "{name}"')  # type: ignore[arg-type]
     url = make_conninfo(**{**conninfo_to_dict(pg_admin_url), "dbname": name})
     try:
-        serving.load(dbt_fixture.db, url, log=lambda *_: None)
+        serving.load(dbt_fixture.db, url, embeddings=fixture_embeddings, log=lambda *_: None)
         yield url
     finally:
         with psycopg.connect(pg_admin_url, autocommit=True) as admin:
@@ -81,3 +114,21 @@ def neo4j_driver() -> Iterator[object]:
         pytest.skip(message)
     yield driver
     driver.close()
+
+
+@pytest.fixture(scope="session")
+def readonly_url(serving_url: str, readonly_role: str) -> str:
+    return make_conninfo(readonly_role, dbname=conninfo_to_dict(serving_url)["dbname"])
+
+
+@pytest.fixture(scope="session")
+def fixture_graph(neo4j_driver: object, dbt_fixture: Build) -> object:
+    """The fixture's graph written to the test Neo4j; returns the driver."""
+    import duckdb
+
+    from pipeline.load import graph as graph_loader
+
+    with duckdb.connect(str(dbt_fixture.db), read_only=True) as con:
+        built = graph_loader.build(con)
+    graph_loader.write(neo4j_driver, built, log=lambda _: None)
+    return neo4j_driver

@@ -29,6 +29,39 @@ class Error(Model):
     source: Source
 
 
+class AskRequest(Model):
+    question: str = Field(min_length=3, max_length=500)
+
+
+class AskStep(Model):
+    index: int = Field(ge=1, le=6)
+    tool: Literal["query_sql", "query_graph", "search_explainers"]
+    summary: str
+    row_count: int = Field(ge=0)
+    duration_ms: int = Field(ge=0)
+
+
+class Citation(Model):
+    n: int = Field(ge=1)
+    kind: Literal["row", "node", "explainer"]
+    ref: str
+    label: str
+    url: str | None
+
+
+class AskAnswer(Model):
+    text: str
+    citations: list[Citation]
+    refused: bool
+    replay: bool
+    source: Source
+
+
+class AskError(Model):
+    code: Literal["timeout", "tool_failed", "internal"]
+    message: str
+
+
 class Versions(Model):
     api: str
     python: str

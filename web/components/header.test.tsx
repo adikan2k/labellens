@@ -13,6 +13,7 @@ test("header links home and to the pages that exist", () => {
   expect(links).toEqual([
     ["Dashboard", "/dashboard"],
     ["Graph", "/graph"],
+    ["Ask", "/ask"],
     ["About", "/about"],
   ]);
 });

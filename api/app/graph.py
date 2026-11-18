@@ -165,7 +165,7 @@ class Graph:
         if self.driver is not None:
             self.driver.close()
 
-    def _read(self, query: str, **params: Any) -> list[dict[str, Any]]:
+    def read(self, query: str, **params: Any) -> list[dict[str, Any]]:
         if self.driver is None:
             raise GraphUnavailable("NEO4J_* is not set")
         from neo4j import RoutingControl
@@ -181,7 +181,7 @@ class Graph:
 
     def neighborhood(self, code: str, depth: int) -> dict[str, Any] | None:
         """The neighbourhood, or None if the graph does not hold this product."""
-        rows = self._read(NEIGHBORHOOD_QUERY, code=code, depth=depth, per_hub=PER_HUB)
+        rows = self.read(NEIGHBORHOOD_QUERY, code=code, depth=depth, per_hub=PER_HUB)
         if not rows:
             return None
         row = rows[0]

@@ -42,11 +42,13 @@ class Settings(BaseSettings):
     # Langfuse
     langfuse_public_key: str | None = None
     langfuse_secret_key: SecretStr | None = None
-    langfuse_host: str | None = None
+    langfuse_base_url: str | None = None
 
     # Public demo limits
     ask_rate_limit_per_hour: int = 10
     ask_daily_spend_cap_usd: float = 0.50
+    # A run stops here; Cloud Run's request timeout (60 s) leaves room to send the error.
+    ask_timeout_seconds: float = 45.0
 
 
 # US dollars per million input and output tokens at standard rates (the Batch API halves
@@ -56,6 +58,16 @@ MODEL_PRICES: dict[str, tuple[float, float]] = {
     "claude-haiku-5-5": (0.10, 0.50),
     "claude-sonnet-5-5": (2.00, 10.00),
 }
+
+
+# US dollars per million tokens for the embeddings model (decision 0001).
+EMBEDDING_PRICES: dict[str, float] = {"voyage-4-lite": 0.02}
+
+
+def embedding_price_per_mtok(model: str) -> float:
+    if model not in EMBEDDING_PRICES:
+        raise ValueError(f"No price for {model} in api/app/config.py; add it before a paid run.")
+    return EMBEDDING_PRICES[model]
 
 
 def price_per_mtok(model: str) -> tuple[float, float]:

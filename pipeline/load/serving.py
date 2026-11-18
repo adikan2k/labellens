@@ -14,6 +14,18 @@ The API reads only what is loaded here, in schema `serving`:
   French water) are often heavily scanned and recorded as English, so the barcode prefix is
   the signal that keeps US products on top. Rows are written in rank order.
 - additives, ingredients, categories: lookups. stats: the dashboard document. meta: snapshot.
+- explainers: one row per additive or ingredient explainer with its Voyage embedding
+  (pgvector, from pipeline/enrich/outputs/explainer_embeddings.parquet) for the ask agent's
+  explainer search. Vectors whose text no longer matches the current explainer are left out.
+  About 1,000 rows, so exact search is fast and there is no vector index.
+
+Two things outside the swap:
+
+- The read-only role (scripts/create_readonly_role.py), which the ask agent's SQL tool uses,
+  gets USAGE on `serving` and SELECT on READONLY_TABLES, granted on the new schema before it
+  is swapped in. Not stats or meta, and nothing outside `serving`.
+- Schema `app` holds what the API writes (app.ask_runs: the ask agent's run log, which backs
+  its rate limit and daily spend cap). It is created if missing and never swapped or dropped.
 
 Safety: the size is estimated from DuckDB before connecting, and the load stops above 800 MB
 (Neon's free plan blocks writes past 1 GB). Tables are built in `serving_next` and swapped in
@@ -42,12 +54,17 @@ import duckdb
 import psycopg
 from psycopg import sql
 
+from pipeline.enrich.embeddings import OUTPUT as EMBEDDINGS_PATH
+from pipeline.enrich.embeddings import TEXTS_SQL as EXPLAINER_TEXTS_SQL
+
 ROOT = Path(__file__).resolve().parents[2]
 DUCKDB_PATH = ROOT / "data" / "labellens.duckdb"
 SCHEMA, NEXT, OLD = "serving", "serving_next", "serving_old"
 MAX_LOAD_BYTES = 800_000_000
 MAX_DATABASE_BYTES = 1_000_000_000
 SWAP_LOCK_TIMEOUT = "30s"
+READONLY_ROLE = "labellens_readonly"
+READONLY_TABLES = ("products", "additives", "ingredients", "categories", "explainers")
 BATCH = 20_000
 NUTRIENTS = [
     "energy_kcal_100g",
@@ -114,6 +131,13 @@ create table {NEXT}.categories (
     name text not null,
     parent_id text
 );
+create table {NEXT}.explainers (
+    id text primary key,
+    kind text not null,
+    name text not null,
+    text text not null,
+    embedding public.vector(1024) not null
+);
 create table {NEXT}.stats (
     id smallint primary key default 1 check (id = 1),
     doc jsonb not null
@@ -122,6 +146,30 @@ create table {NEXT}.meta (
     key text primary key,
     value text not null
 );
+"""
+
+# The API's own tables. Rows carry a keyed hash of the client address, never the address.
+APP_DDL = """
+create schema if not exists app;
+revoke all on schema app from public;
+create table if not exists app.ask_runs (
+    id bigint generated always as identity primary key,
+    created_at timestamptz not null default now(),
+    client_hash text not null,
+    outcome text not null default 'running',
+    model text,
+    prompt_version text,
+    input_tokens integer not null default 0,
+    output_tokens integer not null default 0,
+    embedding_tokens integer not null default 0,
+    cost_usd numeric(10, 6) not null default 0,
+    tool_calls smallint not null default 0,
+    duration_ms integer,
+    replay boolean not null default false,
+    refused boolean not null default false
+);
+create index if not exists ask_runs_client on app.ask_runs (client_hash, created_at);
+create index if not exists ask_runs_created on app.ask_runs (created_at);
 """
 
 # Built after the bulk copy, which is much faster than maintaining them during it.
@@ -189,6 +237,25 @@ LOOKUPS: list[tuple[str, dict[str, str], str]] = [
     ("dim_categories", {c: c for c in ("category_id", "name", "parent_id")}, "categories"),
 ]
 
+EXPLAINER_COLUMNS = ["id", "kind", "name", "text", "embedding"]
+
+
+def _sql_path(path: Path) -> str:
+    return "'" + str(path).replace("'", "''") + "'"
+
+
+def explainers_sql(embeddings: Path) -> str:
+    """Vectors for the current explainers only: same kind, id, name and text as embedded."""
+    return f"""
+    select t.id, t.kind, t.name, t.text,
+           '[' || array_to_string(e.embedding::float[], ',') || ']' as embedding
+    from ({EXPLAINER_TEXTS_SQL}) as t
+    join read_parquet({_sql_path(embeddings)}) as e
+      on e.kind = t.kind and e.id = t.id and e.name = t.name and e.text = t.text
+    order by t.id
+    """
+
+
 PRODUCT_COLUMNS = [
     "code", "name", "brand", "category_id", "category_source", "nutriscore_grade", "nova_group",
     "completeness",
@@ -210,7 +277,7 @@ def _mb(n: int | float) -> str:
     return f"{n / 1e6:,.1f} MB"
 
 
-def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
+def estimate(con: duckdb.DuckDBPyConnection, embeddings: Path | None = None) -> Estimate:
     """Upper-end size of the serving tables in Postgres, from the DuckDB marts.
 
     Heap: 28 bytes of tuple and pointer overhead per row, text as length + 1, numbers at their
@@ -245,6 +312,14 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
         sizes = " + ".join(f"coalesce(strlen(({e})::varchar), 0)" for e in columns.values())
         row = con.execute(f"select coalesce(sum(60 + {sizes}), 0) from {table}").fetchone()
         lookup_bytes += int(row[0]) if row else 0
+    explainer_bytes = 0
+    if embeddings and embeddings.exists():
+        # 1,024 float4 per vector plus its header, the text, and row overhead.
+        row = con.execute(
+            f"select coalesce(sum(60 + 4104 + strlen(text) + strlen(name) + strlen(id)), 0) "
+            f"from ({explainers_sql(embeddings)})"
+        ).fetchone()
+        explainer_bytes = int(row[0]) if row else 0
     return Estimate(
         {
             "products (heap)": int(heap * 1.15) + floor,
@@ -255,6 +330,7 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
             "products_swaps": int(rows * 44 * 1.4) + floor,
             "products_search (GIN)": int(words * 10) + floor,
             "lookups, stats, meta": int(lookup_bytes * 1.5) + 2_000_000,
+            "explainers (vectors)": int(explainer_bytes * 1.15) + floor,
         }
     )
 
@@ -413,13 +489,29 @@ def _drop_old(pg: psycopg.Connection, log=print) -> bool:
         return False
 
 
+def _grant_readonly(pg: psycopg.Connection, schema: str, log=print) -> bool:
+    if not pg.execute("select 1 from pg_roles where rolname = %s", [READONLY_ROLE]).fetchone():
+        log(f"Role {READONLY_ROLE} does not exist yet: scripts/create_readonly_role.py makes it.")
+        return False
+    role = sql.Identifier(READONLY_ROLE)
+    pg.execute(sql.SQL("grant usage on schema {} to {}").format(sql.Identifier(schema), role))
+    tables = sql.SQL(", ").join(sql.Identifier(schema, t) for t in READONLY_TABLES)
+    pg.execute(sql.SQL("grant select on {} to {}").format(tables, role))
+    return True
+
+
 def load(
-    duckdb_path: Path, database_url: str, *, replace: bool = False, log=print
+    duckdb_path: Path,
+    database_url: str,
+    *,
+    replace: bool = False,
+    embeddings: Path | None = EMBEDDINGS_PATH,
+    log=print,
 ) -> dict[str, int]:
     """Load everything and swap it in. Returns actual sizes in bytes per relation."""
     con = duckdb.connect(str(duckdb_path), read_only=True)
     try:
-        est = estimate(con)
+        est = estimate(con, embeddings)
         log("Estimated size in Postgres:")
         for name, size in est.tables.items():
             log(f"  {name:<24} {_mb(size):>10}")
@@ -432,6 +524,7 @@ def load(
         stats, meta = _stats(con), _meta(con)
         with psycopg.connect(database_url, autocommit=True, prepare_threshold=None) as pg:
             _drop_old(pg, log)  # a leftover from a load that found readers on it
+            pg.execute(cast("LiteralString", APP_DDL))
             current = pg.execute("select pg_database_size(current_database())").fetchone()[0]  # type: ignore[index]
             live = _schema_exists(pg, SCHEMA)
             if live and current + est.total > MAX_DATABASE_BYTES:
@@ -446,6 +539,8 @@ def load(
                 live = False
 
             pg.execute(f"drop schema if exists {NEXT} cascade")
+            # Database-wide and outside the swapped schemas, so the vector type outlives swaps.
+            pg.execute("create extension if not exists vector with schema public")
             pg.execute(cast("LiteralString", DDL))  # built only from module constants
             started = time.perf_counter()
             with pg.transaction():
@@ -455,6 +550,18 @@ def load(
                 for source, columns, target in LOOKUPS:
                     query = f"select {', '.join(columns.values())} from {source}"
                     _copy(pg, target, list(columns), _batches(cur, query))
+                vectors = 0
+                if embeddings and embeddings.exists():
+                    vectors = _copy(
+                        pg, "explainers", EXPLAINER_COLUMNS,
+                        _batches(cur, explainers_sql(embeddings)),
+                    )  # fmt: skip
+                texts = cur.execute(f"select count(*) from ({EXPLAINER_TEXTS_SQL})").fetchone()
+                missing = (texts[0] if texts else 0) - vectors
+                log(f"explainers: {vectors:,} with vectors" + (
+                    f"; {missing:,} not embedded yet (run pipeline.enrich.embeddings)"
+                    if missing else ""
+                ))  # fmt: skip
                 pg.execute(f"insert into {NEXT}.stats (doc) values (%s)", [json.dumps(stats)])
                 for key, value in meta.items():
                     pg.execute(
@@ -462,6 +569,7 @@ def load(
                     )
             pg.execute(cast("LiteralString", INDEXES))
             pg.execute(f"analyze {NEXT}.products")
+            _grant_readonly(pg, NEXT, log)  # grants follow the schema through the rename
             log(f"Loaded and indexed in {time.perf_counter() - started:.0f} s")
 
             if not _drop_old(pg, log):
@@ -504,7 +612,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.dry_run:
         with duckdb.connect(str(args.duckdb), read_only=True) as con:
-            est = estimate(con)
+            est = estimate(con, EMBEDDINGS_PATH)
         for name, size in est.tables.items():
             print(f"  {name:<24} {_mb(size):>10}")
         print(f"  {'total':<24} {_mb(est.total):>10}   (limit {_mb(MAX_LOAD_BYTES)})")
