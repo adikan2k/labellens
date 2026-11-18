@@ -119,3 +119,16 @@ def neo4j_driver() -> Iterator[object]:
 @pytest.fixture(scope="session")
 def readonly_url(serving_url: str, readonly_role: str) -> str:
     return make_conninfo(readonly_role, dbname=conninfo_to_dict(serving_url)["dbname"])
+
+
+@pytest.fixture(scope="session")
+def fixture_graph(neo4j_driver: object, dbt_fixture: Build) -> object:
+    """The fixture's graph written to the test Neo4j; returns the driver."""
+    import duckdb
+
+    from pipeline.load import graph as graph_loader
+
+    with duckdb.connect(str(dbt_fixture.db), read_only=True) as con:
+        built = graph_loader.build(con)
+    graph_loader.write(neo4j_driver, built, log=lambda _: None)
+    return neo4j_driver
