@@ -1,36 +1,36 @@
 {
   "label": "public",
   "base_url": "https://labellens-api-1036759996795.us-east4.run.app",
-  "measured_at": "2026-11-17T22:32:12+00:00",
+  "measured_at": "2026-11-18T08:57:03+00:00",
   "requests": 200,
   "errors": 0,
-  "cold_first_ms": 108.8,
-  "p50_ms": 102.2,
-  "p95_ms": 193.0,
-  "p99_ms": 302.1,
-  "max_ms": 395.1,
+  "cold_first_ms": 124.5,
+  "p50_ms": 103.5,
+  "p95_ms": 184.0,
+  "p99_ms": 378.9,
+  "max_ms": 15114.6,
   "target_p95_ms": 300.0,
   "meets_target": true,
   "slowest": [
     [
+      "bre",
+      15114.6
+    ],
+    [
+      "peanut butter",
+      522.9
+    ],
+    [
       "ice cream",
-      395.1
+      378.9
     ],
     [
-      "5449000054227",
-      316.8
+      "lays",
+      253.3
     ],
     [
-      "great value",
-      302.1
-    ],
-    [
-      "yog",
-      299.1
-    ],
-    [
-      "water",
-      296.4
+      "orange juice",
+      222.5
     ]
   ]
 }
