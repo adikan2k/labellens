@@ -20,7 +20,8 @@ GET: dict[str, Any] = {
     "/health": {"status": "ok", "versions": {"api": "0.3.0"}, "source": SOURCE},
     "/search": {"query": "cheerios", "results": [{"code": "1", "name": "Cheerios"}]},
     f"/products/{CODE}": {"product": PRODUCT, "source": SOURCE},
-    f"/products/{CODE}/swaps": {"code": CODE, "swaps": [{"product": PRODUCT}]},
+    f"/products/{CODE}/swaps": {"code": CODE, "swaps": []},  # none is a valid answer
+    f"/products/{smoke.SWAP_CODE}/swaps": {"code": smoke.SWAP_CODE, "swaps": [{"product": {}}]},
     "/graph/neighborhood": {
         "center": f"Product:{CODE}",
         "nodes": [{"id": f"Product:{CODE}"}, {"id": "Brand:x"}],
@@ -107,7 +108,7 @@ def test_a_healthy_deployment_passes_every_check(stub: tuple[Stub, str]) -> None
     _, base = stub
     results, printed = _run(base)
     assert all(r.ok for r in results), printed
-    assert len(results) == 8 + len(smoke.PAGES)
+    assert len(results) == 9 + len(smoke.PAGES)
     assert len(printed.splitlines()) == len(results) + 1  # one line per check, then a total
     assert printed.rstrip().endswith(f"{len(results)}/{len(results)} checks passed.")
 
@@ -143,6 +144,8 @@ def test_mcp_requests_carry_the_2026_headers_and_meta(stub: tuple[Stub, str]) ->
         ("/health", (503, {"detail": "down"}), "api /health", "HTTP 503"),
         ("/search", (200, {"results": []}), "api /search?q=cheerios", "no results"),
         ("/graph/neighborhood", (200, {"center": "x"}), "api /graph/neighborhood", "center"),
+        (f"/products/{smoke.SWAP_CODE}/swaps", (200, {"code": smoke.SWAP_CODE, "swaps": []}),
+         f"api /products/{smoke.SWAP_CODE}/swaps", "no swaps"),
         ("/ask", (200, {}), "api POST /ask (too short)", "expected 422"),
         ("/mcp", (200, {"jsonrpc": "2.0", "id": 1, "result": {"tools": []}}), "mcp tools/list",
          "tools are"),

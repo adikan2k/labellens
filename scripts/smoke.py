@@ -23,6 +23,8 @@ import httpx
 API = "https://labellens-api-1036759996795.us-east4.run.app"
 WEB = "https://labellens-beige.vercel.app"
 CODE = "0016000123991"  # Lucky Charms: in the serving tables, the graph and the swaps
+# Nacho Cheese Doritos: has swaps. Lucky Charms may have none, which is a valid answer.
+SWAP_CODE = "0028400516464"
 UNKNOWN = "0000000000000"
 PAGES = ("/", "/dashboard", "/graph", "/ask", "/about", f"/product/{CODE}")
 MCP_VERSION = "2026-07-28"
@@ -109,11 +111,16 @@ def product(c: httpx.Client, api: str, web: str) -> str:
     return f"{found.get('name')}, Nutri-Score {found.get('nutriscore_grade')}"
 
 
-def swaps(c: httpx.Client, api: str, web: str) -> str:
-    body = _json(c.get(f"{api}/products/{CODE}/swaps"))
-    expect(body.get("code") == CODE, f"code is {body.get('code')!r}")
-    expect(body.get("swaps"), "no swaps")
-    return f"{len(body['swaps'])} swaps"
+def swaps_of(code: str, *, required: bool) -> CheckFn:
+    def check(c: httpx.Client, api: str, web: str) -> str:
+        body = _json(c.get(f"{api}/products/{code}/swaps"))
+        expect(body.get("code") == code, f"code is {body.get('code')!r}")
+        found = body.get("swaps")
+        expect(isinstance(found, list), "swaps is not a list")
+        expect(found or not required, "no swaps")
+        return f"{len(found)} swaps"
+
+    return check
 
 
 def graph(c: httpx.Client, api: str, web: str) -> str:
@@ -166,7 +173,8 @@ def checks(expect_unknown_404: bool) -> list[tuple[str, CheckFn]]:
         ("api /health", health),
         ("api /search?q=cheerios", search),
         (f"api /products/{CODE}", product),
-        (f"api /products/{CODE}/swaps", swaps),
+        (f"api /products/{CODE}/swaps", swaps_of(CODE, required=False)),
+        (f"api /products/{SWAP_CODE}/swaps", swaps_of(SWAP_CODE, required=True)),
         ("api /graph/neighborhood", graph),
         ("api POST /ask (too short)", ask_rejects_short),
         ("mcp tools/list", mcp_tools),
