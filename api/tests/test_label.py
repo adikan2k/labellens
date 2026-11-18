@@ -83,7 +83,7 @@ def test_per_serving_becomes_per_100g_with_sodium_as_salt() -> None:
     assert values["salt_100g"] == pytest.approx(1.67, abs=0.01)  # 200 mg sodium x 2.5, /30 g
     assert values["sugars_100g"] == 20.0
     assert values["fiber_100g"] is None
-    assert note == "Converted from per serving (30 g) to per 100 g."
+    assert note == "Converted from per serving (30 g or ml) to per 100 g or ml."
 
 
 def test_per_100g_is_taken_as_printed_and_kj_becomes_kcal() -> None:

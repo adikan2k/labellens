@@ -63,7 +63,7 @@ def nutrition_per_100g(reading: LabelReading) -> tuple[dict[str, Any], str | Non
     if reading.basis == "per_100g":
         return _per_100g(reading.nutrition, 1.0), None
     if serving and serving > 0:
-        note = f"Converted from per serving ({_number(serving)} g) to per 100 g."
+        note = f"Converted from per serving ({_number(serving)} g or ml) to per 100 g or ml."
         return _per_100g(reading.nutrition, 100.0 / serving), note
     empty: dict[str, Any] = dict.fromkeys(NUTRIENTS)
     printed_any = any(v is not None for v in reading.nutrition.model_dump().values())

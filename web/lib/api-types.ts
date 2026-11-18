@@ -482,7 +482,7 @@ export interface components {
             /** @enum {string} */
             basis: "per_100g" | "per_serving" | "unknown";
             serving_size_g: number | null;
-            /** @example Converted from per serving (30 g) to per 100 g. */
+            /** @example Converted from per serving (30 g or ml) to per 100 g or ml. */
             conversion_note: string | null;
             nutrition: components["schemas"]["Nutrition"];
             ingredients: components["schemas"]["LabelIngredient"][];

@@ -688,7 +688,7 @@ components:
         serving_size_g: { type: [number, "null"] }
         conversion_note:
           type: [string, "null"]
-          example: Converted from per serving (30 g) to per 100 g.
+          example: Converted from per serving (30 g or ml) to per 100 g or ml.
         nutrition: { $ref: "#/components/schemas/Nutrition" }
         ingredients:
           type: array
