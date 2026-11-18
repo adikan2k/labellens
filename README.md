@@ -66,7 +66,7 @@ Each linked result is a report in [`evals/results/`](evals/results/); the data-t
 | [Graph and swaps](evals/results/graph_latency_public.md) | 100 products, live API | Under 1 s | p95 406 ms (graph), 233 ms (swaps) |
 | [Lighthouse](evals/results/lighthouse.md) | Home, product and dashboard pages on mobile | 90 in every category | 98 to 100 in every category |
 | [Prompt caching](evals/results/ask_caching.md) | 10 agent runs with and without a cached prompt | Cheaper, same answers | **64% cheaper per run** |
-| [Cold start](evals/results/cold_start.md) | First request after Cloud Run and Neon both scaled to zero | Timed and noted | **22.6 s after an hour idle** (3.9 s after 25 minutes), then about 0.1 s |
+| [Cold start](evals/results/cold_start.md) | First request after Cloud Run and Neon both scaled to zero | Timed and noted | **22.6 s after an hour idle** (3.9 s after 25 minutes), then about 0.1 s; 16 s of it was startup, cut to 0.4 s since (not yet re-timed after an hour) |
 
 **What these numbers don't show:**
 - The category labels were made by Claude Opus, not by a person, so that result compares two models.
