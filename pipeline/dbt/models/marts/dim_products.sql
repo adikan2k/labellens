@@ -1,9 +1,7 @@
 {#
-  One row per US barcode. category_main comes from category_map: specific tags (priority 2)
-  beat umbrella tags (priority 1), and among equals the later tag wins, since lists mostly
-  run general to specific. Tag order alone is not enough: en:appetizers is stored after
-  en:pickles, which would file pickles as salty snacks. Products with no mapped tag keep
-  category_main null for phase 3's model to fill; category_source says which applied.
+  One row per US barcode. category_main comes from Open Food Facts' tags
+  (int_product_tag_categories); products with no mapped tag keep it null for phase 3's model
+  to fill. category_source says which applied.
 #}
 
 with products as (
@@ -11,14 +9,7 @@ with products as (
 ),
 
 mapped as (
-    select
-        c.code,
-        m.category_id
-    from {{ ref('stg_off__product_categories') }} as c
-    inner join {{ ref('category_map') }} as m on m.off_tag = c.category_tag
-    qualify row_number() over (
-        partition by c.code order by m.priority desc, c.position desc
-    ) = 1
+    select * from {{ ref('int_product_tag_categories') }}
 )
 
 select

@@ -71,7 +71,15 @@ def test_definitions_load_and_materialise_on_the_fixture(tmp_path: Path) -> None
     out = json.loads(lines[-1].removeprefix("RESULT "))
 
     assert {"raw_snapshot", "run_report", "dim_products", "serving_tables"} <= set(out["keys"])
-    assert out["groups"] == ["ingest", "marts", "publish", "report", "seeds", "staging"]
+    assert out["groups"] == [
+        "ingest",
+        "intermediate",
+        "marts",
+        "publish",
+        "report",
+        "seeds",
+        "staging",
+    ]
     assert out["base_deps"] == ["raw_snapshot"]
     assert out["success"], (done.stdout + done.stderr)[-4000:]
     built = set(out["keys"]) - {"serving_tables"}

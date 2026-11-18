@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: int_product_tag_categories
+    description: The category Open Food Facts' tags give a product, via category_map.
+    columns:
+      - name: code
+        data_tests: [unique, not_null]
+      - name: category_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_categories')
+                field: category_id
+
+  - name: int_category_inputs
+    description: >
+      The category model's input for every named product: name, brand, start of the
+      ingredient list, and the tag category if Open Food Facts' tags give one.
+    columns:
+      - name: code
+        data_tests: [unique, not_null]
+      - name: name
+        data_tests: [not_null]
+      - name: ingredients
+        description: Label texts in order, at most 200 characters; null when none are listed.
