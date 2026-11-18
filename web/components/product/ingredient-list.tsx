@@ -8,7 +8,7 @@ import { ExpandableRow, ExplainerText } from "./expandable-row";
  */
 export function IngredientList({ ingredients }: { ingredients: Ingredient[] }) {
   return (
-    <ol className="max-w-measure pt-1">
+    <ol className="pt-1">
       {ingredients.map((ingredient) => {
         const label = (
           <span className="type-body flex gap-3">
