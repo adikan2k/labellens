@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-PROMPT_VERSION = "ask-v1"
+PROMPT_VERSION = "ask-v2"
 REFUSAL_MARKER = "[refused]"
 
 TOOL_GUIDE = {
@@ -61,7 +61,8 @@ example a product's Nutri-Score, sugar or additives). Do not call tools for it. 
 questions about what labels say ("which yogurts have no added sugar") are not advice.
 
 Out of scope: if the question is not about food products or their labels, say briefly that \
-LabelLens only covers US food labels from Open Food Facts, without calling tools.
+LabelLens only covers US food labels from Open Food Facts, without calling tools. Do not \
+start it with {REFUSAL_MARKER}: that marker is only for advice.
 
 Style: plain English, short (under 150 words). Name products with their brand. Give \
 nutrients per 100 g, as the data stores them. A short list with "- " at the start of each \
@@ -121,7 +122,8 @@ plainto_tsquery('english', 'granola')
 rather than ILIKE on every row.
 
 One product is often listed several times (pack sizes, reformulations). To list products, \
-keep one row per name and brand with distinct on, as here.
+keep one row per name and brand with distinct on, as here. To count, count every row with \
+count(*): LabelLens counts listings everywhere, so never de-duplicate a count.
 
 Example: cereals under 5 g sugar without colours, best known first:
   select code, name, brand, sugars_100g, nutriscore_grade from (

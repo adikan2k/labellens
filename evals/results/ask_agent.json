@@ -1,0 +1,83 @@
+{
+  "measured_at": "2026-11-18T05:34:50+00:00",
+  "model": "claude-haiku-5-5",
+  "judge_model": "claude-sonnet-5-5",
+  "judge_cost_usd": 0.1027,
+  "questions": 50,
+  "scores": {
+    "agent": {
+      "variant": "agent",
+      "answerable": 43,
+      "fact_score": 0.977,
+      "correct": 42,
+      "contradictions": 0,
+      "tool_right": 43,
+      "refusals_right": 5,
+      "refusals_total": 5,
+      "false_refusals": 0,
+      "scope_right": 2,
+      "scope_total": 2,
+      "errors": 0,
+      "cost_usd": 0.044,
+      "latency_p50_ms": 2458,
+      "latency_p95_ms": 4551,
+      "by_category": {
+        "sql": {
+          "n": 25,
+          "fact_score": 1.0,
+          "correct": 25,
+          "tool_right": 25
+        },
+        "graph": {
+          "n": 8,
+          "fact_score": 0.875,
+          "correct": 7,
+          "tool_right": 8
+        },
+        "explainer": {
+          "n": 10,
+          "fact_score": 1.0,
+          "correct": 10,
+          "tool_right": 10
+        }
+      }
+    },
+    "baseline": {
+      "variant": "baseline",
+      "answerable": 43,
+      "fact_score": 0.256,
+      "correct": 11,
+      "contradictions": 0,
+      "tool_right": 10,
+      "refusals_right": 5,
+      "refusals_total": 5,
+      "false_refusals": 3,
+      "scope_right": 2,
+      "scope_total": 2,
+      "errors": 0,
+      "cost_usd": 0.0152,
+      "latency_p50_ms": 1279,
+      "latency_p95_ms": 2668,
+      "by_category": {
+        "sql": {
+          "n": 25,
+          "fact_score": 0.04,
+          "correct": 1,
+          "tool_right": 0
+        },
+        "graph": {
+          "n": 8,
+          "fact_score": 0.0,
+          "correct": 0,
+          "tool_right": 0
+        },
+        "explainer": {
+          "n": 10,
+          "fact_score": 1.0,
+          "correct": 10,
+          "tool_right": 10
+        }
+      }
+    }
+  }
+}

@@ -108,7 +108,7 @@ def test_steps_stream_then_a_cited_answer(
     (run,) = _runs(serving_url, ip, key)
     assert run["outcome"] == "answer" and run["tool_calls"] == 1
     assert run["input_tokens"] == 2000 and float(run["cost_usd"]) > 0
-    assert run["model"] == "claude-haiku-5-5" and run["prompt_version"] == "ask-v1"
+    assert run["model"] == "claude-haiku-5-5" and run["prompt_version"] == "ask-v2"
     assert ip not in json.dumps(run, default=str)  # only the keyed hash is stored
 
 

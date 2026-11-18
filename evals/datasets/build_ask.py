@@ -228,14 +228,16 @@ QUESTIONS: list[Q] = [
     Q("graph-05", "Which breakfast cereals have the most ingredients in common with Lucky "
       "Charms, barcode 0016000123991?", "graph", "query_graph", "cypher",
       "MATCH (p:Product {code: '0016000123991'})-[:HAS_INGREDIENT]->(i)<-[:HAS_INGREDIENT]-"
-      "(o:Product) WHERE o.category = p.category AND o <> p WITH o, count(i) AS shared "
+      "(o:Product) WHERE o.category = p.category AND toLower(o.name) <> toLower(p.name) "
+      "WITH o, count(i) AS shared "
       "RETURN o.name AS name, shared ORDER BY shared DESC, o.rank LIMIT 3",
       lambda r: distinct([f"{row['name']} shares {row['shared']} ingredients with it."
                           for row in r])),
     Q("graph-06", "Which salty snacks have ingredients most like Nacho Cheese Flavored Doritos, "
       "barcode 0028400516464?", "graph", "query_graph", "cypher",
       "MATCH (p:Product {code: '0028400516464'})-[:HAS_INGREDIENT]->(i)<-[:HAS_INGREDIENT]-"
-      "(o:Product) WHERE o.category = p.category AND o <> p WITH o, count(i) AS shared "
+      "(o:Product) WHERE o.category = p.category AND toLower(o.name) <> toLower(p.name) "
+      "WITH o, count(i) AS shared "
       "RETURN o.name AS name, shared ORDER BY shared DESC, o.rank LIMIT 2",
       lambda r: distinct([f"{row['name']} shares {row['shared']} ingredients with it."
                           for row in r])),

@@ -543,7 +543,9 @@ def main(argv: list[str] | None = None) -> int:
         to_markdown(scores, items, runs, judgments, meta), "utf-8", newline="\n"
     )
     payload = {**meta, "scores": {v: vars(s) for v, s in scores.items()}}
-    (RESULTS / "ask_agent.json").write_text(json.dumps(payload, indent=2) + "\n", "utf-8")
+    (RESULTS / "ask_agent.json").write_text(
+        json.dumps(payload, indent=2) + "\n", "utf-8", newline="\n"
+    )
     a, b = scores["agent"], scores["baseline"]
     print(
         f"Agent: fact score {a.fact_score:.2f}, correct {a.correct}/{a.answerable}, "
