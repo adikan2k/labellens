@@ -1,7 +1,7 @@
 """Uncertainty for the eval reports: small samples need intervals, not just percentages.
 
 - `wilson`: the Wilson score interval for a proportion (k successes in n). It stays inside
-  [0, 1] and behaves at 0/n and n/n, where the textbook p ± z·√(p(1−p)/n) collapses to a
+  [0, 1] and behaves at 0/n and n/n, where the textbook normal approximation collapses to a
   zero-width interval.
 - `bootstrap_mean`: a percentile bootstrap interval for a mean of per-item values (such as the
   ask eval's fact score), with a fixed seed so a rerun gives the same report.

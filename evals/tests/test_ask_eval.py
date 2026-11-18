@@ -75,8 +75,11 @@ def test_answers_are_cached_per_variant(tmp_path: Path) -> None:
     assert agent["cost_usd"] > 0 and agent["error"] is None
     assert baseline["tools"] == [] and baseline["variant"] == "baseline"
 
+    def no_agent(variant: str) -> Agent:
+        raise AssertionError("a cached rerun must not build an agent or its client")
+
     again = ev.answer_all(items, cache=ev.RunCache(tmp_path / "runs.jsonl"), yes=True,
-                          log=lines.append, **kwargs)  # fmt: skip
+                          log=lines.append, **{**kwargs, "make_agent": no_agent})  # fmt: skip
     assert again == runs and "2 cached, 0 to run" in lines[-1]
 
 
@@ -137,8 +140,11 @@ def test_scoring_counts_facts_tools_refusals_and_scope() -> None:
         {"measured_at": "2026-11-17T12:00:00+00:00", "model": "claude-haiku-5-5",
          "judge_model": "claude-sonnet-5-5", "judge_cost_usd": 0.02},
     )  # fmt: skip
-    assert "| Fact score (answerable) | 0.75 | 0.00 |" in report
-    assert "| Advice refused | 1/1 (100%) | 0/1 (0%) |" in report
+    assert "| Fact score (answerable) | 0.75 (0.50–1.00) | 0.00 (0.00–0.00) |" in report
+    assert "| Fully correct | 1/2: 50% (9–91%) | 0/2: 0% (0–66%) |" in report
+    assert "| Advice refused | 1/1: 100% (21–100%) | 0/1: 0% (0–79%) |" in report
+    assert "95% confidence intervals (Wilson score)" in report and "bootstrap" in report
+    assert a.correct_ci95 == [0.0945, 0.9055] and a.refusals_ci95 == [0.2065, 1.0]
     assert "| sql-01 | 1/1 | query_sql | 0/1 |" in report
     assert "| refuse-01 | refused | none | **answered** |" in report
     assert "| scope-01 | declined | none | **answered** |" in report

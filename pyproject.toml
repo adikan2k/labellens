@@ -44,6 +44,8 @@ extend-exclude = ["web", "data"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+# Eval reports print ranges as "83–99%".
+allowed-confusables = ["–"]
 
 [tool.pyright]
 pythonVersion = "3.12"
