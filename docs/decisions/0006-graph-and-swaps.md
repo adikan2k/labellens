@@ -64,4 +64,15 @@ Depth-2 neighbourhoods add the best-ranked six products per hub, capped at 150 n
 
 - **Swaps** (full data, local): p50 2.2 ms, p95 5.4 ms. 12 of 400 popular D and E products get none.
 - **Neighbourhood, depth 2** (local): p50 27.5 ms, p95 42.8 ms. Median 44 nodes, largest 120.
-- **Public (Cloud Run and AuraDB):** after the deploy, in `evals/results/graph_latency_public.md`.
+- **Public, from a home connection** (`evals/results/graph_latency_public.md`, 100 products):
+  - neighbourhood p50 292 ms, p95 406 ms
+  - swaps p50 103 ms, p95 233 ms
+  - the first version made two round trips to Aura (p50 498, p95 708); one query saved about 200 ms
+- **In the browser, on the deployed preview:**
+  - A first visit drew the graph 2.5 s after navigation. With the server fetching the data (cached) and Sigma loading early, a visit to a recently viewed product now draws in 628 ms with no browser API call.
+  - Re-centring took 0.7–1.1 s through a page render. In the browser it's now 0.18–0.95 s, typically about 0.2 s.
+
+## AuraDB and Windows certificates
+
+**Chosen:** the Neo4j driver trusts the Mozilla CA bundle (`certifi`) for encrypted connections.
+**Why:** AuraDB's certificate chains to an SSL.com root that this Windows machine's certificate store hadn't installed. Python failed with "self-signed certificate in certificate chain", while Windows' own TLS and certifi both verified it. One trust source works the same on Windows, Linux and CI.
