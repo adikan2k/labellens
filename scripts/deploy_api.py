@@ -145,6 +145,11 @@ def commands(
                 str(ROOT),
                 f"--config={ROOT / 'deploy' / 'cloudbuild-api.yaml'}",
                 f"--substitutions=_IMAGE={image}",
+                # Named, not left to the default: with the default bucket gcloud proves the
+                # bucket is the project's by listing every bucket in it, which needs
+                # project-wide storage.buckets.list. The CI deploy account only has the
+                # _cloudbuild bucket itself (scripts/setup_ci_deploy.py).
+                f"--gcs-source-staging-dir=gs://{project}_cloudbuild/source",
                 f"--project={project}",
             ],
         ),

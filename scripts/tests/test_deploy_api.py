@@ -118,3 +118,6 @@ def test_build_and_deploy_only_never_describes_the_project(
     calls.clear()
     assert deploy_api.main([*argv, "--yes"]) == 0
     assert [c[1:3] for c in calls] == [["secrets", "list"], ["builds", "submit"], ["run", "deploy"]]
+    # The staging bucket is named, so gcloud skips its ownership listing, which would need
+    # project-wide storage.buckets.list the deploy account does not have.
+    assert "--gcs-source-staging-dir=gs://p_cloudbuild/source" in calls[1]
