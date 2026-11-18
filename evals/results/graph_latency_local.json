@@ -1,0 +1,29 @@
+{
+  "label": "local",
+  "base_url": "http://127.0.0.1:8000",
+  "measured_at": "2026-11-18T02:03:27+00:00",
+  "products": 60,
+  "timings": [
+    {
+      "endpoint": "/graph/neighborhood?depth=2",
+      "requests": 60,
+      "errors": 0,
+      "cold_first_ms": 414.4,
+      "p50_ms": 27.5,
+      "p95_ms": 42.8,
+      "max_ms": 59.2,
+      "meets_target": true
+    },
+    {
+      "endpoint": "/products/{code}/swaps",
+      "requests": 60,
+      "errors": 0,
+      "cold_first_ms": 5.1,
+      "p50_ms": 5.4,
+      "p95_ms": 24.9,
+      "max_ms": 28.5,
+      "meets_target": true
+    }
+  ],
+  "target_ms": 1000.0
+}

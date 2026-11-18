@@ -4,8 +4,8 @@
 - serving_url: a throwaway Postgres database with the fixture loaded into the serving schema.
   Needs the test Postgres (docker compose up -d postgres). Locally the database tests are
   skipped with that hint when it is not running; in CI (CI=true) they fail instead.
-- neo4j_driver: a driver for the test Neo4j (docker compose up -d neo4j), same skip-or-fail
-  rule. The test Neo4j holds one database, so tests using it replace its contents.
+- neo4j_driver: a driver for the test Neo4j (docker compose up -d neo4j-test), same
+  skip-or-fail rule. Tests replace its contents; the development Neo4j is a separate server.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from psycopg.conninfo import conninfo_to_dict, make_conninfo
 from pipeline.tests.support import FIXTURE_VARS, Build, run_dbt, test_database_url
 
 TEST_NEO4J = (
-    os.environ.get("TEST_NEO4J_URI", "bolt://localhost:57687"),
+    os.environ.get("TEST_NEO4J_URI", "bolt://localhost:57688"),
     os.environ.get("TEST_NEO4J_USER", "neo4j"),
     os.environ.get("TEST_NEO4J_PASSWORD", "labellens-local"),
 )
@@ -75,7 +75,7 @@ def neo4j_driver() -> Iterator[object]:
         driver.verify_connectivity()
     except (DriverError, Neo4jError, OSError) as error:
         driver.close()
-        message = f"Test Neo4j not reachable at {uri}: run `docker compose up -d neo4j`."
+        message = f"Test Neo4j not reachable at {uri}: run `docker compose up -d neo4j-test`."
         if os.environ.get("CI"):
             pytest.fail(f"{message} ({error})")
         pytest.skip(message)

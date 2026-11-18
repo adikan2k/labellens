@@ -36,7 +36,7 @@ jobs:
         env:
           NEO4J_AUTH: neo4j/labellens-local
         ports:
-          - 57687:7687
+          - 57688:7687
         options: >-
           --health-cmd "wget -q --spider http://localhost:7474 || exit 1"
           --health-interval 3s --health-timeout 3s --health-retries 40
