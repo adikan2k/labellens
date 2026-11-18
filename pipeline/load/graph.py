@@ -208,9 +208,9 @@ def write(driver: Any, graph: Graph, log: Log = print) -> None:
 
 
 def connect(uri: str, user: str, password: str) -> Any:
-    from neo4j import GraphDatabase
+    from api.app.graph import make_driver
 
-    driver = GraphDatabase.driver(uri, auth=(user, password))
+    driver = make_driver(uri, user, password)
     driver.verify_connectivity()
     return driver
 

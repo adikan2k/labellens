@@ -1005,6 +1005,7 @@ source = { virtual = "." }
 default-groups = ["dev", "pipeline"]
 dependencies = [
     { name = "anthropic" },
+    { name = "certifi" },
     { name = "fastapi", extra = ["standard"] },
     { name = "neo4j" },
     { name = "psycopg", extra = ["binary", "pool"] },
@@ -1030,6 +1031,7 @@ pipeline = [
 [package.metadata]
 requires-dist = [
     { name = "anthropic", specifier = ">=2.10.0" },
+    { name = "certifi", specifier = ">=2026.10.23" },
     { name = "fastapi", extras = ["standard"] },
     { name = "neo4j", specifier = ">=6.4.1" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.3.9" },

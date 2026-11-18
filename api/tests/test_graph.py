@@ -140,3 +140,21 @@ def test_route_errors(client: TestClient, fake: FakeGraph) -> None:
         fake.fail = False
     assert paused.status_code == 503
     assert "graph is waking up" in paused.json()["detail"]
+
+
+def test_encrypted_addresses_trust_the_mozilla_bundle(monkeypatch: pytest.MonkeyPatch) -> None:
+    import certifi
+    import neo4j
+
+    calls: list[tuple[str, dict[str, Any]]] = []
+    monkeypatch.setattr(
+        neo4j.GraphDatabase, "driver", lambda uri, **kw: calls.append((uri, kw)) or object()
+    )
+    graph.make_driver("neo4j+s://abc.databases.neo4j.io", "neo4j", "pw", connection_timeout=8)
+    graph.make_driver("bolt://localhost:57687", "neo4j", "pw")
+    (secure_uri, secure), (local_uri, local) = calls
+    assert secure_uri == "neo4j://abc.databases.neo4j.io"
+    assert secure["encrypted"] is True and secure["connection_timeout"] == 8
+    assert isinstance(secure["trusted_certificates"], neo4j.TrustCustomCAs)
+    assert certifi.where() in secure["trusted_certificates"].certs
+    assert local_uri == "bolt://localhost:57687" and "encrypted" not in local

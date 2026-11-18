@@ -47,6 +47,26 @@ RETURN labels(n)[0] AS label, coalesce(n.code, n.id) AS key, COUNT { (n)<--() } 
 """
 
 
+def make_driver(uri: str, user: str, password: str, **config: Any) -> Any:
+    """A Neo4j driver that trusts the Mozilla CA bundle (certifi) for encrypted connections.
+
+    AuraDB's certificate chains to an SSL.com root that a Windows certificate store may not
+    have installed yet, so the system store fails there while certifi verifies it. One trust
+    source everywhere (Windows, Linux, CI). `neo4j+s://` becomes `neo4j://` with encryption
+    on, since the driver only takes a custom trust store without the +s shorthand. Local
+    `bolt://` addresses are unchanged.
+    """
+    from neo4j import GraphDatabase, TrustCustomCAs
+
+    scheme, sep, rest = uri.partition("://")
+    if sep and scheme.endswith("+s"):
+        import certifi
+
+        uri = f"{scheme[:-2]}://{rest}"
+        config |= {"encrypted": True, "trusted_certificates": TrustCustomCAs(certifi.where())}
+    return GraphDatabase.driver(uri, auth=(user, password), **config)
+
+
 class GraphUnavailable(RuntimeError):
     """Not configured, or AuraDB is paused, reloading or unreachable."""
 
@@ -126,11 +146,9 @@ class Graph:
     def open(cls, uri: str | None, user: str | None, password: str | None) -> Graph:
         if not (uri and user and password):
             return cls(driver=None)
-        from neo4j import GraphDatabase
-
         # Lazy: no connection is made until the first query, so a paused instance does not
         # stop the API from starting.
-        return cls(driver=GraphDatabase.driver(uri, auth=(user, password), connection_timeout=8))
+        return cls(driver=make_driver(uri, user, password, connection_timeout=8))
 
     def close(self) -> None:
         if self.driver is not None:
