@@ -9,7 +9,7 @@ connection string). This script never sees a secret's value; Cloud Run reads the
 Secrets that do not exist yet are left out, and the script says which; without the ask
 secrets the API runs and /ask answers 503.
 
-Plain settings (CORS_ORIGINS, NEO4J_URI, NEO4J_USER, LANGFUSE_PUBLIC_KEY, LANGFUSE_HOST) go
+Plain settings (CORS_ORIGINS, NEO4J_URI, NEO4J_USER, LANGFUSE_PUBLIC_KEY, LANGFUSE_BASE_URL) go
 in an env-vars file rather than on the command line, where Windows' cmd.exe mangles them.
 They come from the environment or .env unless given as flags.
 
@@ -42,7 +42,7 @@ SECRETS = {
     "EMBEDDINGS_API_KEY": "labellens-voyage-key",
     "LANGFUSE_SECRET_KEY": "labellens-langfuse-secret",
 }
-PLAIN = ("NEO4J_URI", "NEO4J_USER", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_HOST")
+PLAIN = ("NEO4J_URI", "NEO4J_USER", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_BASE_URL")
 APIS = [
     "run.googleapis.com",
     "artifactregistry.googleapis.com",

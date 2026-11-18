@@ -51,13 +51,15 @@ class Tracer:
         self.client = client
 
     @classmethod
-    def from_keys(cls, public_key: str | None, secret_key: str | None, host: str | None) -> Tracer:
+    def from_keys(
+        cls, public_key: str | None, secret_key: str | None, base_url: str | None
+    ) -> Tracer:
         if not (public_key and secret_key):
             return cls()
         try:
             from langfuse import Langfuse
 
-            return cls(Langfuse(public_key=public_key, secret_key=secret_key, host=host))
+            return cls(Langfuse(public_key=public_key, secret_key=secret_key, base_url=base_url))
         except Exception:
             log.warning("Langfuse: could not start the client; tracing is off", exc_info=True)
             return cls()

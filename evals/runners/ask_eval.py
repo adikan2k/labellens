@@ -446,7 +446,7 @@ def main(argv: list[str] | None = None) -> int:
         tracer = Tracer.from_keys(
             settings.langfuse_public_key,
             secret(settings.langfuse_secret_key),
-            settings.langfuse_host,
+            settings.langfuse_base_url,
         )
         return Agent(
             client,

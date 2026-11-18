@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     # Langfuse
     langfuse_public_key: str | None = None
     langfuse_secret_key: SecretStr | None = None
-    langfuse_host: str | None = None
+    langfuse_base_url: str | None = None
 
     # Public demo limits
     ask_rate_limit_per_hour: int = 10

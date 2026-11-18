@@ -247,7 +247,9 @@ def _open_ask(app: FastAPI, settings: Settings) -> ask_module.AskService | None:
         secret(settings.embeddings_api_key), settings.embeddings_model
     )
     tracer = getattr(app.state, "tracer", None) or Tracer.from_keys(
-        settings.langfuse_public_key, secret(settings.langfuse_secret_key), settings.langfuse_host
+        settings.langfuse_public_key,
+        secret(settings.langfuse_secret_key),
+        settings.langfuse_base_url,
     )
     db = app.state.db
     return ask_module.AskService(
