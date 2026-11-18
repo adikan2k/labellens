@@ -49,7 +49,9 @@ class Settings(BaseSettings):
 
     # Public demo limits
     ask_rate_limit_per_hour: int = 10
-    ask_daily_spend_cap_usd: float = 0.50
+    ask_daily_spend_cap_usd: float = 0.50  # shared by questions and label reads
+    # Label photos read per client per rolling hour (counted apart from questions)
+    label_rate_limit_per_hour: int = 10
     # A run stops here; Cloud Run's request timeout (60 s) leaves room to send the error.
     ask_timeout_seconds: float = 45.0
     # MCP requests per client per minute, per instance (in memory; decision 0008)
@@ -63,6 +65,20 @@ MODEL_PRICES: dict[str, tuple[float, float]] = {
     "claude-haiku-5-5": (0.10, 0.50),
     "claude-sonnet-5-5": (2.00, 10.00),
 }
+
+
+# How to turn thinking off, per model. Haiku 5.5 takes {"type": "disabled"}; Sonnet 5.5 rejects
+# that and takes {"type": "between_tools"}, with which it does not think before answering.
+THINKING_OFF: dict[str, dict[str, str]] = {
+    "claude-haiku-5-5": {"type": "disabled"},
+    "claude-sonnet-5-5": {"type": "between_tools"},
+}
+
+
+def thinking_off(model: str) -> dict[str, str]:
+    if model not in THINKING_OFF:
+        raise ValueError(f"No thinking-off setting for {model} in api/app/config.py; add it.")
+    return THINKING_OFF[model]
 
 
 # Prompt caching, as multiples of the model's input price. A cache read costs a tenth of it on

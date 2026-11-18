@@ -20,6 +20,8 @@ EXPECTED_OPERATIONS = [
     ("get", "/stats/overview"),
     ("get", "/graph/neighborhood"),
     ("post", "/ask"),
+    ("post", "/label"),
+    ("get", "/ready"),
     ("post", "/mcp"),
 ]
 

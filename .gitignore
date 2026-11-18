@@ -42,3 +42,7 @@ coverage/
 Thumbs.db
 .vscode/
 .idea/
+
+# Label photos for the label-reading eval: Open Food Facts images (CC BY-SA), fetched by
+# evals/datasets/build_labels.py --download; not redistributed here.
+evals/cache/label_images/

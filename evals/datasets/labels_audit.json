@@ -1,0 +1,92 @@
+{
+  "_about": "Corrections to Open Food Facts' truth for the label-reading eval, each checked against the photo itself (by Claude, reading the photo; spot-check before relying on it). `exclude` drops a label from nutrient scoring; `nutrition` and `additives` replace the truth values given. Nutrients a label does not print are handled by the runner (truth 0, read nothing: not scored), so they are not listed here.",
+  "label-03": {
+    "exclude": "The nutrition photo is of a different product (a Lidl chicken stock) filed under this pizza."
+  },
+  "label-06": {
+    "nutrition": {
+      "energy_kcal_100g": 37,
+      "sugars_100g": 9
+    },
+    "note": "The panel prints 159 kJ / 37 kcal and 9 g sugars per 100 ml. The ingredients list E300, E330, E440, E445, E414, E950, E954 and E160a; Open Food Facts lists none.",
+    "additives": [
+      "en:e160a",
+      "en:e300",
+      "en:e330",
+      "en:e414",
+      "en:e440",
+      "en:e445",
+      "en:e950",
+      "en:e954"
+    ]
+  },
+  "label-07": {
+    "nutrition": {
+      "energy_kcal_100g": 744
+    },
+    "note": "The panel prints 3060 kJ / 744 kcal per 100 g; 375 is wrong (butter)."
+  },
+  "label-10": {
+    "exclude": "The nutrition photo shows the front of the cup; the panel is out of focus and unreadable."
+  },
+  "label-15": {
+    "nutrition": {
+      "sugars_100g": 4.58
+    },
+    "additives": [
+      "en:e300"
+    ],
+    "note": "11 g sugars per 240 ml is 4.58 g per 100 ml; the ingredients list ascorbic acid (E300)."
+  },
+  "label-16": {
+    "nutrition": {
+      "salt_100g": 0.11,
+      "proteins_100g": 6.9
+    },
+    "note": "The panel prints 6.9 g protein and 0.11 g salt per 100 g."
+  },
+  "label-17": {
+    "nutrition": {
+      "salt_100g": 0.17
+    },
+    "additives": [
+      "en:e407",
+      "en:e460",
+      "en:e466",
+      "en:e950",
+      "en:e955",
+      "en:e960"
+    ],
+    "note": "230 mg sodium per 340 ml is 0.17 g salt per 100 ml. Ingredients: carrageenan, cellulose gel and gum, acesulfame potassium, sucralose, stevia leaf extract."
+  },
+  "label-19": {
+    "nutrition": {
+      "fat_100g": 9.7,
+      "salt_100g": 1.62,
+      "sugars_100g": 6.9
+    },
+    "note": "The panel prints 9.7 g fat, 6.9 g sugars and 1.62 g salt per 100 g."
+  },
+  "label-20": {
+    "nutrition": {
+      "proteins_100g": 9.09
+    },
+    "note": "5 g protein per 55 g serving is 9.09 g per 100 g."
+  },
+  "label-24": {
+    "exclude": "The 'nutrition' photo is a screenshot of a chatbot's answer, not a label."
+  },
+  "label-28": {
+    "nutrition": {
+      "salt_100g": 1.1
+    },
+    "note": "The panel prints 1.1 g salt per 100 g."
+  },
+  "label-13": {
+    "additives": [
+      "en:e500",
+      "en:e509"
+    ],
+    "note": "The ingredients list calcium chloride (E509) and sodium bicarbonate (E500)."
+  }
+}

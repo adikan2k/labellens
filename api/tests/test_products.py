@@ -62,7 +62,14 @@ def test_product_has_label_nutrition_and_lists_in_order(
     )
     assert [a["additive_id"] for a in product["additives"]] == rich["additive_ids"]
     for additive in product["additives"]:
-        assert set(additive) == {"additive_id", "e_number", "name", "function", "explainer"}
+        assert set(additive) == {
+            "additive_id",
+            "e_number",
+            "name",
+            "function",
+            "explainer",
+            "flagged",
+        }
     assert product["category_source"] in ("off_tags", "model", None)
     assert body["source"]["snapshot_date"] == "2026-11-17"
     assert response.headers["cache-control"] == "public, max-age=3600"

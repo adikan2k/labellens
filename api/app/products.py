@@ -29,7 +29,7 @@ select
         select jsonb_agg(jsonb_build_object(
                    'additive_id', a.additive_id, 'e_number', a.e_number, 'name', a.name,
                    'function', a.function, 'explainer', a.explainer,
-                   'explainer_ai', a.explainer_ai)
+                   'explainer_ai', a.explainer_ai, 'flagged', a.flagged)
                order by x.ord)
         from unnest(p.additive_ids) with ordinality as x(id, ord)
         join serving.additives a on a.additive_id = x.id

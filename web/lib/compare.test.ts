@@ -21,6 +21,7 @@ const additive = (id: string, e: string | null, name: string): Additive => ({
   name,
   function: null,
   explainer: null,
+  flagged: false,
 });
 
 describe("parseCodes", () => {

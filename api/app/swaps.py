@@ -176,3 +176,67 @@ def find_swaps(conn: DictConnection, code: str, limit: int) -> list[dict[str, An
         if len(swaps) == limit:
             break
     return swaps
+
+
+# For a label read from a photo that matches no product in the data: there is no grade to
+# beat, so these are the category's well-graded products (A or B), similar by name where the
+# name gives words, under the same rules as swaps (no flagged additive, a real barcode, an
+# ingredient list). The page says that is all they are.
+WELL_GRADED_SQL = """
+select code, name, brand, category_id, nutriscore_grade, nova_group, image_path, additive_count
+from serving.products
+where category_id = %(category)s
+  and nutriscore_grade in ('a', 'b')
+  and not has_flagged
+  and gtin_valid
+  and cardinality(ingredient_ids) > 0
+  and (%(words)s::text is null
+       or to_tsvector('english'::regconfig, name || ' ' || coalesce(brand, ''))
+          @@ to_tsquery('english'::regconfig, %(words)s))
+order by nutriscore_grade, additive_count, rank_pos
+limit %(fetch)s
+"""
+
+
+def well_graded_reason(row: dict[str, Any]) -> str:
+    """'Nutri-Score A · 1 additive · none flagged by Open Food Facts'."""
+    return " · ".join(
+        [
+            f"Nutri-Score {row['nutriscore_grade'].upper()}",
+            _additives(row["additive_count"]),
+            "none flagged by Open Food Facts",
+        ]
+    )
+
+
+def well_graded_like(
+    conn: DictConnection, category: str, name: str | None, limit: int
+) -> list[dict[str, Any]]:
+    """Well-graded products in a category, those sharing the name's head word first."""
+    if not category or category == OTHER:
+        return []
+    words = name_words(name or "")
+    tiers: list[str | None] = [words[-1]] if words else []
+    tiers.append(None)  # then the whole category
+    rows: list[dict[str, Any]] = []
+    for query in tiers:
+        params = {"category": category, "words": query, "fetch": limit * OVERFETCH}
+        rows += conn.execute(WELL_GRADED_SQL, params).fetchall()
+        if len(rows) >= limit:
+            break
+    out, seen = [], set()
+    for row in rows:
+        key = ((row["name"] or "").casefold(), (row["brand"] or "").casefold())
+        if key in seen or row["code"] in {o["product"]["code"] for o in out}:
+            continue
+        seen.add(key)
+        out.append(
+            {
+                "product": summary(row),
+                "reason": well_graded_reason(row),
+                "additive_count": row["additive_count"],
+            }
+        )
+        if len(out) == limit:
+            break
+    return out

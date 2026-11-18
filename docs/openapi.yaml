@@ -172,6 +172,75 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
+  /label:
+    post:
+      tags: [label]
+      operationId: readLabel
+      summary: Read a food label from one or two photos, and explain it from the data
+      description: |
+        Claude (the default model in config) reads the photos into structured data: name,
+        brand, barcode, nutrition as printed, ingredients and additives. LabelLens converts the
+        nutrition to per 100 g in code, adds its explainers and the Open Food Facts
+        overexposure flag, finds the product the label most likely is (by barcode, else by
+        brand and name when the words agree), and suggests swaps or well-graded products.
+
+        The photos go to Anthropic to be read and are not stored. Limits: 10 reads per IP per
+        hour, counted apart from questions; reads share the daily spend cap with /ask, and
+        past it this answers 503.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [images]
+              properties:
+                images:
+                  type: array
+                  minItems: 1
+                  maxItems: 2
+                  description: JPEG, PNG or WebP, by their bytes; 5 MB each at most.
+                  items: { type: string, format: binary }
+      responses:
+        "200":
+          description: The label as read, and what LabelLens adds.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LabelResponse" }
+        "413":
+          description: The upload is larger than two 5 MB photos.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "422": { $ref: "#/components/responses/InvalidRequest" }
+        "429":
+          description: Label read limit reached for this IP.
+          headers:
+            Retry-After:
+              schema: { type: integer }
+              description: Seconds until another read is accepted.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+
+  /ready:
+    get:
+      tags: [health]
+      operationId: getReady
+      summary: What a demo has left, after waking the lazy services
+      description: |
+        Builds the ask agent and the label reader if they are not built yet (their libraries
+        are slow to import on a cold instance) and reports today's spend against the cap and
+        this IP's remaining questions and label reads this hour. No model call.
+      responses:
+        "200":
+          description: Ready state.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ready" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+
   /mcp:
     post:
       tags: [meta]
@@ -337,7 +406,7 @@ components:
 
     Additive:
       type: object
-      required: [additive_id, e_number, name, function, explainer]
+      required: [additive_id, e_number, name, function, explainer, flagged]
       properties:
         additive_id: { type: string, example: "en:e330" }
         e_number: { type: [string, "null"], example: E330 }
@@ -347,6 +416,11 @@ components:
           description: What it does, from Open Food Facts' additives taxonomy.
           example: Antioxidant, sequestrant
         explainer: { $ref: "#/components/schemas/Explainer" }
+        flagged:
+          type: boolean
+          description: >-
+            Open Food Facts marks it as a high overexposure risk (EFSA). Swaps never
+            contain one.
 
     Ingredient:
       type: object
@@ -592,3 +666,80 @@ components:
       properties:
         code: { type: string, enum: [timeout, tool_failed, internal] }
         message: { type: string }
+
+    LabelIngredient:
+      description: >-
+        An ingredient as printed. ingredient_id is ours when LabelLens knows the ingredient
+        (it may then have an explainer), else label:<rank>.
+      allOf:
+        - $ref: "#/components/schemas/Ingredient"
+
+    LabelRead:
+      type: object
+      required: [name, brand, barcode, category_id, category_name, basis, serving_size_g,
+                 conversion_note, nutrition, ingredients, additives, unmatched_additives]
+      properties:
+        name: { type: [string, "null"] }
+        brand: { type: [string, "null"] }
+        barcode: { type: [string, "null"], description: Digits read from the photo, if any. }
+        category_id: { type: string, description: A leaf of the category taxonomy, or other. }
+        category_name: { type: [string, "null"] }
+        basis: { type: string, enum: [per_100g, per_serving, unknown] }
+        serving_size_g: { type: [number, "null"] }
+        conversion_note:
+          type: [string, "null"]
+          example: Converted from per serving (30 g or ml) to per 100 g or ml.
+        nutrition: { $ref: "#/components/schemas/Nutrition" }
+        ingredients:
+          type: array
+          items: { $ref: "#/components/schemas/LabelIngredient" }
+        additives:
+          type: array
+          items: { $ref: "#/components/schemas/Additive" }
+        unmatched_additives:
+          type: array
+          items: { type: string }
+          description: Additives read from the label that LabelLens has no entry for.
+
+    LabelMatch:
+      type: object
+      required: [how, product]
+      properties:
+        how: { type: string, enum: [barcode, name] }
+        product: { $ref: "#/components/schemas/Product" }
+
+    LabelResponse:
+      type: object
+      required: [is_food_label, label, match, suggestions, suggestions_kind, source]
+      properties:
+        is_food_label: { type: boolean }
+        label:
+          oneOf:
+            - $ref: "#/components/schemas/LabelRead"
+            - type: "null"
+        match:
+          oneOf:
+            - $ref: "#/components/schemas/LabelMatch"
+            - type: "null"
+        suggestions:
+          type: array
+          items: { $ref: "#/components/schemas/Swap" }
+        suggestions_kind:
+          type: [string, "null"]
+          enum: [swaps, category, null]
+          description: >-
+            Swaps for the matched product, or well-graded products in the label's category.
+        source: { $ref: "#/components/schemas/Source" }
+
+    Ready:
+      type: object
+      required: [ask_configured, label_configured, questions_left, label_reads_left,
+                 spent_today_usd, daily_cap_usd, source]
+      properties:
+        ask_configured: { type: boolean }
+        label_configured: { type: boolean }
+        questions_left: { type: integer, minimum: 0 }
+        label_reads_left: { type: integer, minimum: 0 }
+        spent_today_usd: { type: number, minimum: 0 }
+        daily_cap_usd: { type: number }
+        source: { $ref: "#/components/schemas/Source" }
