@@ -67,7 +67,9 @@ Phase 7 followed a review of everything built so far. The engineering was strong
 **Deploy on merge, keyless.**
 - **Chosen:** Workload Identity Federation, limited to this repo's `main` branch. The deploy account's roles are narrowed to single resources where possible.
 - **Rejected:** a service-account key in GitHub secrets, which is long-lived and leaks.
-- **Not live yet:** the one-time setup (`scripts/setup_ci_deploy.py --yes`) hasn't been run. Until it is, the workflow fails at its first step with a clear message, and deploys stay manual.
+- **Live:** after the one-time setup (`scripts/setup_ci_deploy.py --yes`), merging PR #16 built and deployed revision `labellens-api-00017`, and the smoke test after it passed 16/16.
+- **One snag:** the first two runs failed with "forbidden from accessing the bucket", even though the account had full access to that bucket. When `gcloud builds submit` uses its default staging bucket, it first checks the bucket belongs to the project by listing every bucket in it, which needs project-wide `storage.buckets.list`. Naming the bucket (`--gcs-source-staging-dir`) skips that check.
+  - **Rejected:** granting the project-wide listing. It would have fixed the error by widening the very access the setup was built to narrow.
 
 **Weekly pipeline as a canary.**
 - **Chosen:** every week CI downloads the export, builds and tests it, dry-runs both loads against their caps, and uploads the report. Publishing is manual.
@@ -94,7 +96,5 @@ Every eval report now gives 95% Wilson intervals, and the fact score gets a boot
 
 ## Still open
 
-- Run `scripts/setup_ci_deploy.py --yes` to turn on deploy-on-merge.
-- Set the repo variable `SMOKE_EXPECT_UNKNOWN_404=true` so CI also checks the 404, now that it ships.
 - Time a cold start after a full hour idle (the measured 3.9 s was after 25 minutes, already past both platforms' scale-down points).
 - The graph-page layout questions above.
