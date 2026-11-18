@@ -8,6 +8,7 @@ import { cachedStats } from "@/lib/cached";
 import { WAKING_UP } from "@/lib/copy";
 import {
   additiveFinding,
+  categorySourceNote,
   largestFinding,
   novaFinding,
   nutriscoreFinding,
@@ -88,7 +89,7 @@ async function Dashboard() {
 
         <ChartPanel id="categories" finding={largestFinding(categories, "category")}>
           <BarChart bars={categories.map((r) => ({ label: r.label, value: r.count, display: formatCount(r.count) }))} />
-          <Note>Products whose Open Food Facts category tags place them in one of 26 categories.</Note>
+          <Note>{categorySourceNote(stats.category_sources)}</Note>
           <DataTable
             caption="Products per category"
             headers={["Category", "Products"]}

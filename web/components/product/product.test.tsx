@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import type { Additive, Nutrition } from "@/lib/api";
+import type { Additive, Ingredient, Nutrition } from "@/lib/api";
 import { formatEnergy, formatGrams, formatShare } from "@/lib/format";
 
 // motion reads prefers-reduced-motion once at load, so the hook is mocked to switch it per test.
@@ -12,6 +12,7 @@ vi.mock("motion/react", async (original) => ({
 }));
 
 const { AdditiveList } = await import("./additive-list");
+const { IngredientList } = await import("./ingredient-list");
 const { NutritionPanel, PIECES, PRINT_END, startOf } = await import("./nutrition-panel");
 
 afterEach(() => {
@@ -113,6 +114,30 @@ describe("AdditiveList", () => {
     );
     fireEvent.click(screen.getByRole("button"));
     expect(screen.getByText("An acid from citrus.")).toBeTruthy();
+    expect(screen.getByText("Written by AI from Open Food Facts data.")).toBeTruthy();
+  });
+});
+
+describe("IngredientList", () => {
+  const ingredients: Ingredient[] = [
+    { ingredient_id: "en:oat", name: "Oats", rank: 1, explainer: { text: "Whole grain oats, rolled.", ai_generated: true } },
+    { ingredient_id: "en:quillaia", name: "Quillaia", rank: 2, explainer: null },
+  ];
+
+  test("keeps label order with ranks", () => {
+    render(<IngredientList ingredients={ingredients} />);
+    const items = screen.getAllByRole("listitem");
+    expect(items.map((li) => li.textContent?.replace("⌄", "").trim())).toEqual(["1Oats", "2Quillaia"]);
+  });
+
+  test("only ingredients with an explainer expand, and show the AI note", () => {
+    render(<IngredientList ingredients={ingredients} />);
+    const buttons = screen.getAllByRole("button");
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0].getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(buttons[0]);
+    expect(buttons[0].getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText("Whole grain oats, rolled.")).toBeTruthy();
     expect(screen.getByText("Written by AI from Open Food Facts data.")).toBeTruthy();
   });
 });

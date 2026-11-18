@@ -25,6 +25,8 @@ Phase 0 creates these. If one changes, update this list in the same commit.
 - Load the serving tables: `uv run python -m pipeline.load.serving --dry-run` (size only), then without `--dry-run` (reads `DATABASE_URL`; `--database-url postgresql://labellens:labellens@localhost:54329/labellens` for local)
 - API locally: `uv run fastapi dev api/app/main.py` (set `DATABASE_URL`)
 - Deploy the API: `uv run python scripts/deploy_api.py --project <id> --web-origin <vercel url>` prints the commands; add `--yes` to run them
+- Enrichment (paid; prints the estimate, sends only with `--yes`; reruns cost $0 from the committed outputs in `pipeline/enrich/outputs/`): `uv run python -m pipeline.enrich.categories --limit <n>` and `uv run python -m pipeline.enrich.explainers --limit <n>`, then `dbt build` again
+- Category eval (needs `evals/datasets/category_gold.csv`): `uv run python -m evals.runners.category_accuracy --limit 200` (add `--yes`; variants `--name-only`, `--model eval`, `--tagged-sample 1000`)
 - Search latency eval: `uv run python -m evals.runners.search_latency --base-url <api url> --label public`
 - Lighthouse eval (needs Node and Chrome): `uv run python -m evals.runners.lighthouse --base-url https://labellens-beige.vercel.app`
 - Regenerate web API types after changing `docs/openapi.yaml`: `pnpm -C web gen:api`

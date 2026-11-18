@@ -271,6 +271,11 @@ export interface components {
         Product: components["schemas"]["ProductSummary"] & {
             /** @description Display name of category_main. */
             category_name: string | null;
+            /**
+             * @description Where category_main came from: Open Food Facts' own category tags, or the model (phase 3 enrichment) when the tags give none. The UI marks `model` as suggested by AI.
+             * @enum {string|null}
+             */
+            category_source: "off_tags" | "model" | null;
             completeness: number | null;
             nutrition: components["schemas"]["Nutrition"];
             additives: components["schemas"]["Additive"][];
@@ -337,8 +342,10 @@ export interface components {
             nutriscore: components["schemas"]["CountByKey"][];
             /** @description Products per NOVA group, 1 to 4, then unknown. */
             nova: components["schemas"]["CountByKey"][];
-            /** @description Products per category in our taxonomy. */
+            /** @description Products per category in our taxonomy, without "Other or unclear". */
             categories: components["schemas"]["CountByKey"][];
+            /** @description Named products by where their category came from: `off_tags`, `model`, and `null` for none. */
+            category_sources: components["schemas"]["CountByKey"][];
             /** @description Most common additives by number of products. */
             top_additives: components["schemas"]["CountByKey"][];
             /** @description Nutri-Score spread per category, categories with enough graded products. */

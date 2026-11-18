@@ -16,6 +16,8 @@ flags:
 # Paths are relative to the repo root: run dbt from there (see CLAUDE.md).
 vars:
   raw_dir: data/raw
+  # Enrichment outputs (pipeline/enrich), committed; relative to the repo root like raw_dir.
+  enrich_dir: pipeline/enrich/outputs
   # Pin a snapshot folder here or with --vars; by default the newest under raw_dir is used.
   snapshot_dir: ""
   # From docs/data-profile.md.
@@ -30,6 +32,8 @@ models:
     +materialized: table
     staging:
       +tags: [staging]
+    intermediate:
+      +tags: [intermediate]
     marts:
       +tags: [marts]
 

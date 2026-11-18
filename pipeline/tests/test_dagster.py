@@ -50,6 +50,7 @@ def test_definitions_load_and_materialise_on_the_fixture(tmp_path: Path) -> None
     env = {
         **os.environ,
         "LABELLENS_RAW_DIR": str(FIXTURE_RAW),
+        "LABELLENS_ENRICH_DIR": str(FIXTURE_RAW.parent / "enrich"),
         "LABELLENS_DUCKDB": str(tmp_path / "fixture.duckdb"),
         "LABELLENS_DUCKDB_TMP": str(tmp_path / "spill"),
         "LABELLENS_REPORTS_DIR": str(tmp_path / "reports"),
@@ -71,7 +72,15 @@ def test_definitions_load_and_materialise_on_the_fixture(tmp_path: Path) -> None
     out = json.loads(lines[-1].removeprefix("RESULT "))
 
     assert {"raw_snapshot", "run_report", "dim_products", "serving_tables"} <= set(out["keys"])
-    assert out["groups"] == ["ingest", "marts", "publish", "report", "seeds", "staging"]
+    assert out["groups"] == [
+        "ingest",
+        "intermediate",
+        "marts",
+        "publish",
+        "report",
+        "seeds",
+        "staging",
+    ]
     assert out["base_deps"] == ["raw_snapshot"]
     assert out["success"], (done.stdout + done.stderr)[-4000:]
     built = set(out["keys"]) - {"serving_tables"}
@@ -93,9 +102,10 @@ def test_fixture_run_leaves_real_files_alone() -> None:
     source = (ROOT / "pipeline" / "dagster" / "definitions.py").read_text("utf-8")
     test = Path(__file__).read_text("utf-8")
     overridable = {
-        name for name in ("LABELLENS_RAW_DIR", "LABELLENS_DUCKDB", "LABELLENS_DUCKDB_TMP",
-                          "LABELLENS_REPORTS_DIR", "LABELLENS_DBT_TARGET", "LABELLENS_DBT_VARS")
+        name for name in ("LABELLENS_RAW_DIR", "LABELLENS_ENRICH_DIR", "LABELLENS_DUCKDB",
+                          "LABELLENS_DUCKDB_TMP", "LABELLENS_REPORTS_DIR", "LABELLENS_DBT_TARGET",
+                          "LABELLENS_DBT_VARS")
         if f'"{name}"' in source
     }  # fmt: skip
-    assert len(overridable) == 6
+    assert len(overridable) == 7
     assert all(f'"{name}"' in test for name in overridable)

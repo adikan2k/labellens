@@ -63,7 +63,7 @@ def test_product_has_label_nutrition_and_lists_in_order(
     assert [a["additive_id"] for a in product["additives"]] == rich["additive_ids"]
     for additive in product["additives"]:
         assert set(additive) == {"additive_id", "e_number", "name", "function", "explainer"}
-        assert additive["explainer"] is None  # written in phase 3
+    assert product["category_source"] in ("off_tags", "model", None)
     assert body["source"]["snapshot_date"] == "2026-11-17"
     assert response.headers["cache-control"] == "public, max-age=3600"
 
@@ -84,6 +84,34 @@ def test_citric_acid_reads_as_a_name_with_its_function(
         "Citric acid",
         "Antioxidant, sequestrant",
     )
+    # From the fixture's enrichment outputs (pipeline/tests/fixtures/enrich).
+    assert citric["explainer"]["ai_generated"] is True
+    assert citric["explainer"]["text"].startswith("An acid found in citrus fruit")
+
+
+def test_a_model_category_says_so(client: TestClient) -> None:
+    # The fixture's enrichment outputs file 000287050 (no category tags) as supplements.
+    product = client.get("/products/000287050").json()["product"]
+    assert (product["category_main"], product["category_source"]) == ("supplements", "model")
+    assert product["category_name"] == "Supplements and protein powders"
+
+
+def test_ingredients_carry_their_explainer_or_null(client: TestClient, serving_url: str) -> None:
+    with psycopg.connect(serving_url, autocommit=True) as pg:
+        row = pg.execute(
+            "select code from serving.products where 'en:salt' = any(ingredient_ids) limit 1"
+        ).fetchone()
+    if row is None:
+        pytest.skip("no fixture product with salt")
+    ingredients = client.get(f"/products/{row[0]}").json()["product"]["ingredients"]
+    salt = next(i for i in ingredients if i["ingredient_id"] == "en:salt")
+    assert salt["explainer"] == {
+        "text": "Sodium chloride, a mineral mined or evaporated from seawater, used for taste "
+        "and to preserve food.",
+        "ai_generated": True,
+    }
+    others = [i for i in ingredients if i["ingredient_id"] not in ("en:salt", "en:e330", "en:e322")]
+    assert all(i["explainer"] is None for i in others)
 
 
 def test_unknown_barcode_is_a_404_with_source(client: TestClient) -> None:

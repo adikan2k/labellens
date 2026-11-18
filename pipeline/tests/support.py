@@ -18,6 +18,7 @@ FIXTURE_PARQUET = FIXTURE_RAW / "2026-11-17" / "food.parquet"
 # The fixture is small and deliberately over-represents unnamed products.
 FIXTURE_VARS: dict[str, object] = {
     "raw_dir": "pipeline/tests/fixtures/raw",
+    "enrich_dir": "pipeline/tests/fixtures/enrich",
     "min_products": 100,
     "max_products": 1000,
     "max_unnamed_share": 0.1,

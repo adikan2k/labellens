@@ -9,3 +9,10 @@ uv run python scripts/make_fixture.py --snapshot data/raw/2026-11-17
 ```
 
 Contains data from Open Food Facts, available under the Open Database License (https://opendatacommons.org/licenses/odbl/1-0/). This extract stays under the ODbL.
+
+## enrich/
+
+Small enrichment outputs in the same format `pipeline/enrich` writes, for products and
+additives in the fixture: two model categories and one invalid answer (which dbt must drop),
+two additive explainers and one ingredient explainer. Hand-written, not model output; the
+fixture build reads them through `enrich_dir`.

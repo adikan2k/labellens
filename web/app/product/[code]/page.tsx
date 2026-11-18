@@ -4,11 +4,12 @@ import { Suspense, ViewTransition } from "react";
 
 import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
+import { IngredientList } from "@/components/product/ingredient-list";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SettleChip } from "@/components/product/settle-chip";
 import type { Product } from "@/lib/api";
 import { cachedProduct } from "@/lib/cached";
-import { WAKING_UP } from "@/lib/copy";
+import { AI_CATEGORY_NOTE, WAKING_UP } from "@/lib/copy";
 import { NOVA_LABELS } from "@/lib/format";
 
 /** Not async: params are awaited inside the Suspense boundary, so the shell prerenders. */
@@ -44,6 +45,9 @@ function ProductLayout({ product }: { product: Product }) {
           <h1 className="type-display break-words">{product.name}</h1>
         </ViewTransition>
         <p className="type-body pt-3 text-ink-muted">{meta || "Brand not listed"}</p>
+        {product.category_source === "model" && (
+          <p className="type-small pt-1 text-ink-muted">{AI_CATEGORY_NOTE}</p>
+        )}
 
         <dl className="pt-8">
           <div className="flex items-center gap-4 pb-3">
@@ -88,21 +92,13 @@ function ProductLayout({ product }: { product: Product }) {
           </h2>
           <Rule weight="thin" />
           {product.ingredients.length > 0 ? (
-            <ol className="type-body max-w-measure pt-3">
-              {product.ingredients.map((ingredient) => (
-                <li key={ingredient.ingredient_id} className="flex gap-3 py-1">
-                  <span className="type-data-value w-6 shrink-0 text-right text-ink-muted">
-                    {ingredient.rank}
-                  </span>
-                  <span>{ingredient.name}</span>
-                </li>
-              ))}
-            </ol>
+            <IngredientList ingredients={product.ingredients} />
           ) : (
             <p className="type-body pt-3">Open Food Facts has no ingredient list for this product.</p>
           )}
           <p className="type-small pt-3 text-ink-muted">
-            In label order. Only ingredients Open Food Facts recognises are listed.
+            In label order. Only ingredients Open Food Facts recognises are listed; the most
+            common open to say what they are.
           </p>
         </section>
 

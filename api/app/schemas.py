@@ -92,6 +92,7 @@ class Ingredient(Model):
 
 class Product(ProductSummary):
     category_name: str | None
+    category_source: Literal["off_tags", "model"] | None
     completeness: float | None
     nutrition: Nutrition
     additives: list[Additive]
@@ -141,6 +142,7 @@ class StatsOverview(Model):
     nutriscore: list[CountByKey]
     nova: list[CountByKey]
     categories: list[CountByKey]
+    category_sources: list[CountByKey]
     top_additives: list[CountByKey]
     nutriscore_by_category: list[CategoryGrades]
     median_sugars_by_category: list[CategoryMedian]

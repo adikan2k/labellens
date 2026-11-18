@@ -8,7 +8,8 @@
   3. Otherwise the name comes from the id (en:chicken-fillet -> Chicken fillet), or for
      non-English ids, the most common spelling.
 
-  Footnote marks (*, †, #, _) are stripped. explainer is filled in phase 3.
+  Footnote marks (*, †, #, _) are stripped. explainer is the model's: the ingredient's own,
+  or for an ingredient that is an additive (en:e330), the additive's.
 #}
 
 with uses as (
@@ -37,6 +38,10 @@ named as (
 
 additive_names as (
     select additive_id, name from {{ ref('stg_off__additives') }} where name is not null
+),
+
+explainers as (
+    select kind, id, text from {{ ref('stg_enrich__explainers') }}
 )
 
 select
@@ -48,6 +53,8 @@ select
         else {{ capitalise('n.any_text') }}
     end as name,
     n.product_count,
-    null::varchar as explainer
+    coalesce(own.text, additive.text) as explainer
 from named as n
 left join additive_names as a on a.additive_id = n.ingredient_id
+left join explainers as own on own.kind = 'ingredient' and own.id = n.ingredient_id
+left join explainers as additive on additive.kind = 'additive' and additive.id = n.ingredient_id

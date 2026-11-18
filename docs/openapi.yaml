@@ -362,11 +362,20 @@ components:
       allOf:
         - $ref: "#/components/schemas/ProductSummary"
         - type: object
-          required: [category_name, completeness, nutrition, additives, ingredients, off_url]
+          required:
+            [category_name, category_source, completeness, nutrition, additives, ingredients,
+             off_url]
           properties:
             category_name:
               type: [string, "null"]
               description: Display name of category_main.
+            category_source:
+              type: [string, "null"]
+              enum: [off_tags, model, null]
+              description: >
+                Where category_main came from: Open Food Facts' own category tags, or the
+                model (phase 3 enrichment) when the tags give none. The UI marks `model` as
+                suggested by AI.
             completeness: { type: [number, "null"], minimum: 0, maximum: 1 }
             nutrition: { $ref: "#/components/schemas/Nutrition" }
             additives:
@@ -451,7 +460,7 @@ components:
       type: object
       required:
         [product_count, named_product_count, brand_count, category_count, additive_count,
-         nutriscore, nova, categories, top_additives, nutriscore_by_category,
+         nutriscore, nova, categories, category_sources, top_additives, nutriscore_by_category,
          median_sugars_by_category, source]
       properties:
         product_count: { type: integer, minimum: 0 }
@@ -472,7 +481,13 @@ components:
           items: { $ref: "#/components/schemas/CountByKey" }
         categories:
           type: array
-          description: Products per category in our taxonomy.
+          description: Products per category in our taxonomy, without "Other or unclear".
+          items: { $ref: "#/components/schemas/CountByKey" }
+        category_sources:
+          type: array
+          description: >
+            Named products by where their category came from: `off_tags`, `model`, and
+            `null` for none.
           items: { $ref: "#/components/schemas/CountByKey" }
         top_additives:
           type: array
