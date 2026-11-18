@@ -75,7 +75,9 @@ def pg_admin_url() -> str:
 def readonly_role(pg_admin_url: str) -> str:
     from scripts.create_readonly_role import create_role
 
-    return create_role(pg_admin_url, rotate=True)
+    # A fixed local test password: the role is cluster-wide, and a random one per run broke
+    # any other test run (or local API) using the same Docker Postgres at the same time.
+    return create_role(pg_admin_url, rotate=True, password="labellens-readonly-local-test")
 
 
 @pytest.fixture(scope="session")
