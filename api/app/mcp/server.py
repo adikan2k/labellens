@@ -55,7 +55,9 @@ LabelLens explains US packaged-food labels from Open Food Facts: Nutri-Score, NO
 group, nutrients per 100 g, additives, and better swaps in the same category.
 
 To look at a product you only know by name, call search_products first and use the barcode it \
-returns. LabelLens shows label facts; it does not give medical or dietary advice."""
+returns. When someone wants something better, healthier or similar to a product, call \
+find_swaps directly: it already includes that product. LabelLens shows label facts; it does \
+not give medical or dietary advice."""
 
 Barcode = Annotated[
     str,
@@ -176,7 +178,8 @@ def create_mcp(get_db: Callable[[], Database], web_url: str, *, per_minute: int 
         description=(
             "The label of one product by barcode: Nutri-Score, NOVA processing group, "
             "nutrients per 100 g and additives (with the ones Open Food Facts flags for a high "
-            "overexposure risk). Call search_products first if you only have a name."
+            "overexposure risk). Call search_products first if you only have a name. For "
+            "healthier alternatives or something to eat instead, use find_swaps."
         ),
         annotations=READ_ONLY,
     )
@@ -208,10 +211,12 @@ def create_mcp(get_db: Callable[[], Database], web_url: str, *, per_minute: int 
         resource_uri=CARD_URI,
         title="Find better swaps",
         description=(
-            "Healthier swaps for one product, by barcode: similar products in the same "
+            "Healthier alternatives to one product, by barcode: similar products in the same "
             "category with a better Nutri-Score and no additive flagged by Open Food Facts, "
-            "each with the reason it is better. Call search_products first if you only have "
-            "a name."
+            "each with the reason it is better. Use it whenever someone wants something "
+            "better, healthier or to eat instead. It already returns the product's own name "
+            "and Nutri-Score, so get_product is not needed first. Call search_products first "
+            "if you only have a name."
         ),
         annotations=READ_ONLY,
     )
