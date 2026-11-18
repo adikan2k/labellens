@@ -10,6 +10,12 @@ vi.mock("@/lib/ask", async (original) => ({
   askQuestion: (...args: unknown[]) => askQuestion(...args),
 }));
 
+let reducedMotion = false;
+vi.mock("motion/react", async (original) => ({
+  ...(await original<typeof import("motion/react")>()),
+  useReducedMotion: () => reducedMotion,
+}));
+
 const { AskPanel } = await import("./ask-panel");
 const { AskFailure, RateLimited } = await import("@/lib/ask");
 
@@ -57,6 +63,7 @@ async function ask(text: string) {
 
 beforeEach(() => {
   askQuestion.mockReset();
+  reducedMotion = false;
 });
 afterEach(cleanup);
 
@@ -141,6 +148,14 @@ describe("AskPanel", () => {
     expect(screen.getByText("1. Searched the products")).toBeTruthy();
   });
 
+  test("a failure before any step shows the message without an empty steps panel", async () => {
+    scripted(new RateLimited("That's 10 questions this hour from here.", 600), []);
+    render(<AskPanel />);
+    await ask("cereals");
+    expect(screen.getByRole("alert")).toBeTruthy();
+    expect(screen.queryByRole("region", { name: "Steps" })).toBeNull();
+  });
+
   test("an example question asks straight away", async () => {
     scripted(answer);
     render(<AskPanel />);
@@ -148,6 +163,42 @@ describe("AskPanel", () => {
       fireEvent.click(screen.getByRole("button", { name: "Healthier swaps for Nacho Cheese Doritos" }));
     });
     expect(askQuestion.mock.calls[0][0]).toBe("Healthier swaps for Nacho Cheese Doritos");
+  });
+
+  test("Show steps names the list it opens and closes", async () => {
+    scripted(answer);
+    render(<AskPanel />);
+    await ask("cereals");
+    const toggle = screen.getByRole("button", { name: "Show steps (2)" });
+    const list = document.getElementById(toggle.getAttribute("aria-controls") ?? "");
+    expect(list).not.toBeNull();
+    expect(list!.hidden).toBe(true);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+
+    fireEvent.click(toggle);
+    expect(list!.hidden).toBe(false);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(within(list!).getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  test("step rows wipe in, unless the reader prefers reduced motion", async () => {
+    const wiping = () =>
+      screen.getAllByRole("listitem").filter((row) => row.querySelector("[style*='clip-path']")).length;
+
+    scripted(answer, [steps[0]]);
+    render(<AskPanel />);
+    await ask("cereals");
+    fireEvent.click(screen.getByRole("button", { name: "Show steps (1)" }));
+    expect(wiping()).toBe(1);
+
+    cleanup();
+    reducedMotion = true;
+    scripted(answer, [steps[0]]);
+    render(<AskPanel />);
+    await ask("cereals");
+    fireEvent.click(screen.getByRole("button", { name: "Show steps (1)" }));
+    expect(screen.getByText("1. Searched the products")).toBeTruthy();
+    expect(wiping()).toBe(0);
   });
 
   test("Enter submits; a question under three characters does not", async () => {
