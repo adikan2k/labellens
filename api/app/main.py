@@ -20,6 +20,7 @@ from starlette.exceptions import HTTPException
 
 from api.app import products
 from api.app import search as search_module
+from api.app import swaps as swaps_module
 from api.app.config import Settings, get_settings
 from api.app.db import UNAVAILABLE, Database, DatabaseNotConfigured, DictConnection
 from api.app.schemas import (
@@ -29,10 +30,11 @@ from api.app.schemas import (
     SearchResponse,
     Source,
     StatsOverview,
+    SwapsResponse,
     Versions,
 )
 
-API_VERSION = "0.2.0"
+API_VERSION = "0.3.0"
 WAKING_UP = "Search is waking up. Try again in a few seconds."
 
 
@@ -127,6 +129,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(404, f"No product with barcode {code} in this snapshot.")
         response.headers["Cache-Control"] = "public, max-age=3600"
         return ProductResponse(product=found, source=source(request))  # type: ignore[arg-type]
+
+    @app.get(
+        "/products/{code}/swaps",
+        responses={404: {"model": Error}, 422: {"model": Error}, 503: {"model": Error}},
+    )
+    def product_swaps(
+        request: Request,
+        response: Response,
+        conn: Conn,
+        code: Annotated[str, Path(min_length=1, max_length=32)],
+        limit: Annotated[int, Query(ge=1, le=20)] = 5,
+    ) -> SwapsResponse:
+        found = swaps_module.find_swaps(conn, code, limit)
+        if found is None:
+            raise HTTPException(404, f"No product with barcode {code} in this snapshot.")
+        response.headers["Cache-Control"] = "public, max-age=3600"
+        return SwapsResponse(code=code, swaps=found, source=source(request))  # type: ignore[arg-type]
 
     @app.get("/stats/overview", responses={503: {"model": Error}})
     def stats(request: Request, response: Response, conn: Conn) -> StatsOverview:

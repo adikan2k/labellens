@@ -105,6 +105,18 @@ class ProductResponse(Model):
     source: Source
 
 
+class Swap(Model):
+    product: ProductSummary
+    reason: str
+    additive_count: int = Field(ge=0)
+
+
+class SwapsResponse(Model):
+    code: str = Field(min_length=1, max_length=32)
+    swaps: list[Swap]
+    source: Source
+
+
 class CountByKey(Model):
     key: str | None
     label: str
