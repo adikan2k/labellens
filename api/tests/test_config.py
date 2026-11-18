@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from api.app.config import Settings
+from api.app.config import CACHE_READ_MULTIPLIERS, MODEL_PRICES, Settings, input_cost_usd
 
 ENV_EXAMPLE = Path(__file__).resolve().parents[2] / ".env.example"
 
@@ -49,3 +49,13 @@ def test_settings_match_env_example() -> None:
     api_names = {n for n in _env_example_names() if not n.startswith("NEXT_PUBLIC_")}
 
     assert api_names == {field.upper() for field in Settings.model_fields}
+
+
+def test_every_priced_model_has_a_cache_read_price() -> None:
+    assert set(CACHE_READ_MULTIPLIERS) == set(MODEL_PRICES)
+    assert input_cost_usd("claude-haiku-5-5", 1_000_000) == pytest.approx(0.10)
+    assert input_cost_usd("claude-haiku-5-5", 0, cache_read=1_000_000) == pytest.approx(0.01)
+    assert input_cost_usd("claude-haiku-5-5", 0, cache_write=1_000_000) == pytest.approx(0.125)
+    assert input_cost_usd("claude-sonnet-5-5", 0, cache_read=1_000_000) == pytest.approx(0.10)
+    with pytest.raises(ValueError):
+        input_cost_usd("claude-unknown", 1)
