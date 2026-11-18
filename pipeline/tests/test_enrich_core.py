@@ -57,12 +57,18 @@ def shouter(wrong: dict[str, int] | None = None):
     return answer
 
 
-def run(client: FakeAnthropic, store_path: Path, words: list[str], **kwargs: Any) -> core.Summary:
+def run(
+    client: FakeAnthropic,
+    store_path: Path,
+    words: list[str],
+    refs: list[str] | None = None,
+    **kwargs: Any,
+) -> core.Summary:
     options: dict[str, Any] = {"limit": 1000, "yes": True, "batch": False, "log": lambda _: None}
     options.update(kwargs)
     return core.run(
         Shout(),
-        [core.Item(ref=w, payload={"word": w}) for w in words],
+        [core.Item(ref=r, payload={"word": w}) for r, w in zip(refs or words, words, strict=True)],
         client_factory=lambda: client,
         settings=core.CallSettings(model="model-x", thinking_off=True),
         store=core.OutputStore(store_path),
@@ -117,7 +123,7 @@ def test_invalid_output_is_retried_once_then_stored_as_null(tmp_path: Path) -> N
     assert (summary.ok, summary.invalid) == (4, 1)
     assert len(client.calls) == 3  # two first-attempt requests, one retry with fig and kiwi
     rows = core.OutputStore(tmp_path / "out.jsonl").load()
-    by_ref = {r["ref"]: r for r in rows.values()}
+    by_ref = {r["ref"]: r for r in rows}
     assert by_ref["fig"]["value"] == "FIG"
     assert by_ref["kiwi"]["value"] is None and by_ref["kiwi"]["status"] == "invalid"
     # Stored as invalid, so a rerun does not pay for kiwi again.
@@ -128,7 +134,7 @@ def test_batch_results_are_matched_by_custom_id_not_order(tmp_path: Path) -> Non
     client = FakeAnthropic(shouter())  # the fake returns batch results in reverse order
     summary = run(client, tmp_path / "out.jsonl", WORDS, batch=True)
     assert summary.ok == 5 and client.batches_created == 1
-    rows = core.OutputStore(tmp_path / "out.jsonl").load().values()
+    rows = core.OutputStore(tmp_path / "out.jsonl").load()
     assert all(r["value"] == r["ref"].upper() for r in rows)
     assert summary.cost == pytest.approx(summary.usage.cost(PRICES, batch=True))
     assert not (core.STATE_DIR / "shout.json").exists()  # cleared once results are saved
@@ -197,3 +203,29 @@ def test_refusals_and_bad_json_make_every_item_invalid() -> None:
     assert core.parse_response(task, payloads, Message([Block("not json")])) == [None, None]
     partial = json.dumps({"items": [{"id": 2, "value": "B"}, {"id": 9, "value": "Z"}]})
     assert core.parse_response(task, payloads, Message([Block(partial)])) == [None, "B"]
+
+
+def test_identical_inputs_share_one_call_but_each_ref_gets_a_row(tmp_path: Path) -> None:
+    client = FakeAnthropic(shouter())
+    summary = run(
+        client, tmp_path / "out.jsonl", ["cola", "cola", "tea"], refs=["001", "002", "003"]
+    )
+    assert summary.uncached == 2 and summary.ok == 2
+    sent = client.calls[0]["messages"][0]["content"]
+    assert sent.count("cola") == 1
+    rows = core.OutputStore(tmp_path / "out.jsonl").load()
+    assert {(r["ref"], r["value"]) for r in rows} == {
+        ("001", "COLA"),
+        ("002", "COLA"),
+        ("003", "TEA"),
+    }
+
+
+def test_prune_keeps_only_current_items(tmp_path: Path) -> None:
+    client = FakeAnthropic(shouter())
+    run(client, tmp_path / "out.jsonl", WORDS)
+    run(client, tmp_path / "out.jsonl", ["apple", "fig"], prune=True)
+    assert {r["ref"] for r in core.OutputStore(tmp_path / "out.jsonl").load()} == {"apple", "fig"}
+    run(client, tmp_path / "out.jsonl", ["apple", "fig", "kiwi"])  # without prune: kept, added
+    refs = [r["ref"] for r in core.OutputStore(tmp_path / "out.jsonl").load()]
+    assert refs == ["apple", "fig", "kiwi"]

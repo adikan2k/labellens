@@ -148,23 +148,21 @@ class OutputStore:
     def __init__(self, path: Path):
         self.path = path
 
-    def load(self) -> dict[str, dict[str, Any]]:
+    def load(self) -> list[dict[str, Any]]:
         if not self.path.exists():
-            return {}
+            return []
         if self.path.suffix == ".jsonl":
-            rows = [json.loads(line) for line in self.path.read_text("utf-8").splitlines() if line]
-        else:
-            import duckdb
+            return [json.loads(line) for line in self.path.read_text("utf-8").splitlines() if line]
+        import duckdb
 
-            with duckdb.connect() as con:
-                cursor = con.execute("select * from read_parquet(?)", [str(self.path)])
-                names = [d[0] for d in cursor.description]
-                rows = [dict(zip(names, values, strict=True)) for values in cursor.fetchall()]
-        return {row["key"]: row for row in rows}
+        with duckdb.connect() as con:
+            cursor = con.execute("select * from read_parquet(?)", [str(self.path)])
+            names = [d[0] for d in cursor.description]
+            return [dict(zip(names, values, strict=True)) for values in cursor.fetchall()]
 
-    def save(self, rows: dict[str, dict[str, Any]]) -> None:
+    def save(self, rows: list[dict[str, Any]]) -> None:
         """Write every row, sorted so reruns give the same file."""
-        ordered = sorted(rows.values(), key=lambda r: (r["ref"], r["key"]))
+        ordered = sorted(rows, key=lambda r: (r["ref"], r["key"]))
         self.path.parent.mkdir(parents=True, exist_ok=True)
         lines = "".join(
             json.dumps({f: row.get(f) for f in ROW_FIELDS}, ensure_ascii=False) + "\n"
@@ -393,11 +391,34 @@ def run(
     limit: int,
     yes: bool,
     batch: bool = True,
+    prune: bool = False,
     log: Log = print,
     poll_seconds: float = 30.0,
 ) -> Summary:
+    """Send what is not cached (at most `limit` distinct inputs) and store the results.
+
+    The file keeps one row per (ref, key): items with the same input share one call but each
+    gets its own row. With `prune`, rows for refs or inputs not in `items` are dropped, so the
+    production file holds exactly one row per current item.
+    """
     summary = Summary()
-    rows = store.load()
+    loaded = store.load()
+    known: dict[str, dict[str, Any]] = {row["key"]: row for row in loaded}
+
+    pairs: list[tuple[str, str]] = []  # (ref, key) for every item
+    by_key: dict[str, Item] = {}  # one item per distinct input: what gets sent
+    for item in items:
+        key = cache_key(task, settings, item.payload)
+        pairs.append((item.ref, key))
+        by_key.setdefault(key, item)
+    current = set(pairs)
+    kept = [] if prune else [r for r in loaded if (r["ref"], r["key"]) not in current]
+
+    def save() -> None:
+        rows = [
+            {**known[key], "ref": ref, "key": key} for ref, key in sorted(current) if key in known
+        ]
+        store.save(kept + rows)
 
     def record(outcome: Outcome, final: bool) -> list[tuple[str, Item]]:
         """Store valid values (and invalid ones on the final attempt); return items to retry."""
@@ -407,7 +428,7 @@ def run(
             if item is None:
                 continue
             if value is not None or final:
-                rows[key] = {
+                known[key] = {
                     "key": key,
                     "ref": item.ref,
                     "value": value,
@@ -417,12 +438,8 @@ def run(
                 }
             else:
                 retry.append((key, item))
-        store.save(rows)
+        save()
         return retry
-
-    by_key: dict[str, Item] = {}
-    for item in items:
-        by_key.setdefault(cache_key(task, settings, item.payload), item)
 
     # A batch left by an interrupted run is collected first: it is already paid for.
     state_path = _state_path(task)
@@ -441,21 +458,23 @@ def run(
         summary.sent = True
         state_path.unlink()
 
-    uncached = [(k, i) for k, i in by_key.items() if k not in rows]
+    uncached = [(k, i) for k, i in by_key.items() if k not in known]
     summary.cached = len(by_key) - len(uncached)
     summary.uncached = len(uncached)
     todo = uncached[: max(limit, 0)]
     if not todo:
-        log(f"{summary.cached:,} items cached, 0 to send: no calls, $0.00.")
+        if prune and len(kept) + sum(1 for _, k in current if k in known) != len(loaded):
+            save()  # drop rows for items that no longer need this task
+        log(f"{summary.cached:,} distinct inputs cached, 0 to send: no calls, $0.00.")
         return summary
 
     groups = list(_chunks([i for _, i in todo], task.group_size))
     summary.estimate = estimate(task, settings, groups, batch, prices)
     e = summary.estimate
     log(
-        f"{summary.cached:,} items cached; {summary.uncached:,} not cached, sending {e.items:,} "
-        f"(--limit {limit:,}) in {e.requests:,} requests to {settings.model}"
-        f"{' via the Batch API' if batch else ''}.\n"
+        f"{summary.cached:,} distinct inputs cached; {summary.uncached:,} not cached, sending "
+        f"{e.items:,} (--limit {limit:,}) in {e.requests:,} requests to {settings.model}"
+        f"{' via the Batch API' if batch else ''}. "
         f"Estimated {e.input_tokens:,} input and {e.output_tokens:,} output tokens: "
         f"about ${e.cost:.2f}."
     )
@@ -483,10 +502,10 @@ def run(
         if attempt == 1:
             log(f"Retrying {len(pending):,} items whose output failed validation.")
 
-    done = [rows[k] for k, _ in todo if k in rows]
+    done = [known[k] for k, _ in todo if k in known]
     summary.ok = sum(1 for r in done if r["status"] == "ok")
     summary.invalid = sum(1 for r in done if r["status"] == "invalid")
-    summary.errored = sum(1 for k, _ in todo if k not in rows)
+    summary.errored = sum(1 for k, _ in todo if k not in known)
     summary.cost = summary.usage.cost(prices, batch)
     log(
         f"Done: {summary.ok:,} valid, {summary.invalid:,} invalid (stored as null), "
