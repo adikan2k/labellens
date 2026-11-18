@@ -14,22 +14,28 @@ const DEFAULT_CODE = "0016000275263";
 /** Not async: the query is read inside the Suspense boundary, so the shell prerenders. */
 export default function GraphPage({ searchParams }: PageProps<"/graph">) {
   return (
-    <div className="w-full px-4 pt-8 pb-16">
-      <h1 className="type-title">The food graph</h1>
-      <p className="type-body max-w-measure pt-2 text-ink-muted">
-        Products, the brands that make them, their categories, additives and ingredients, and the
-        other products they share them with.
-      </p>
-      <div className="pt-6">
-        <GraphSearch />
+    // The words sit on the page width, lined up with the header; the graph below them runs
+    // the full width (DESIGN.md, graph explorer).
+    <div className="w-full pt-8 pb-16">
+      <div className="mx-auto w-full max-w-page px-4">
+        <h1 className="type-title">The food graph</h1>
+        <p className="type-body max-w-measure pt-2 text-ink-muted">
+          Products, the brands that make them, their categories, additives and ingredients, and
+          the other products they share them with.
+        </p>
+        <div className="pt-6">
+          <GraphSearch />
+        </div>
       </div>
-      <Suspense fallback={<p className="type-body pt-6">Drawing the graph…</p>}>
-        {searchParams.then(({ code }) => {
-          const chosen = typeof code === "string" && code ? code : DEFAULT_CODE;
-          // Keyed by product, so a search link to another product starts afresh.
-          return <ExplorerWithData key={chosen} code={chosen} />;
-        })}
-      </Suspense>
+      <div className="px-4">
+        <Suspense fallback={<p className="type-body pt-6">Drawing the graph…</p>}>
+          {searchParams.then(({ code }) => {
+            const chosen = typeof code === "string" && code ? code : DEFAULT_CODE;
+            // Keyed by product, so a search link to another product starts afresh.
+            return <ExplorerWithData key={chosen} code={chosen} />;
+          })}
+        </Suspense>
+      </div>
     </div>
   );
 }

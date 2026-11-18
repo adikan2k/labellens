@@ -2,7 +2,15 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import type { GraphNeighborhood } from "@/lib/api";
-import { degree, groupByKind, layout, productCode, toGraph, type Tokens } from "@/lib/graph-view";
+import {
+  degree,
+  groupByKind,
+  layout,
+  pickLabels,
+  productCode,
+  toGraph,
+  type Tokens,
+} from "@/lib/graph-view";
 
 const TOKENS: Tokens = {
   ink: "ink",
@@ -68,6 +76,69 @@ describe("graph view", () => {
     expect(productCode("Product:0016000275287")).toBe("0016000275287");
     expect(productCode("Brand:x")).toBeNull();
     expect(degree(DATA, "Brand:general mills")).toBe(3);
+  });
+
+  test("labels never overlap; forced labels win, then priority", () => {
+    const box = (id: string, left: number, top: number, width = 100) => ({
+      id,
+      left,
+      top,
+      width,
+      height: 16,
+    });
+    const boxes = [
+      box("center", 0, 0),
+      box("busy", 50, 8), // overlaps the centre
+      box("near", 0, 18), // 2 px below the centre: inside the padding
+      box("clear", 0, 40),
+      box("low", 10, 44), // overlaps "clear", which ranks higher
+      box("selected", 300, 0),
+      box("crowded", 320, 4), // overlaps the selected node
+    ];
+    const rank: Record<string, number> = { busy: 9, near: 1, clear: 5, low: 4, crowded: 99 };
+    const shown = pickLabels(boxes, ["center", "selected"], (id) => rank[id] ?? 0);
+    expect([...shown].sort()).toEqual(["center", "clear", "selected"]);
+    const kept = boxes.filter((b) => shown.has(b.id));
+    for (const a of kept) {
+      for (const b of kept) {
+        if (a === b) continue;
+        const apart =
+          a.left + a.width <= b.left || b.left + b.width <= a.left || a.top + a.height <= b.top || b.top + b.height <= a.top;
+        expect(apart).toBe(true);
+      }
+    }
+  });
+
+  test("labels cover no other node's dot and stay inside the canvas", () => {
+    const label = (id: string, left: number) => ({ id, left, top: 0, width: 60, height: 16 });
+    const dot = (id: string, left: number) => ({ id, left, top: 4, width: 8, height: 8 });
+    const shown = pickLabels(
+      [label("a", 0), label("b", 200), label("c", 120)],
+      [],
+      () => 0,
+      {
+        dots: [dot("a", -10), dot("b", 190), dot("x", 30), dot("c", 110)],
+        bounds: { width: 300, height: 100 },
+      },
+    );
+    // a covers x's dot; b's own dot does not count against it; c fits.
+    expect([...shown].sort()).toEqual(["b", "c"]);
+    const outside = pickLabels([label("edge", 260), label("centre", 260)], ["centre"], () => 0, {
+      bounds: { width: 300, height: 100 },
+    });
+    expect([...outside]).toEqual(["centre"]); // only a forced label may run past the edge
+  });
+
+  test("forced labels show even when they overlap each other", () => {
+    const shown = pickLabels(
+      [
+        { id: "a", left: 0, top: 0, width: 50, height: 16 },
+        { id: "b", left: 10, top: 0, width: 50, height: 16 },
+      ],
+      ["a", "b"],
+      () => 0,
+    );
+    expect(shown).toEqual(new Set(["a", "b"]));
   });
 });
 

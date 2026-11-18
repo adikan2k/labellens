@@ -117,7 +117,7 @@ export const EVAL_RESULTS: EvalResult[] = [
   },
   {
     name: "Waking up",
-    headline: "The first search after a quiet spell takes about 4 seconds; the next ones about 0.1 s.",
+    headline: "After an hour with no visitors, the first search took 22.6 s; the next ones about 0.1 s.",
     file: "evals/results/cold_start.md",
   },
 ];

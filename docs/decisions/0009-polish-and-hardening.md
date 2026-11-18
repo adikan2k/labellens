@@ -1,6 +1,6 @@
 # 0009: Polish and hardening (phase 7)
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18. Phase 7.
+Status: accepted. Date: 2026-11-18. Phase 7.
 
 Phase 7 followed a review of everything built so far. The engineering was strong, but the presentation was weak, and a few problems were visible to users. It ran as five parallel pieces of work (PRs #10–#14): data, website, operations, prompt caching and eval intervals. Human category labels were left out by choice.
 
@@ -54,9 +54,9 @@ Phase 7 followed a review of everything built so far. The engineering was strong
   - dashboard label width;
   - table headers off the type scale;
   - a view transition that ignored reduced motion.
-- **Left for you to decide:**
-  - the graph page's full-width layout against the header's page width (DESIGN.md says full width);
-  - overlapping labels in dense graph clusters.
+- **The graph page, decided afterwards:**
+  - **Layout:** the title, intro and search moved onto the page width, so their left edge meets the header's; the graph itself stays full width, as DESIGN.md says. **Rejected:** putting the whole page on the page width, which would narrow the graph from about 1,210 to 780 px at 1600 px wide, for the sake of one edge.
+  - **Labels:** Sigma's label grid only caps labels per grid cell, so long names in neighbouring cells ran into each other. Labels are now picked by a greedy collision check after every camera move: most-linked first, each kept only if it clears every kept label, covers no other dot and fits in the canvas. Measured on the Cheerios graph: 43 of 79 labels at the start, 7 zoomed out and all 79 zoomed in, with no overlaps in any of them. **Rejected:** a bigger label grid, which shows fewer labels and still lets neighbouring cells collide.
 
 ## Operations
 
@@ -94,7 +94,12 @@ Phase 7 followed a review of everything built so far. The engineering was strong
 
 Every eval report now gives 95% Wilson intervals, and the fact score gets a bootstrap interval over questions with a fixed seed. Reports were regenerated from cache at $0, and no point estimate changed. "97% on 30" now reads as 83–99%.
 
+## Cold start, after an hour idle
+
+After 67 minutes with no requests, the first search took 22.6 s, then 0.1 s. After 25 minutes it had taken 3.9 s, so the shorter wait was not representative.
+- **Where the time went:** 6.3 s for Cloud Run to start an instance, 16.0 s in the app's startup step, and 0.2 s for the search with Neon waking. Neon was never the problem.
+- **Likely cause:** startup imports the ask agent's libraries (`anthropic`, `langfuse` with OpenTelemetry), which a search never needs. Locally they take 3.5 s warm, and a fresh Cloud Run host reads the image's files on demand. The startup step logs no timings, so this is not yet proven.
+
 ## Still open
 
-- Time a cold start after a full hour idle (the measured 3.9 s was after 25 minutes, already past both platforms' scale-down points).
-- The graph-page layout questions above.
+- Bring the cold start down: load the ask agent's libraries on the first `/ask` instead of at startup, then time another hour idle. A minimum instance is the fallback, but it bills every hour.

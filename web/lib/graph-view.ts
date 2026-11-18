@@ -39,6 +39,8 @@ export type NodeAttributes = {
   kind: GraphNode["kind"];
   grade: NutriscoreGrade | null;
   isCenter: boolean;
+  /** Set by the canvas after each camera move: this label clears the others (pickLabels). */
+  labelShown?: boolean;
 };
 
 // Screen pixels (Sigma's default sizing): small dots, the centre product clearly larger.
@@ -109,6 +111,57 @@ export function layout(graph: Graph<NodeAttributes>, center: string, iterations 
     const { x, y } = graph.getNodeAttributes(center);
     graph.updateEachNodeAttributes((_, attrs) => ({ ...attrs, x: attrs.x - x, y: attrs.y - y }));
   }
+}
+
+/** A label's box on screen, in CSS pixels. */
+export type LabelBox = { id: string; left: number; top: number; width: number; height: number };
+
+function apart(a: Omit<LabelBox, "id">, b: Omit<LabelBox, "id">, padding: number): boolean {
+  return (
+    a.left >= b.left + b.width + padding ||
+    b.left >= a.left + a.width + padding ||
+    a.top >= b.top + b.height + padding ||
+    b.top >= a.top + a.height + padding
+  );
+}
+
+/**
+ * Which labels to draw so that none overlap. The forced ones (the centre product, the
+ * selected node) are kept first; the rest go in order of priority, each kept only if its box,
+ * padded, clears every label already kept, covers no other node's dot (`dots`, keyed by node)
+ * and fits inside `bounds`. Sigma's own label grid only caps labels per grid cell, so long
+ * names in neighbouring cells ran into each other.
+ */
+export function pickLabels(
+  boxes: LabelBox[],
+  forced: readonly string[],
+  priority: (id: string) => number,
+  {
+    padding = 4,
+    dots = [],
+    bounds,
+  }: { padding?: number; dots?: LabelBox[]; bounds?: { width: number; height: number } } = {},
+): Set<string> {
+  const rank = (box: LabelBox) => {
+    const i = forced.indexOf(box.id);
+    return i >= 0 ? Number.MAX_SAFE_INTEGER - i : priority(box.id);
+  };
+  const ordered = [...boxes].sort((a, b) => rank(b) - rank(a) || a.id.localeCompare(b.id));
+  const inside = (box: LabelBox) =>
+    !bounds ||
+    (box.left >= 0 &&
+      box.top >= 0 &&
+      box.left + box.width <= bounds.width &&
+      box.top + box.height <= bounds.height);
+  const kept: LabelBox[] = [];
+  for (const box of ordered) {
+    const clear =
+      inside(box) &&
+      kept.every((k) => apart(box, k, padding)) &&
+      dots.every((d) => d.id === box.id || apart(box, d, 1));
+    if (clear || forced.includes(box.id)) kept.push(box);
+  }
+  return new Set(kept.map((k) => k.id));
 }
 
 export const KIND_ORDER: GraphNode["kind"][] = ["Product", "Brand", "Category", "Additive", "Ingredient"];

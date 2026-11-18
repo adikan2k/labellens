@@ -1,6 +1,6 @@
 # 0008: The MCP App (phase 6)
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18. Phase 6.
+Status: accepted. Date: 2026-11-18. Phase 6.
 
 ## Public, read-only and unauthenticated, on purpose
 
@@ -66,6 +66,9 @@ Status: draft for Aditya to rewrite. Date: 2026-11-18. Phase 6.
   - `get_product` points to it.
   - The server instructions say to call it directly.
 - After the fix it scored 90%, then 97%. Two more fresh runs scored 97% and 97%, each with a different single miss. The usual miss is the model answering "what does MSG do" from its own knowledge.
+- On 30 requests, 29/30 has a 95% interval of 83–99%. That's enough to show the definitions work, but not to rank small wording changes against each other.
+
+**In Claude itself:** the card renders in a Claude conversation for both `get_product` and `find_swaps`, and Claude chains the tools on its own, a search and then the product's card (screenshots in `docs/evidence/phase-6/`).
 
 ## Also
 

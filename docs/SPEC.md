@@ -280,6 +280,6 @@ Targets are goals. The README reports what was measured, including misses.
 - [ ] Rate limit and daily cap triggered on purpose and behaved
 - [ ] Works by keyboard, at 375 px wide, and with reduced motion
 - [ ] ODbL attribution in the footer and on the about page
-- [ ] Opened after an hour idle; cold start timed and noted
+- [x] Opened after an hour idle; cold start timed and noted
 - [ ] Three cached example runs of `/ask` in place
 - [ ] Decision log covers every phase
