@@ -26,6 +26,10 @@ vars:
   max_unnamed_share: 0.03
   min_products: 900000
   max_products: 1200000
+  # The graph's caps (SPEC section 5), under AuraDB Free's 200,000 nodes and 400,000
+  # relationships. int_graph_products fills to the relationship cap; the loader checks both.
+  graph_max_nodes: 180000
+  graph_max_relationships: 360000
 
 models:
   labellens:

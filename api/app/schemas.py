@@ -98,6 +98,7 @@ class Product(ProductSummary):
     additives: list[Additive]
     ingredients: list[Ingredient]
     off_url: str
+    in_graph: bool
 
 
 class ProductResponse(Model):

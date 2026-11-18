@@ -285,6 +285,8 @@ export interface components {
              * @description The product's page on Open Food Facts.
              */
             off_url: string;
+            /** @description Whether the food graph holds this product (the most complete graded products), so the explorer can open its neighbourhood. */
+            in_graph: boolean;
         };
         ProductResponse: {
             product: components["schemas"]["Product"];

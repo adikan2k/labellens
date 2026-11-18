@@ -92,6 +92,7 @@ create table {NEXT}.products (
     ingredient_ids text[] not null,
     additive_count smallint not null,
     has_flagged boolean not null,
+    in_graph boolean not null,
     rank_pos integer not null
 );
 create table {NEXT}.additives (
@@ -161,13 +162,11 @@ select
     coalesce(i.ids, []::varchar[]) as ingredient_ids,
     flags.additive_count,
     flags.has_flagged_additive as has_flagged,
-    row_number() over (
-        order by
-            (length(p.code) between 12 and 13
-             and try_cast(left(lpad(p.code, 13, '0'), 3) as integer) between 0 and 139) desc,
-            (p.lang = 'en') desc, p.scans desc, p.completeness desc nulls last, p.code
-    ) as rank_pos
+    g.code is not null as in_graph,
+    r.rank_pos
 from dim_products as p
+join int_product_rank as r using (code)
+left join int_graph_products as g using (code)
 join fct_nutrition as f using (code)
 left join additives as a using (code)
 left join ingredients as i using (code)
@@ -194,7 +193,7 @@ PRODUCT_COLUMNS = [
     "code", "name", "brand", "category_id", "category_source", "nutriscore_grade", "nova_group",
     "completeness",
     "scans", "image_path", *NUTRIENTS, "additive_ids", "ingredient_ids", "additive_count",
-    "has_flagged", "rank_pos",
+    "has_flagged", "in_graph", "rank_pos",
 ]  # fmt: skip
 
 
@@ -228,7 +227,7 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
             count(*),
             sum(28 + strlen(code) + 1 + strlen(name) + 1 + coalesce(strlen(brand) + 1, 0)
                 + coalesce(strlen(category_main) + 1, 0)
-                + coalesce(strlen(category_source) + 1, 0) + 2 + 2 + 4 + 4 + 4 + 2 + 1
+                + coalesce(strlen(category_source) + 1, 0) + 2 + 2 + 4 + 4 + 4 + 2 + 1 + 1
                 + coalesce(strlen(image_path) + 1, 0) + 7 * 4
                 + 24 + coalesce(
                     list_sum(list_transform(additive_ids, lambda x: strlen(x) + 4)), 0)

@@ -216,3 +216,11 @@ def _count(url: str) -> int:
         row = pg.execute("select count(*) from serving.products").fetchone()
     assert row
     return row[0]
+
+
+def test_in_graph_marks_exactly_the_graph_subset(
+    pg: psycopg.Connection, marts: duckdb.DuckDBPyConnection
+) -> None:
+    in_graph = {c for (c,) in pg.execute("select code from products where in_graph").fetchall()}
+    subset = {c for (c,) in marts.execute("select code from int_graph_products").fetchall()}
+    assert in_graph == subset and subset

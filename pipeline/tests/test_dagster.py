@@ -83,11 +83,11 @@ def test_definitions_load_and_materialise_on_the_fixture(tmp_path: Path) -> None
     ]
     assert out["base_deps"] == ["raw_snapshot"]
     assert out["success"], (done.stdout + done.stderr)[-4000:]
-    built = set(out["keys"]) - {"serving_tables"}
+    built = set(out["keys"]) - {"serving_tables", "graph"}
     assert set(out["materialized"]) == built
     # Building never publishes: only the publish job loads the live database.
     assert set(out["pipeline_job"]) == built
-    assert out["publish_job"] == ["serving_tables"]
+    assert out["publish_job"] == ["graph", "serving_tables"]
     assert out["checks"] >= 30
     assert out["checks_passed"] == out["checks"]
 

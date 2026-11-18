@@ -162,7 +162,37 @@ def serving_tables(context: dg.AssetExecutionContext) -> dg.MaterializeResult:
     )
 
 
-PUBLISH = dg.AssetSelection.assets(serving_tables)
+@dg.asset(group_name="publish", deps=[run_report], kinds={"neo4j"})
+def graph(context: dg.AssetExecutionContext) -> dg.MaterializeResult:
+    """The food graph in Neo4j (AuraDB Free), replaced by pipeline/load/graph.py.
+
+    Publish job only, like serving_tables. Counts are checked against the caps before writing.
+    """
+    import duckdb
+
+    from api.app.config import get_settings
+    from pipeline.load import graph as graph_load
+
+    settings = get_settings()
+    if not (settings.neo4j_uri and settings.neo4j_user and settings.neo4j_password):
+        raise dg.Failure("NEO4J_URI, NEO4J_USER and NEO4J_PASSWORD are not set.")
+    with duckdb.connect(str(DUCKDB_PATH), read_only=True) as con:
+        built = graph_load.build(con)
+    graph_load.report(built, log=context.log.info)
+    graph_load.check(built)
+    driver = graph_load.connect(
+        settings.neo4j_uri, settings.neo4j_user, settings.neo4j_password.get_secret_value()
+    )
+    try:
+        graph_load.write(driver, built, log=context.log.info)
+    finally:
+        driver.close()
+    return dg.MaterializeResult(
+        metadata={"nodes": built.node_count, "relationships": built.relationship_count}
+    )
+
+
+PUBLISH = dg.AssetSelection.assets(serving_tables, graph)
 
 pipeline_job = dg.define_asset_job(
     "pipeline",
@@ -170,11 +200,13 @@ pipeline_job = dg.define_asset_job(
     description="Snapshot, dbt build, run report. Never writes to the live database.",
 )
 publish_job = dg.define_asset_job(
-    "publish", selection=PUBLISH, description="Load the built marts into Postgres (Neon)."
+    "publish",
+    selection=PUBLISH,
+    description="Load the built marts into Postgres (Neon) and the graph into Neo4j.",
 )
 
 defs = dg.Definitions(
-    assets=[raw_snapshot, labellens_dbt, run_report, serving_tables],
+    assets=[raw_snapshot, labellens_dbt, run_report, serving_tables, graph],
     jobs=[pipeline_job, publish_job],
     resources={"dbt": DbtCliResource(project_dir=dbt_project)},
 )

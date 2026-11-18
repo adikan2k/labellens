@@ -364,7 +364,7 @@ components:
         - type: object
           required:
             [category_name, category_source, completeness, nutrition, additives, ingredients,
-             off_url]
+             off_url, in_graph]
           properties:
             category_name:
               type: [string, "null"]
@@ -388,6 +388,11 @@ components:
               type: string
               format: uri
               description: The product's page on Open Food Facts.
+            in_graph:
+              type: boolean
+              description: >
+                Whether the food graph holds this product (the most complete graded products),
+                so the explorer can open its neighbourhood.
 
     ProductResponse:
       type: object
