@@ -1,0 +1,174 @@
+{
+  "measured_at": "2026-11-18T23:22:02+00:00",
+  "model": "claude-haiku-5-5",
+  "prompt_version": "label-v2",
+  "cost_usd": 0.019463,
+  "p50_s": 1.528,
+  "as_is": {
+    "audited": false,
+    "labels": 30,
+    "excluded": [],
+    "not_printed": 0,
+    "read_as_food": 29,
+    "labels_all_right": 10,
+    "nutrients_right": 144,
+    "nutrients_known": 204,
+    "per_nutrient": {
+      "energy_kcal_100g": [
+        23,
+        30
+      ],
+      "fat_100g": [
+        24,
+        30
+      ],
+      "saturated_fat_100g": [
+        24,
+        30
+      ],
+      "salt_100g": [
+        19,
+        30
+      ],
+      "fiber_100g": [
+        12,
+        24
+      ],
+      "sugars_100g": [
+        20,
+        30
+      ],
+      "proteins_100g": [
+        22,
+        30
+      ]
+    },
+    "by_language": {
+      "en": {
+        "labels": 22,
+        "right": 7,
+        "n": 150,
+        "k": 103
+      },
+      "other": {
+        "labels": 8,
+        "right": 3,
+        "n": 54,
+        "k": 41
+      }
+    },
+    "additives": {
+      "true_positive": 25,
+      "predicted": 39,
+      "actual": 29
+    },
+    "intervals": {
+      "nutrients": [
+        0.64,
+        0.7641
+      ],
+      "labels_all_right": [
+        0.1923,
+        0.5122
+      ],
+      "additive_precision": [
+        0.4842,
+        0.7726
+      ],
+      "additive_recall": [
+        0.6944,
+        0.945
+      ]
+    }
+  },
+  "checked": {
+    "audited": true,
+    "labels": 27,
+    "excluded": [
+      {
+        "id": "label-03",
+        "why": "The nutrition photo is of a different product (a Lidl chicken stock) filed under this pizza."
+      },
+      {
+        "id": "label-10",
+        "why": "The nutrition photo shows the front of the cup; the panel is out of focus and unreadable."
+      },
+      {
+        "id": "label-24",
+        "why": "The 'nutrition' photo is a screenshot of a chatbot's answer, not a label."
+      }
+    ],
+    "not_printed": 27,
+    "read_as_food": 27,
+    "labels_all_right": 23,
+    "nutrients_right": 155,
+    "nutrients_known": 158,
+    "per_nutrient": {
+      "energy_kcal_100g": [
+        25,
+        25
+      ],
+      "fat_100g": [
+        25,
+        25
+      ],
+      "saturated_fat_100g": [
+        23,
+        23
+      ],
+      "salt_100g": [
+        23,
+        24
+      ],
+      "fiber_100g": [
+        12,
+        13
+      ],
+      "sugars_100g": [
+        23,
+        23
+      ],
+      "proteins_100g": [
+        24,
+        25
+      ]
+    },
+    "by_language": {
+      "en": {
+        "labels": 20,
+        "right": 16,
+        "n": 116,
+        "k": 113
+      },
+      "other": {
+        "labels": 7,
+        "right": 7,
+        "n": 42,
+        "k": 42
+      }
+    },
+    "additives": {
+      "true_positive": 36,
+      "predicted": 38,
+      "actual": 40
+    },
+    "intervals": {
+      "nutrients": [
+        0.9457,
+        0.9935
+      ],
+      "labels_all_right": [
+        0.6752,
+        0.9408
+      ],
+      "additive_precision": [
+        0.8271,
+        0.9854
+      ],
+      "additive_recall": [
+        0.7695,
+        0.9604
+      ]
+    }
+  }
+}
