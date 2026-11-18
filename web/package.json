@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/copy-zxing-wasm.mjs && next dev",
+    "build": "node scripts/copy-zxing-wasm.mjs && next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "gen:api": "openapi-typescript ../docs/openapi.yaml -o lib/api-types.ts",
@@ -15,6 +15,7 @@
     "node": ">=22"
   },
   "dependencies": {
+    "barcode-detector": "3.2.3",
     "graphology": "^0.26.0",
     "graphology-layout-forceatlas2": "^0.10.1",
     "motion": "^14.14.0",
