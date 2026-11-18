@@ -17,7 +17,7 @@ def _connect(url: str) -> psycopg.Connection:
 
 
 def test_role_name_matches_the_loader() -> None:
-    assert script.ROLE == serving.READONLY_ROLE
+    assert script.ROLE == serving.PRODUCTION_READONLY_ROLE
 
 
 def test_reads_exactly_the_public_tables(readonly_url: str) -> None:

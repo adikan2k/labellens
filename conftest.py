@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
 import uuid
 from collections.abc import Iterator
@@ -72,12 +73,29 @@ def pg_admin_url() -> str:
 
 
 @pytest.fixture(scope="session")
-def readonly_role(pg_admin_url: str) -> str:
+def readonly_role(pg_admin_url: str) -> Iterator[str]:
+    """A read-only role of this run's own, which the loader grants to.
+
+    Roles belong to the whole Postgres cluster: sharing labellens_readonly meant every run
+    re-passworded it and broke any other run (another worktree, the local API) at the same
+    time. A unique name per run, dropped at the end, keeps runs apart.
+    """
+    from pipeline.load import serving
     from scripts.create_readonly_role import create_role
 
-    # A fixed local test password: the role is cluster-wide, and a random one per run broke
-    # any other test run (or local API) using the same Docker Postgres at the same time.
-    return create_role(pg_admin_url, rotate=True, password="labellens-readonly-local-test")
+    name = f"labellens_readonly_t{uuid.uuid4().hex[:8]}"
+    patch = pytest.MonkeyPatch()
+    patch.setattr(serving, "READONLY_ROLE", name)
+    try:
+        yield create_role(pg_admin_url, name)
+    finally:
+        patch.undo()
+        # A database another fixture kept may still grant to it; leaving it then is harmless.
+        with (
+            psycopg.connect(pg_admin_url, autocommit=True) as admin,
+            contextlib.suppress(psycopg.Error),
+        ):
+            admin.execute(f'drop role if exists "{name}"')  # type: ignore[arg-type]
 
 
 @pytest.fixture(scope="session")

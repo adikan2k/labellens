@@ -45,8 +45,7 @@ def create_role(
 ) -> str:
     """Create (or, with rotate, re-password) the role. Returns its connection URL.
 
-    The password is random unless given. Tests give a fixed local one: roles belong to the
-    whole Postgres cluster, so two test runs at once would otherwise re-password each other.
+    The password is random unless given. Tests make a role of their own per run (conftest.py).
     """
     password = password or secrets.token_urlsafe(24)
     with psycopg.connect(admin_url, autocommit=True, prepare_threshold=None) as pg:

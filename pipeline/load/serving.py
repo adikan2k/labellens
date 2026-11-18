@@ -63,7 +63,9 @@ SCHEMA, NEXT, OLD = "serving", "serving_next", "serving_old"
 MAX_LOAD_BYTES = 800_000_000
 MAX_DATABASE_BYTES = 1_000_000_000
 SWAP_LOCK_TIMEOUT = "30s"
-READONLY_ROLE = "labellens_readonly"
+PRODUCTION_READONLY_ROLE = "labellens_readonly"
+# The role the grants go to; tests point it at a role of their own (conftest.py).
+READONLY_ROLE = PRODUCTION_READONLY_ROLE
 READONLY_TABLES = ("products", "additives", "ingredients", "categories", "explainers")
 BATCH = 20_000
 NUTRIENTS = [
