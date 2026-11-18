@@ -160,3 +160,38 @@ describe("format", () => {
     expect(formatShare(1, 1000)).toBe("<1%");
   });
 });
+
+describe("SwapList and no-swap reasons", async () => {
+  const { SwapList } = await import("./swap-list");
+  const { noSwapsReason } = await import("@/lib/copy");
+  const swap = {
+    product: {
+      code: "0016000124790",
+      name: "Plain Cheerios",
+      brand: "General Mills",
+      category_main: "breakfast-cereals",
+      nutriscore_grade: "a" as const,
+      nova_group: 3 as const,
+      image_url: null,
+    },
+    reason: "Nutri-Score A instead of C · no additives instead of 2 · none flagged by Open Food Facts",
+    additive_count: 0,
+  };
+
+  test("each swap links to its product with name, brand, grade and reason", () => {
+    render(<SwapList swaps={[swap]} />);
+    const link = screen.getByRole("link", { name: /Plain Cheerios/ });
+    expect(link.getAttribute("href")).toBe("/product/0016000124790");
+    expect(within(link).getByText("General Mills")).toBeTruthy();
+    expect(within(link).getByText(swap.reason)).toBeTruthy();
+    expect(within(link).getByRole("img", { name: "Nutri-Score A" })).toBeTruthy();
+  });
+
+  test("an empty list says which rule left nothing", () => {
+    expect(noSwapsReason({ category_main: "other", nutriscore_grade: "d" })).toMatch(/no category/);
+    expect(noSwapsReason({ category_main: null, nutriscore_grade: "d" })).toMatch(/no category/);
+    expect(noSwapsReason({ category_main: "cheese", nutriscore_grade: null })).toMatch(/no Nutri-Score/);
+    expect(noSwapsReason({ category_main: "cheese", nutriscore_grade: "a" })).toMatch(/already scores/);
+    expect(noSwapsReason({ category_main: "cheese", nutriscore_grade: "d" })).toMatch(/No similar product/);
+  });
+});

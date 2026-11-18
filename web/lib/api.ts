@@ -19,6 +19,11 @@ export type StatsOverview = Schemas["StatsOverview"];
 export type CountByKey = Schemas["CountByKey"];
 export type Source = Schemas["Source"];
 export type NutriscoreGrade = NonNullable<Schemas["NutriscoreGrade"]>;
+export type Swap = Schemas["Swap"];
+export type SwapsResponse = Schemas["SwapsResponse"];
+export type GraphNeighborhood = Schemas["GraphNeighborhood"];
+export type GraphNode = Schemas["GraphNode"];
+export type GraphEdge = Schemas["GraphEdge"];
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
 
@@ -64,6 +69,19 @@ export function searchProducts(
 
 export function getProduct(code: string): Promise<ProductResponse> {
   return request<ProductResponse>(`/products/${encodeURIComponent(code)}`);
+}
+
+export function getSwaps(code: string, limit = 5): Promise<SwapsResponse> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  return request<SwapsResponse>(`/products/${encodeURIComponent(code)}/swaps?${params}`);
+}
+
+export function getNeighborhood(
+  code: string,
+  options: { depth?: 1 | 2; signal?: AbortSignal } = {},
+): Promise<GraphNeighborhood> {
+  const params = new URLSearchParams({ code, depth: String(options.depth ?? 2) });
+  return request<GraphNeighborhood>(`/graph/neighborhood?${params}`, { signal: options.signal });
 }
 
 export function getStats(): Promise<StatsOverview> {

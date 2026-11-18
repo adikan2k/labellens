@@ -5,11 +5,18 @@ import { Suspense, ViewTransition } from "react";
 import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
 import { IngredientList } from "@/components/product/ingredient-list";
+import { SwapList } from "@/components/product/swap-list";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SettleChip } from "@/components/product/settle-chip";
-import type { Product } from "@/lib/api";
-import { cachedProduct } from "@/lib/cached";
-import { AI_CATEGORY_NOTE, WAKING_UP } from "@/lib/copy";
+import type { Product, Swap } from "@/lib/api";
+import { cachedProduct, cachedSwaps } from "@/lib/cached";
+import {
+  AI_CATEGORY_NOTE,
+  noSwapsReason,
+  SWAP_RULE,
+  SWAPS_UNAVAILABLE,
+  WAKING_UP,
+} from "@/lib/copy";
 import { NOVA_LABELS } from "@/lib/format";
 
 /** Not async: params are awaited inside the Suspense boundary, so the shell prerenders. */
@@ -24,18 +31,22 @@ export default function ProductPage({ params }: PageProps<"/product/[code]">) {
 }
 
 async function ProductView({ code }: { code: string }) {
-  let found: Awaited<ReturnType<typeof cachedProduct>>;
-  try {
-    found = await cachedProduct(code);
-  } catch {
+  // Product and swaps together, so the page renders once and nothing shifts. A swap failure
+  // leaves the label standing with a note; a product failure means unavailable.
+  const [productResult, swapsResult] = await Promise.allSettled([
+    cachedProduct(code),
+    cachedSwaps(code),
+  ]);
+  if (productResult.status === "rejected") {
     // Errors from a cached function arrive without their class; any of them means unavailable.
     return <Unavailable code={code} />;
   }
-  if (!found) notFound();
-  return <ProductLayout product={found.product} />;
+  if (!productResult.value) notFound();
+  const swaps = swapsResult.status === "fulfilled" ? swapsResult.value.swaps : null;
+  return <ProductLayout product={productResult.value.product} swaps={swaps} />;
 }
 
-function ProductLayout({ product }: { product: Product }) {
+function ProductLayout({ product, swaps }: { product: Product; swaps: Swap[] | null }) {
   const meta = [product.brand, product.category_name].filter(Boolean).join(", ");
   return (
     // One panel, placed by the grid: after the name on phones, a sticky right column on desktop.
@@ -86,6 +97,23 @@ function ProductLayout({ product }: { product: Product }) {
           )}
         </section>
 
+        <section aria-labelledby="swaps" className="pt-12">
+          <h2 id="swaps" className="type-heading pb-2">
+            Better swaps
+          </h2>
+          <Rule weight="thin" />
+          {swaps === null ? (
+            <p className="type-body pt-3">{SWAPS_UNAVAILABLE}</p>
+          ) : swaps.length > 0 ? (
+            <>
+              <SwapList swaps={swaps} />
+              <p className="type-small pt-3 text-ink-muted">{SWAP_RULE}</p>
+            </>
+          ) : (
+            <p className="type-body pt-3">{noSwapsReason(product)}</p>
+          )}
+        </section>
+
         <section aria-labelledby="ingredients" className="pt-12">
           <h2 id="ingredients" className="type-heading pb-2">
             Ingredients ({product.ingredients.length})
@@ -102,10 +130,15 @@ function ProductLayout({ product }: { product: Product }) {
           </p>
         </section>
 
-        <p className="pt-12">
+        <p className="flex flex-wrap gap-x-6 gap-y-2 pt-12">
           <a href={product.off_url} className="type-data-value">
             Open in Open Food Facts
           </a>
+          {product.in_graph && (
+            <Link href={`/graph?code=${product.code}`} className="type-data-value">
+              Explore in the graph
+            </Link>
+          )}
         </p>
       </div>
     </article>
