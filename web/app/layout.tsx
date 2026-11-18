@@ -3,6 +3,7 @@ import { Archivo } from "next/font/google";
 
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { RouteFocus } from "@/components/route-focus";
 import { ROOT_TITLE, SITE_DESCRIPTION } from "@/lib/metadata";
 
 import "./globals.css";
@@ -24,9 +25,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${archivo.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-paper text-ink">
         <Header />
-        <main id="main" className="flex-1">
+        {/* Focusable only from code: RouteFocus moves focus here after a navigation. */}
+        <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>
+        <RouteFocus />
         <Footer />
       </body>
     </html>
