@@ -1,17 +1,19 @@
 # Category accuracy: claude-sonnet-5-5-full-silver
 
-Measured 2026-11-18T01:01:50+00:00: `claude-sonnet-5-5`, prompt `categories-v1`, inputs: name, brand and ingredients. Cost $0.0872 (0 when every answer was cached).
+Measured 2026-11-18T08:12:09+00:00: `claude-sonnet-5-5`, prompt `categories-v1`, inputs: name, brand and ingredients. Cost $0.0000 (0 when every answer was cached).
 
 Labels: 200 products labelled by Claude Opus 5.5 (an AI model, not a person).
 
 | | Accuracy |
 | --- | ---: |
-| **All labelled products** | **92.0% (184/200)** |
-| dev half | 92.4% (97/105) |
-| test half | 91.6% (87/95) |
-| Products Open Food Facts' tags place | 91.7% (110/120) |
-| Products they do not (what the fill is for) | 92.5% (74/80) |
-| Baseline: Open Food Facts' tags, where they give a category | 87.5% (105/120) |
+| **All labelled products** | **184/200: 92.0% (87.4–95.0%)** |
+| dev half | 97/105: 92.4% (85.7–96.1%) |
+| test half | 87/95: 91.6% (84.3–95.7%) |
+| Products Open Food Facts' tags place | 110/120: 91.7% (85.3–95.4%) |
+| Products they do not (what the fill is for) | 74/80: 92.5% (84.6–96.5%) |
+| Baseline: Open Food Facts' tags, where they give a category | 105/120: 87.5% (80.4–92.3%) |
+
+Ranges in brackets are 95% confidence intervals (Wilson score): with this few cases the true rate could plausibly be anywhere in the range, so a gap smaller than the ranges may be noise.
 
 Target: 90%. This run **meets** it. Invalid answers (counted wrong): 0.
 

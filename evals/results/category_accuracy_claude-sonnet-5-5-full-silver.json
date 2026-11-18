@@ -3,7 +3,7 @@
   "model": "claude-sonnet-5-5",
   "prompt_version": "categories-v1",
   "inputs": "name, brand and ingredients",
-  "measured_at": "2026-11-18T01:01:50+00:00",
+  "measured_at": "2026-11-18T08:12:09+00:00",
   "overall": {
     "n": 200,
     "correct": 184,
@@ -243,6 +243,10 @@
         "cooking-baking",
         1
       ]
+    ],
+    "ci95": [
+      0.874,
+      0.9502
     ]
   },
   "halves": {
@@ -444,6 +448,10 @@
           "bread",
           1
         ]
+      ],
+      "ci95": [
+        0.8568,
+        0.9609
       ]
     },
     "test": {
@@ -650,6 +658,10 @@
           "cooking-baking",
           1
         ]
+      ],
+      "ci95": [
+        0.8425,
+        0.9567
       ]
     }
   },
@@ -862,6 +874,10 @@
           "bread",
           1
         ]
+      ],
+      "ci95": [
+        0.8534,
+        0.9541
       ]
     },
     "Products they do not (what the fill is for)": {
@@ -1022,6 +1038,10 @@
           "salty-snacks",
           1
         ]
+      ],
+      "ci95": [
+        0.8459,
+        0.9652
       ]
     }
   },
@@ -1248,10 +1268,14 @@
         "yogurt",
         1
       ]
+    ],
+    "ci95": [
+      0.804,
+      0.9228
     ]
   },
   "missing": [],
-  "cost_usd": 0.0872,
+  "cost_usd": 0.0,
   "target": 0.9,
   "against": "gold",
   "labels": "200 products labelled by Claude Opus 5.5 (an AI model, not a person)"

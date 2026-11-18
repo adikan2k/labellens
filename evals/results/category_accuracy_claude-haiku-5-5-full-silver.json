@@ -3,7 +3,7 @@
   "model": "claude-haiku-5-5",
   "prompt_version": "categories-v1",
   "inputs": "name, brand and ingredients",
-  "measured_at": "2026-11-18T00:59:39+00:00",
+  "measured_at": "2026-11-18T08:12:06+00:00",
   "overall": {
     "n": 200,
     "correct": 180,
@@ -243,6 +243,10 @@
         "nuts-bars",
         1
       ]
+    ],
+    "ci95": [
+      0.8506,
+      0.9343
     ]
   },
   "halves": {
@@ -454,6 +458,10 @@
           "bread",
           1
         ]
+      ],
+      "ci95": [
+        0.8108,
+        0.9334
       ]
     },
     "test": {
@@ -660,11 +668,15 @@
           "other",
           1
         ]
+      ],
+      "ci95": [
+        0.8425,
+        0.9567
       ]
     }
   },
   "by_tags": {
-    "Gold products Open Food Facts' tags place": {
+    "Products Open Food Facts' tags place": {
       "n": 120,
       "correct": 109,
       "accuracy": 0.9083,
@@ -872,9 +884,13 @@
           "bread",
           1
         ]
+      ],
+      "ci95": [
+        0.8433,
+        0.948
       ]
     },
-    "Gold products they do not (what the fill is for)": {
+    "Products they do not (what the fill is for)": {
       "n": 80,
       "correct": 71,
       "accuracy": 0.8875,
@@ -1053,6 +1069,10 @@
           "fruit-veg",
           1
         ]
+      ],
+      "ci95": [
+        0.7998,
+        0.9397
       ]
     }
   },
@@ -1279,10 +1299,14 @@
         "yogurt",
         1
       ]
+    ],
+    "ci95": [
+      0.804,
+      0.9228
     ]
   },
   "missing": [],
-  "cost_usd": 0.0044,
+  "cost_usd": 0.0,
   "target": 0.9,
   "against": "gold",
   "labels": "200 products labelled by Claude Opus 5.5 (an AI model, not a person)"
