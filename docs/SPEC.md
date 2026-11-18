@@ -102,16 +102,16 @@ labellens/
 
 Create these before phase 0 ends. Put every secret in `.env` (never committed) and in the deploy platforms' secret settings.
 
-- [ ] GitHub repo `labellens`, public
-- [ ] Anthropic API key, with a monthly spend limit of $15 set in the console
-- [ ] Embeddings provider key (whichever phase 0 picks)
-- [ ] Neon project
-- [ ] Neo4j AuraDB Free instance (save the generated password; it is shown once)
-- [ ] Google Cloud project with billing enabled and a budget alert at $5
-- [ ] Vercel account linked to GitHub
-- [ ] Langfuse cloud project
-- [ ] Reference screenshots saved to `docs/design/refs/` (see DESIGN.md)
-- [ ] 200 products hand-labelled with `scripts/label.py` (built in phase 0)
+- [x] GitHub repo `labellens`, public
+- [ ] Anthropic API key, with a monthly spend limit of $15 set in the console (the key is live; the limit is only visible in the console, so not checked here)
+- [x] Embeddings provider key (whichever phase 0 picks): Voyage, decision 0001
+- [x] Neon project
+- [x] Neo4j AuraDB Free instance (save the generated password; it is shown once)
+- [ ] Google Cloud project with billing enabled and a budget alert at $5 (billing is on; the alert is only visible in the billing console, so not checked here)
+- [x] Vercel account linked to GitHub
+- [x] Langfuse cloud project
+- [ ] Reference screenshots saved to `docs/design/refs/` (see DESIGN.md). Skipped: the design pass checked every page against DESIGN.md's written rules instead (decision 0009)
+- [ ] 200 products hand-labelled with `scripts/label.py` (built in phase 0). Skipped by choice: the category eval uses labels from Claude Opus, and the README says so
 
 ---
 
@@ -276,10 +276,10 @@ Targets are goals. The README reports what was measured, including misses.
 
 ## 10. Launch checklist
 
-- [ ] Every target in section 8 measured and in the README
-- [ ] Rate limit and daily cap triggered on purpose and behaved
-- [ ] Works by keyboard, at 375 px wide, and with reduced motion
-- [ ] ODbL attribution in the footer and on the about page
+- [x] Every target in section 8 measured and in the README. Category accuracy is measured against Claude Opus labels, not human ones (see section 4)
+- [x] Rate limit and daily cap triggered on purpose and behaved: in production, the 11th question in an hour got a 429 with `Retry-After`, and with the cap forced to $0 on a temporary revision the closest replay was served (PR #7). Tests cover both
+- [x] Works by keyboard, at 375 px wide, and with reduced motion: every page audited at 375 px with no sideways scroll, and reduced motion fixed and tested (PRs #8 and #14). Keyboard checked on production on 2026-11-18: every stop shows the focus ring, and the main task on each page works without a mouse (search to product, ingredient and additive details, the dashboard's "Show the numbers", the graph's list view, the 404)
+- [x] ODbL attribution in the footer and on the about page: footer on all 7 pages, tested
 - [x] Opened after an hour idle; cold start timed and noted
-- [ ] Three cached example runs of `/ask` in place
-- [ ] Decision log covers every phase
+- [x] Three cached example runs of `/ask` in place (`api/app/ask/replays/`)
+- [x] Decision log covers every phase: 0001–0002 phase 0, 0003–0008 phases 1–6, 0009 phase 7
