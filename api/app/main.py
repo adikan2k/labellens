@@ -7,8 +7,11 @@ thread pool. psycopg's async mode needs a selector event loop, which Windows doe
 default, so sync keeps local development working everywhere.
 """
 
+import logging
 import platform
-from collections.abc import Iterator
+import threading
+import time
+from collections.abc import Callable, Iterator
 from contextlib import asynccontextmanager
 from typing import Annotated
 
@@ -44,6 +47,37 @@ API_VERSION = "0.3.0"
 WAKING_UP = "Search is waking up. Try again in a few seconds."
 GRAPH_UNAVAILABLE = "The graph is waking up or being reloaded. Try again in a minute."
 ASK_NOT_CONFIGURED = "The ask agent is not configured."
+# Uvicorn's own logger, so these lines reach Cloud Run's log without logging setup of our own.
+log = logging.getLogger("uvicorn.error")
+
+
+class LazyAsk:
+    """The ask service, built on the first /ask rather than at startup.
+
+    Its libraries (anthropic, langfuse with OpenTelemetry) take seconds to import, and on a
+    fresh Cloud Run instance far longer: an hour-idle cold start spent 16 s in startup
+    (evals/results/cold_start.md). A search never needs them, so only the first question
+    after a quiet spell pays."""
+
+    def __init__(self, build: Callable[[], ask_module.AskService | None]) -> None:
+        self._build = build
+        self._lock = threading.Lock()
+        self._built = False
+        self._service: ask_module.AskService | None = None
+
+    def get(self) -> ask_module.AskService | None:
+        if not self._built:
+            with self._lock:
+                if not self._built:
+                    started = time.perf_counter()
+                    self._service = self._build()
+                    self._built = True
+                    log.info("Ask service ready in %.2f s", time.perf_counter() - started)
+        return self._service
+
+    def close(self) -> None:
+        if self._service is not None:
+            self._service.readonly.close()
 
 
 def get_connection(request: Request) -> Iterator[DictConnection]:
@@ -58,6 +92,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        started = time.perf_counter()
         url = settings.database_url.get_secret_value() if settings.database_url else None
         app.state.db = Database.open(url, timeout=settings.db_pool_timeout)
         if not hasattr(app.state, "graph"):  # tests may set one
@@ -67,16 +102,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.graph = graph_module.Graph.open(
                 settings.neo4j_uri, settings.neo4j_user, password
             )
-        app.state.ask = _open_ask(app, settings)
+        app.state.ask = LazyAsk(lambda: _open_ask(app, settings))
         try:
             # A mounted route's own lifespan never runs, so the MCP session manager runs here.
             async with app.state.mcp.server.session_manager.run():
+                log.info("Startup took %.2f s", time.perf_counter() - started)
                 yield
         finally:
             app.state.db.close()
             app.state.graph.close()
-            if app.state.ask is not None:
-                app.state.ask.readonly.close()
+            app.state.ask.close()
 
     app = FastAPI(title="LabelLens API", version=API_VERSION, lifespan=lifespan)
     # The MCP server reads app.state.db per call; the pool opens in the lifespan.
@@ -200,7 +235,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         "/ask", responses={422: {"model": Error}, 429: {"model": Error}, 503: {"model": Error}}
     )
     def ask(request: Request, body: AskRequest) -> Response:
-        service: ask_module.AskService | None = request.app.state.ask
+        service = request.app.state.ask.get()
         if service is None:
             raise HTTPException(503, ASK_NOT_CONFIGURED)
         peer = request.client.host if request.client else None
