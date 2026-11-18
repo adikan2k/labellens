@@ -1,0 +1,49 @@
+name: Smoke
+
+# Read-only checks against production (scripts/smoke.py): the API, MCP and the web pages.
+# No secrets and no model calls. Runs every 6 hours, on demand, and as the last job of the
+# Deploy API workflow (workflow_call, so a failed smoke test turns that deploy run red).
+# Set the repository variable SMOKE_EXPECT_UNKNOWN_404=true once the web app answers 404 for
+# an unknown barcode.
+
+on:
+  schedule:
+    - cron: "41 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      expect_unknown_404:
+        description: "Also require /product/<unknown barcode> to answer 404"
+        type: boolean
+        default: false
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      # setup-uv publishes exact tags only (no floating v10), so pin the commit.
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: true
+      - run: uv sync --locked --no-default-groups
+      - name: Smoke test
+        env:
+          API_URL: ${{ vars.API_URL }}
+          WEB_URL: ${{ vars.WEB_ORIGIN }}
+          EXPECT_404: ${{ inputs.expect_unknown_404 || vars.SMOKE_EXPECT_UNKNOWN_404 == 'true' }}
+        run: |
+          args=()
+          [ -n "$API_URL" ] && args+=(--api "$API_URL")
+          [ -n "$WEB_URL" ] && args+=(--web "$WEB_URL")
+          [ "$EXPECT_404" = "true" ] && args+=(--expect-unknown-404)
+          uv run --no-sync python scripts/smoke.py "${args[@]}" | tee smoke.txt
+          exit "${PIPESTATUS[0]}"
+      - name: Summary
+        if: always()
+        run: |
+          { echo '```'; cat smoke.txt 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
