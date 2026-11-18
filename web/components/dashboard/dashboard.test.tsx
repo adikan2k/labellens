@@ -143,4 +143,12 @@ describe("charts", () => {
     expect(screen.getByRole("table", { name: "Products per grade" })).toBeTruthy();
     expect(screen.getByRole("rowheader", { name: "A" })).toBeTruthy();
   });
+
+  test("the table is set in the data row roles: labels 500, values 700", () => {
+    render(<DataTable caption="Products per grade" headers={["Grade", "Products"]} rows={[["A", "100"]]} />);
+    expect(screen.getByRole("columnheader", { name: "Grade" }).className).toContain("type-data-label");
+    expect(screen.getByRole("rowheader", { name: "A" }).className).toContain("type-data-label");
+    expect(screen.getByRole("cell", { name: "100" }).className).toContain("type-data-value");
+    expect(screen.getByRole("table").outerHTML).not.toMatch(/font-(bold|normal)/);
+  });
 });

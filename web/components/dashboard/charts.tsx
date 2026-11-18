@@ -112,17 +112,17 @@ export function GradeStacks({ stacks }: { stacks: Stack[] }) {
   );
 }
 
-/** The chart's data as a table, on request (DESIGN.md quality floor). */
+/** The chart's data as a table, on request (DESIGN.md quality floor), in the data row roles. */
 export function DataTable({ caption, headers, rows }: { caption: string; headers: string[]; rows: (string | number)[][] }) {
   return (
     <details className="pt-4">
       <summary className="type-small cursor-pointer underline underline-offset-2">Show the numbers</summary>
-      <table className="type-small mt-3 w-full">
+      <table className="mt-3 w-full">
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr className="border-b border-ink">
             {headers.map((h, i) => (
-              <th key={h} scope="col" className={`py-1 font-bold ${i ? "text-right" : "text-left"}`}>
+              <th key={h} scope="col" className={`type-data-label py-1 ${i ? "text-right" : "text-left"}`}>
                 {h}
               </th>
             ))}
@@ -133,11 +133,11 @@ export function DataTable({ caption, headers, rows }: { caption: string; headers
             <tr key={String(row[0])} className="border-b border-rule-light">
               {row.map((cell, i) =>
                 i === 0 ? (
-                  <th key={i} scope="row" className="py-1 text-left font-normal">
+                  <th key={i} scope="row" className="type-data-label py-1 text-left">
                     {cell}
                   </th>
                 ) : (
-                  <td key={i} className="py-1 text-right tabular-nums">
+                  <td key={i} className="type-data-value py-1 text-right">
                     {cell}
                   </td>
                 ),
