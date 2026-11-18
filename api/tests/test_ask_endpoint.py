@@ -4,6 +4,8 @@ the daily cap's replays, failures, and the event payloads against the contract."
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from collections.abc import Iterator
 from typing import Any
 
@@ -90,7 +92,7 @@ def test_steps_stream_then_a_cited_answer(
     app = _app(serving_url, readonly_url, scripted)
     with TestClient(app) as client:
         response = _ask(client, "  What are the best-known products?  ", ip)
-        key = app.state.ask.hash_key
+        key = app.state.ask.get().hash_key
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/event-stream")
     events = _events(response)
@@ -149,7 +151,7 @@ def test_over_the_daily_cap_a_replay_is_served(
     app.state.ask_replays = replays
     with TestClient(app) as client:
         response = _ask(client, "which cereals have little sugar", ip)
-        key = app.state.ask.hash_key
+        key = app.state.ask.get().hash_key
     events = _events(response)
     assert [name for name, _ in events] == ["step", "answer"]
     answer = AskAnswer.model_validate(events[-1][1])
@@ -165,7 +167,7 @@ def test_over_the_cap_without_replays_says_so(
 ) -> None:
     app = _app(serving_url, readonly_url, ScriptedClient(), ask_daily_spend_cap_usd=0.0)
     with TestClient(app) as client:
-        app.state.ask.replays = []  # as before any replay is recorded
+        app.state.ask.get().replays = []  # as before any replay is recorded
         events = _events(_ask(client, "anything at all", ip))
     answer = AskAnswer.model_validate(events[-1][1])
     assert answer.replay and answer.text == NO_REPLAY
@@ -187,7 +189,7 @@ def test_failures_end_with_an_error_event(
     app = _app(serving_url, readonly_url, scripted, **settings)
     with TestClient(app) as client:
         response = _ask(client, "a question", ip)
-        key = app.state.ask.hash_key
+        key = app.state.ask.get().hash_key
     ((name, data),) = _events(response)
     assert name == "error"
     assert AskError.model_validate(data).code == code
@@ -202,6 +204,32 @@ def test_without_the_read_only_database_ask_is_unavailable(serving_url: str) -> 
     with TestClient(app) as client:
         response = client.post("/ask", json={"question": "anything"})
     assert response.status_code == 503 and response.json()["detail"] == ASK_NOT_CONFIGURED
+
+
+def test_startup_leaves_the_ask_libraries_unloaded(serving_url: str, readonly_url: str) -> None:
+    """They cost an hour-idle cold start 16 s (evals/results/cold_start.md); a search never
+    needs them. A fresh interpreter, because this file imports anthropic itself."""
+    script = f"""
+import sys
+from fastapi.testclient import TestClient
+from api.app.config import Settings
+from api.app.main import create_app
+app = create_app(Settings(_env_file=None, database_url={serving_url!r},
+                          database_url_readonly={readonly_url!r}, anthropic_api_key="test"))
+with TestClient(app) as client:
+    assert client.get("/search", params={{"q": "milk"}}).status_code == 200
+    loaded = sorted({{m.split(".")[0] for m in sys.modules}} & {{"anthropic", "langfuse"}})
+    assert loaded == [], loaded
+"""
+    done = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True)
+    assert done.returncode == 0, done.stderr[-2000:]
+
+
+def test_the_ask_service_is_built_once(serving_url: str, readonly_url: str) -> None:
+    app = _app(serving_url, readonly_url, ScriptedClient())
+    with TestClient(app):
+        first = app.state.ask.get()
+        assert first is not None and app.state.ask.get() is first
 
 
 def test_a_short_question_is_invalid(serving_url: str, readonly_url: str) -> None:
