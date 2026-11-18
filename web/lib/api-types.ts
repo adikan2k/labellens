@@ -285,6 +285,8 @@ export interface components {
              * @description The product's page on Open Food Facts.
              */
             off_url: string;
+            /** @description Whether the food graph holds this product (the most complete graded products), so the explorer can open its neighbourhood. */
+            in_graph: boolean;
         };
         ProductResponse: {
             product: components["schemas"]["Product"];
@@ -355,11 +357,14 @@ export interface components {
             source: components["schemas"]["Source"];
         };
         GraphNode: {
+            /** @description Kind and key, e.g. "Product:0016000275287" or "Brand:general mills". */
             id: string;
             /** @enum {string} */
             kind: "Product" | "Brand" | "Category" | "Additive" | "Ingredient";
             name: string;
-            nutriscore_grade?: components["schemas"]["NutriscoreGrade"];
+            nutriscore_grade: components["schemas"]["NutriscoreGrade"];
+            /** @description For additives and ingredients, their explainer (written by AI from Open Food Facts data); otherwise null. */
+            detail: string | null;
         };
         GraphEdge: {
             /** @description Node id. */
@@ -593,6 +598,7 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+            503: components["responses"]["Unavailable"];
         };
     };
     ask: {

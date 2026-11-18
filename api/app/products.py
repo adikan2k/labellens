@@ -70,6 +70,7 @@ def get_product(conn: DictConnection, code: str) -> dict[str, Any] | None:
         "additives": [_with_explainer(a) for a in row["additives"]],
         "ingredients": [_with_explainer(i) for i in row["ingredients"]],
         "off_url": f"https://world.openfoodfacts.org/product/{row['code']}",
+        "in_graph": row["in_graph"],
     }
 
 

@@ -1,8 +1,14 @@
-# Local Postgres for tests and development. Same image as CI and close to Neon (Postgres 17
-# with pgvector). The credentials are local test values, not secrets.
+# Local Postgres and Neo4j for tests and development. Same images as CI; Postgres 17 with
+# pgvector is close to Neon, Neo4j 2025 is close to AuraDB. The credentials are local test
+# values, not secrets.
 #
-#   docker compose up -d postgres
+#   docker compose up -d postgres neo4j neo4j-test
 #   TEST_DATABASE_URL=postgresql://labellens:labellens@localhost:54329/labellens (the default)
+#   TEST_NEO4J_URI=bolt://localhost:57688, user neo4j, password labellens-local (the default)
+#
+# Two Neo4j servers: `neo4j` (57687) holds the real graph for local development, and
+# `neo4j-test` (57688, no volume) is the one tests replace. Community edition has one
+# database per server, so tests cannot use a database of their own on the first.
 services:
   postgres:
     image: pgvector/pgvector:pg17
@@ -20,5 +26,33 @@ services:
       timeout: 3s
       retries: 30
 
+  neo4j:
+    image: neo4j:2025-community
+    environment:
+      NEO4J_AUTH: neo4j/labellens-local
+    ports:
+      - "57687:7687"
+      - "57474:7474"
+    volumes:
+      - labellens-neo4j:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  neo4j-test:
+    image: neo4j:2025-community
+    environment:
+      NEO4J_AUTH: neo4j/labellens-local
+    ports:
+      - "57688:7687"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
 volumes:
   labellens-pg:
+  labellens-neo4j:

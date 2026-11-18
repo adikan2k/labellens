@@ -35,5 +35,9 @@ select
     json_extract_string(e, '$.vegan.en') as vegan,
     json_extract_string(e, '$.vegetarian.en') as vegetarian,
     try_cast(json_extract_string(e, '$.efsa_evaluation_date.en') as date) as efsa_evaluation_date,
-    json_extract_string(e, '$.wikidata.en') as wikidata_id
+    json_extract_string(e, '$.wikidata.en') as wikidata_id,
+    -- Open Food Facts' reading of EFSA's exposure data: 'high' where estimated intake can
+    -- exceed the acceptable daily intake. Phase 4's swap rule excludes 'high'.
+    nullif(replace(json_extract_string(e, '$.efsa_evaluation_overexposure_risk.en'), 'en:', ''), '')
+        as overexposure_risk
 from fields

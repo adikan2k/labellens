@@ -90,6 +90,9 @@ create table {NEXT}.products (
     {", ".join(f"{n} real" for n in NUTRIENTS)},
     additive_ids text[] not null,
     ingredient_ids text[] not null,
+    additive_count smallint not null,
+    has_flagged boolean not null,
+    in_graph boolean not null,
     rank_pos integer not null
 );
 create table {NEXT}.additives (
@@ -126,6 +129,9 @@ INDEXES = f"""
 create index products_search on {NEXT}.products
     using gin (to_tsvector('english'::regconfig, name || ' ' || coalesce(brand, '')));
 create index products_rank on {NEXT}.products (rank_pos);
+-- Swaps: same category, better grade, no flagged additive, fewest additives, then rank.
+create index products_swaps on {NEXT}.products
+    (category_id, nutriscore_grade, additive_count, rank_pos) where not has_flagged;
 """
 
 PRODUCTS_SQL = f"""
@@ -154,16 +160,17 @@ select
     {", ".join(f"f.{n}" for n in NUTRIENTS)},
     coalesce(a.ids, []::varchar[]) as additive_ids,
     coalesce(i.ids, []::varchar[]) as ingredient_ids,
-    row_number() over (
-        order by
-            (length(p.code) between 12 and 13
-             and try_cast(left(lpad(p.code, 13, '0'), 3) as integer) between 0 and 139) desc,
-            (p.lang = 'en') desc, p.scans desc, p.completeness desc nulls last, p.code
-    ) as rank_pos
+    flags.additive_count,
+    flags.has_flagged_additive as has_flagged,
+    g.code is not null as in_graph,
+    r.rank_pos
 from dim_products as p
+join int_product_rank as r using (code)
+left join int_graph_products as g using (code)
 join fct_nutrition as f using (code)
 left join additives as a using (code)
 left join ingredients as i using (code)
+join dim_product_flags as flags using (code)
 where p.name is not null
 order by rank_pos
 """
@@ -185,7 +192,8 @@ LOOKUPS: list[tuple[str, dict[str, str], str]] = [
 PRODUCT_COLUMNS = [
     "code", "name", "brand", "category_id", "category_source", "nutriscore_grade", "nova_group",
     "completeness",
-    "scans", "image_path", *NUTRIENTS, "additive_ids", "ingredient_ids", "rank_pos",
+    "scans", "image_path", *NUTRIENTS, "additive_ids", "ingredient_ids", "additive_count",
+    "has_flagged", "in_graph", "rank_pos",
 ]  # fmt: skip
 
 
@@ -219,7 +227,7 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
             count(*),
             sum(28 + strlen(code) + 1 + strlen(name) + 1 + coalesce(strlen(brand) + 1, 0)
                 + coalesce(strlen(category_main) + 1, 0)
-                + coalesce(strlen(category_source) + 1, 0) + 2 + 2 + 4 + 4 + 4
+                + coalesce(strlen(category_source) + 1, 0) + 2 + 2 + 4 + 4 + 4 + 2 + 1 + 1
                 + coalesce(strlen(image_path) + 1, 0) + 7 * 4
                 + 24 + coalesce(
                     list_sum(list_transform(additive_ids, lambda x: strlen(x) + 4)), 0)
@@ -242,6 +250,9 @@ def estimate(con: duckdb.DuckDBPyConnection) -> Estimate:
             "products (heap)": int(heap * 1.15) + floor,
             "products_pkey": int(pk_keys * 1.4) + floor,
             "products_rank": int(rows * 20 * 1.4) + floor,
+            # category, grade, count, rank and a 16-byte entry header; counted for every row,
+            # though only rows without a flagged additive are indexed.
+            "products_swaps": int(rows * 44 * 1.4) + floor,
             "products_search (GIN)": int(words * 10) + floor,
             "lookups, stats, meta": int(lookup_bytes * 1.5) + 2_000_000,
         }
@@ -473,7 +484,8 @@ def load(
             }
             database = pg.execute("select pg_database_size(current_database())").fetchone()[0]  # type: ignore[index]
         log("Actual size in Postgres:")
-        tables = {k: v for k, v in sizes.items() if not k.endswith(("_pkey", "_rank", "_search"))}
+        indexes = ("_pkey", "_rank", "_search", "_swaps")
+        tables = {k: v for k, v in sizes.items() if not k.endswith(indexes)}
         for name, size in tables.items():
             log(f"  {name:<24} {_mb(size):>10}  (with indexes)")
         log(f"  {'database total':<24} {_mb(database):>10}")

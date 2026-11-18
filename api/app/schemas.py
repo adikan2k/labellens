@@ -98,10 +98,49 @@ class Product(ProductSummary):
     additives: list[Additive]
     ingredients: list[Ingredient]
     off_url: str
+    in_graph: bool
 
 
 class ProductResponse(Model):
     product: Product
+    source: Source
+
+
+class Swap(Model):
+    product: ProductSummary
+    reason: str
+    additive_count: int = Field(ge=0)
+
+
+class SwapsResponse(Model):
+    code: str = Field(min_length=1, max_length=32)
+    swaps: list[Swap]
+    source: Source
+
+
+class GraphNode(Model):
+    id: str
+    kind: Literal["Product", "Brand", "Category", "Additive", "Ingredient"]
+    name: str
+    nutriscore_grade: NutriscoreGrade | None
+    detail: str | None
+
+
+class GraphEdge(Model):
+    model_config = ConfigDict(
+        json_schema_serialization_defaults_required=True, populate_by_name=True
+    )
+
+    from_: str = Field(alias="from", description="Node id.")
+    to: str = Field(description="Node id.")
+    type: Literal["MADE_BY", "IN", "CONTAINS", "HAS_INGREDIENT", "CHILD_OF"]
+
+
+class GraphNeighborhood(Model):
+    center: str = Field(description="Node id of the product.")
+    nodes: list[GraphNode]
+    edges: list[GraphEdge]
+    truncated: bool
     source: Source
 
 

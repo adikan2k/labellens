@@ -30,6 +30,7 @@ joined as (
         taxonomy.vegetarian,
         taxonomy.efsa_evaluation_date,
         taxonomy.wikidata_id,
+        taxonomy.overexposure_risk,
         taxonomy.additive_id is not null as in_taxonomy,
         used.product_count
     from used
@@ -54,6 +55,10 @@ select
     vegetarian,
     efsa_evaluation_date,
     wikidata_id,
+    overexposure_risk,
+    -- The swap rule's flag list (phase 4): additives Open Food Facts marks as high
+    -- overexposure risk. OFF's data, not our judgement.
+    coalesce(overexposure_risk = 'high', false) as flagged,
     in_taxonomy,
     product_count,
     explainers.text as explainer

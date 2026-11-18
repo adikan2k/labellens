@@ -8,7 +8,17 @@
  */
 import { cacheLife } from "next/cache";
 
-import { ApiError, getProduct, getStats, type ProductResponse, type StatsOverview } from "./api";
+import {
+  ApiError,
+  getProduct,
+  getStats,
+  getNeighborhood,
+  getSwaps,
+  type GraphNeighborhood,
+  type ProductResponse,
+  type StatsOverview,
+  type SwapsResponse,
+} from "./api";
 
 export async function cachedStats(): Promise<StatsOverview> {
   "use cache";
@@ -26,4 +36,18 @@ export async function cachedProduct(code: string): Promise<ProductResponse | nul
     if (error instanceof ApiError && error.status === 404) return null;
     throw error;
   }
+}
+
+/** Better swaps for a product. Throws when the API is unavailable (not cached). */
+export async function cachedSwaps(code: string): Promise<SwapsResponse> {
+  "use cache";
+  cacheLife("hours");
+  return getSwaps(code);
+}
+
+/** A depth-2 neighbourhood for the explorer's first paint. Throws when unavailable or absent. */
+export async function cachedNeighborhood(code: string): Promise<GraphNeighborhood> {
+  "use cache";
+  cacheLife("hours");
+  return getNeighborhood(code, { depth: 2 });
 }

@@ -1,8 +1,10 @@
 name: Pipeline
 
 # The full pipeline, weekly and on demand: snapshot the Open Food Facts export, build and
-# test the marts, write the run report, then load the serving tables into Neon.
-# Needs the repository secret DATABASE_URL (Neon's pooled connection string) to publish.
+# test the marts, write the run report, then load the serving tables into Neon and the graph
+# into Neo4j. Needs the repository secrets DATABASE_URL (Neon's pooled connection string) and
+# NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD to publish. Enrichment is never run here (it costs
+# money); the build reads the committed outputs in pipeline/enrich/outputs.
 
 on:
   schedule:
@@ -60,3 +62,16 @@ jobs:
             exit 1
           fi
           uv run python -m pipeline.load.serving
+
+      - name: Load the graph into Neo4j
+        if: github.event_name == 'schedule' || inputs.publish
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USER: ${{ secrets.NEO4J_USER }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+        run: |
+          if [ -z "$NEO4J_URI" ]; then
+            echo "::error::The NEO4J_* secrets are not set; the graph was not published."
+            exit 1
+          fi
+          uv run python -m pipeline.load.graph

@@ -31,6 +31,15 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U labellens -d labellens"
           --health-interval 2s --health-timeout 3s --health-retries 30
+      neo4j:
+        image: neo4j:2025-community
+        env:
+          NEO4J_AUTH: neo4j/labellens-local
+        ports:
+          - 57688:7687
+        options: >-
+          --health-cmd "wget -q --spider http://localhost:7474 || exit 1"
+          --health-interval 3s --health-timeout 3s --health-retries 40
     steps:
       - uses: actions/checkout@v7
       # setup-uv publishes exact tags only (no floating v10), so pin the commit.

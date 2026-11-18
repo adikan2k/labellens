@@ -1,0 +1,29 @@
+{
+  "label": "public",
+  "base_url": "https://labellens-api-1036759996795.us-east4.run.app",
+  "measured_at": "2026-11-18T02:32:20+00:00",
+  "products": 100,
+  "timings": [
+    {
+      "endpoint": "/graph/neighborhood?depth=2",
+      "requests": 100,
+      "errors": 0,
+      "cold_first_ms": 1146.6,
+      "p50_ms": 292.0,
+      "p95_ms": 406.0,
+      "max_ms": 757.7,
+      "meets_target": true
+    },
+    {
+      "endpoint": "/products/{code}/swaps",
+      "requests": 100,
+      "errors": 0,
+      "cold_first_ms": 124.1,
+      "p50_ms": 103.0,
+      "p95_ms": 233.2,
+      "max_ms": 309.3,
+      "meets_target": true
+    }
+  ],
+  "target_ms": 1000.0
+}
