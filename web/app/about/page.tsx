@@ -45,7 +45,15 @@ export default function AboutPage() {
           </li>
           <li>
             Categories come from the product&rsquo;s Open Food Facts tags, mapped to 26 categories.
-            Products with no clear tag have no category yet.
+            Where the tags give none, an AI model suggests one from the product&rsquo;s name, brand
+            and ingredients, and the product page says so. Its accuracy against 200 products
+            labelled by hand is in the{" "}
+            <a href={`${REPO}/tree/main/evals/results`}>eval results</a>.
+          </li>
+          <li>
+            Explainers for additives and common ingredients are written by an AI model once each,
+            from Open Food Facts&rsquo; taxonomy where it has one. They say what a substance is and
+            why it is used, never whether it is good or bad, and they are marked as AI-written.
           </li>
           <li>Only ingredients and additives that Open Food Facts recognises are listed.</li>
         </ul>

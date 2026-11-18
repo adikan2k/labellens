@@ -29,6 +29,19 @@ export function largestFinding(rows: CountByKey[], noun: string): string {
   return `${top.label} is the largest ${noun}, with ${formatCount(top.count)} products`;
 }
 
+/** Where categories came from, for the note under the category chart. */
+export function categorySourceNote(rows: CountByKey[]): string {
+  const total = rows.reduce((s, r) => s + r.count, 0);
+  const count = (key: string | null) => rows.find((r) => r.key === key)?.count ?? 0;
+  const parts = [
+    `${pct(count("off_tags"), total)}% of products are placed by their Open Food Facts category tags`,
+  ];
+  if (count("model")) {
+    parts.push(`${pct(count("model"), total)}% by AI from the name and ingredients, where the tags give none`);
+  }
+  return `${parts.join("; ")}. “Other or unclear” is left out.`;
+}
+
 export function additiveFinding(rows: CountByKey[]): string {
   const top = [...rows].sort((a, b) => b.count - a.count)[0];
   if (!top) return "No additive data yet";

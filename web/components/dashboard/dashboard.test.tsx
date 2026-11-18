@@ -4,6 +4,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import type { StatsOverview } from "@/lib/api";
 import {
   additiveFinding,
+  categorySourceNote,
   largestFinding,
   novaFinding,
   nutriscoreFinding,
@@ -43,6 +44,11 @@ const stats = {
     { key: "cheese", label: "Cheese", count: 30 },
     { key: "sodas", label: "Sodas and soft drinks", count: 70 },
   ],
+  category_sources: [
+    { key: "model", label: "Suggested by AI", count: 690 },
+    { key: "off_tags", label: "From Open Food Facts' category tags", count: 280 },
+    { key: null, label: "No category", count: 10 },
+  ],
   top_additives: [{ key: "en:e330", label: "E330 Citric acid", count: 400 }],
   nutriscore_by_category: [
     { category_id: "cheese", name: "Cheese", graded_count: 100, grades: { a: 0, b: 0, c: 20, d: 50, e: 30 } },
@@ -79,6 +85,15 @@ describe("findings are computed from the numbers", () => {
   test("category with the most D and E grades", () => {
     expect(poorGradeFinding(stats)).toBe("Cheese: 80% score D or E, the most of any category");
   });
+  test("the category note gives each source's share and leaves out Other", () => {
+    expect(categorySourceNote(stats.category_sources)).toBe(
+      "29% of products are placed by their Open Food Facts category tags; 70% by AI from the name " +
+        "and ingredients, where the tags give none. “Other or unclear” is left out.",
+    );
+    const tagsOnly = [{ key: "off_tags", label: "", count: 5 }];
+    expect(categorySourceNote(tagsOnly)).not.toContain("AI");
+  });
+
   test("category with the highest median sugar", () => {
     expect(sugarFinding(stats)).toBe("Candy and chocolate have the most sugar: a median of 48.2 g per 100 g");
   });

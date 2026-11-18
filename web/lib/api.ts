@@ -13,6 +13,7 @@ export type Product = Schemas["Product"];
 export type ProductResponse = Schemas["ProductResponse"];
 export type Additive = Schemas["Additive"];
 export type Ingredient = Schemas["Ingredient"];
+export type Explainer = Schemas["Explainer"];
 export type Nutrition = Schemas["Nutrition"];
 export type StatsOverview = Schemas["StatsOverview"];
 export type CountByKey = Schemas["CountByKey"];
