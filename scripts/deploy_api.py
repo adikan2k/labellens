@@ -9,9 +9,10 @@ connection string). This script never sees a secret's value; Cloud Run reads the
 Secrets that do not exist yet are left out, and the script says which; without the ask
 secrets the API runs and /ask answers 503.
 
-Plain settings (CORS_ORIGINS, NEO4J_URI, NEO4J_USER, LANGFUSE_PUBLIC_KEY, LANGFUSE_BASE_URL) go
-in an env-vars file rather than on the command line, where Windows' cmd.exe mangles them.
-They come from the environment or .env unless given as flags.
+Plain settings (CORS_ORIGINS and PUBLIC_WEB_URL from --web-origin; NEO4J_URI, NEO4J_USER,
+LANGFUSE_PUBLIC_KEY, LANGFUSE_BASE_URL) go in an env-vars file rather than on the command line,
+where Windows' cmd.exe mangles them. They come from the environment or .env unless given as
+flags.
 
 /ask streams for up to 45 seconds, so the request timeout is 60.
 
@@ -208,7 +209,11 @@ def main(argv: list[str] | None = None) -> int:
     from api.app.config import get_settings
 
     settings = get_settings()
-    plain = {"CORS_ORIGINS": cors_origins(args.web_origin)} | {
+    plain = {
+        "CORS_ORIGINS": cors_origins(args.web_origin),
+        # Links from MCP tool results and the card point at the deployed site.
+        "PUBLIC_WEB_URL": args.web_origin,
+    } | {
         name: getattr(args, name.lower()) or getattr(settings, name.lower()) or "" for name in PLAIN
     }
     with tempfile.TemporaryDirectory() as tmp:
