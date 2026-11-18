@@ -157,7 +157,9 @@ A two-column grid of charts, each inside a panel opened by `rule-heavy` with its
 
 ### Graph explorer
 
-Full width below the header. The graph fills the space; a panel on the right shows the selected node in label style. Nodes are black dots; the selected product is the only filled shape with its grade colour.
+Full width below the header. The title, intro and search sit on the page width, lined up with the header; the graph below them fills the full width, and a panel on the right shows the selected node in label style. Nodes are black dots; the selected product is the only filled shape with its grade colour.
+
+Labels never overlap. A label shows only where it clears every other label, covers no other dot and fits inside the canvas; the most linked nodes are labelled first, and the centre product and the selected node always are. Zooming in reveals more labels, zooming out fewer, and hovering shows any node's name.
 
 ### Ask
 

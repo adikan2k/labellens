@@ -54,9 +54,9 @@ Phase 7 followed a review of everything built so far. The engineering was strong
   - dashboard label width;
   - table headers off the type scale;
   - a view transition that ignored reduced motion.
-- **Left for you to decide:**
-  - the graph page's full-width layout against the header's page width (DESIGN.md says full width);
-  - overlapping labels in dense graph clusters.
+- **The graph page, decided afterwards:**
+  - **Layout:** the title, intro and search moved onto the page width, so their left edge meets the header's; the graph itself stays full width, as DESIGN.md says. **Rejected:** putting the whole page on the page width, which would narrow the graph from about 1,210 to 780 px at 1600 px wide, for the sake of one edge.
+  - **Labels:** Sigma's label grid only caps labels per grid cell, so long names in neighbouring cells ran into each other. Labels are now picked by a greedy collision check after every camera move: most-linked first, each kept only if it clears every kept label, covers no other dot and fits in the canvas. Measured on the Cheerios graph: 43 of 79 labels at the start, 7 zoomed out and all 79 zoomed in, with no overlaps in any of them. **Rejected:** a bigger label grid, which shows fewer labels and still lets neighbouring cells collide.
 
 ## Operations
 
@@ -97,4 +97,3 @@ Every eval report now gives 95% Wilson intervals, and the fact score gets a boot
 ## Still open
 
 - Time a cold start after a full hour idle (the measured 3.9 s was after 25 minutes, already past both platforms' scale-down points).
-- The graph-page layout questions above.
