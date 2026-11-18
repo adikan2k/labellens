@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
+    # The website, for links from MCP tool results and the card to product pages
+    public_web_url: str = "http://localhost:3000"
+
     # Neo4j AuraDB Free
     neo4j_uri: str | None = None
     neo4j_user: str | None = None
