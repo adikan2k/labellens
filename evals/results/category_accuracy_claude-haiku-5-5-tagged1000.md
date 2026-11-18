@@ -1,10 +1,12 @@
 # Category agreement with tags: claude-haiku-5-5-tagged1000
 
-Measured 2026-11-18T00:49:17+00:00: `claude-haiku-5-5`, prompt `categories-v1`, inputs: name and brand only. Cost $0.0000 (0 when every answer was cached).
+Measured 2026-11-18T08:12:08+00:00: `claude-haiku-5-5`, prompt `categories-v1`, inputs: name and brand only. Cost $0.0000 (0 when every answer was cached).
 
 | | Agreement |
 | --- | ---: |
-| **All sampled products** | **79.7% (797/1000)** |
+| **All sampled products** | **797/1000: 79.7% (77.1–82.1%)** |
+
+Ranges in brackets are 95% confidence intervals (Wilson score): with this few cases the true rate could plausibly be anywhere in the range, so a gap smaller than the ranges may be noise.
 
 Agreement, not accuracy: Open Food Facts' tags and our tag mapping make mistakes of their own, so a disagreement is not always the model's error. The 90% target applies to the gold labels. Invalid answers: 0.
 

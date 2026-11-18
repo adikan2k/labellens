@@ -1,17 +1,19 @@
 # Category accuracy: claude-haiku-5-5-name-only-silver
 
-Measured 2026-11-18T01:01:40+00:00: `claude-haiku-5-5`, prompt `categories-v1`, inputs: name and brand only. Cost $0.0031 (0 when every answer was cached).
+Measured 2026-11-18T08:12:07+00:00: `claude-haiku-5-5`, prompt `categories-v1`, inputs: name and brand only. Cost $0.0000 (0 when every answer was cached).
 
 Labels: 200 products labelled by Claude Opus 5.5 (an AI model, not a person).
 
 | | Accuracy |
 | --- | ---: |
-| **All labelled products** | **87.5% (175/200)** |
-| dev half | 85.7% (90/105) |
-| test half | 89.5% (85/95) |
-| Products Open Food Facts' tags place | 86.7% (104/120) |
-| Products they do not (what the fill is for) | 88.8% (71/80) |
-| Baseline: Open Food Facts' tags, where they give a category | 87.5% (105/120) |
+| **All labelled products** | **175/200: 87.5% (82.2–91.4%)** |
+| dev half | 90/105: 85.7% (77.8–91.1%) |
+| test half | 85/95: 89.5% (81.7–94.2%) |
+| Products Open Food Facts' tags place | 104/120: 86.7% (79.4–91.6%) |
+| Products they do not (what the fill is for) | 71/80: 88.8% (80.0–94.0%) |
+| Baseline: Open Food Facts' tags, where they give a category | 105/120: 87.5% (80.4–92.3%) |
+
+Ranges in brackets are 95% confidence intervals (Wilson score): with this few cases the true rate could plausibly be anywhere in the range, so a gap smaller than the ranges may be noise.
 
 Target: 90%. This run **misses** it. Invalid answers (counted wrong): 0.
 
