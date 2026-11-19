@@ -258,6 +258,35 @@ Labels never overlap. A label shows only where it clears every other label, cove
 
 A single column: the question box, then each agent step as a row in a label-style panel (tool name, what it looked up, row count), then the answer with numbered citations that link to the rows.
 
+### My basket
+
+`/basket`. The products someone is thinking of buying, looked at together. Kept in the browser only (no account), 30 at most. "Add to my basket" sits in the link row on product pages and under a label read that matched a product; the header shows the count once it is above zero.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ My basket                                      (title)     │
+│ ████████████████████████████████████████████ rule-heavy    │
+│ 6 products · 4 ultra-processed · 2 flagged additives       │
+│ ┌A┬─B─┬───C───┬────D────┬──E──┐  grade bar, by count       │
+│ High in sugars: 3 · High in salt: 2 · High in saturates: 1 │
+│                                                            │
+│ Product name, brand              [ D ]   Remove            │
+│ High in sugars · High in salt                              │
+│ Better swap: Product (B), one additive fewer  [ Swap ]     │
+│ ─────────────────────────────────────────── rule-hair      │
+│ ...                                                        │
+│ Additives across the basket       (heading)                │
+│ E338 Phosphoric acid · in 2 products · Flagged by OFF      │
+│ Share this basket: link                                    │
+└────────────────────────────────────────────────────────────┘
+```
+
+- **Facts, not a score of the person.** The summary counts grades, processing, flagged additives and high-in flags; it never rates the basket or the shopper.
+- **Swap** replaces the item with the top swap (the product page's rule), and the summary updates. The old product can be added back.
+- The grade bar is one bar of the five Nutri-Score colours, each as long as its count, the letter on each segment; products with no grade are counted in words.
+- **Sharing:** `/basket?codes=…` (barcodes only) opens a read-only copy with "Save as my basket".
+- **Empty:** an invitation, with search, scan and read-a-label as the ways to start.
+
 ### Read a label
 
 `/label`. The photo step is a single column on the reading width; the result uses the product page's layout, because it is a product page for a pack LabelLens may not know.
