@@ -2,7 +2,7 @@
 
 LabelLens turns the Open Food Facts database into a product people can search, question and plug into Claude. It ships as a tested data pipeline, a knowledge graph, a dashboard, a web app and an MCP App.
 
-This file is what Claude Code builds against. Each phase has a scope and a "done when" line. A phase is not done until its "done when" is true and you have seen the evidence.
+This is the plan LabelLens was built against, phase by phase, with Claude Code as the pair programmer. Each phase has a scope and a "done when" line. A phase is not done until its "done when" is true and you have seen the evidence.
 
 Sprint dates: phase 0 on Tue Nov 17, phases 1 and 2 on Wed Nov 18, phases 3 and 4 on Thu Nov 19, phases 5 and 6 on Fri Nov 20, design polish on Mon Nov 23, launch checks on Tue Nov 24.
 

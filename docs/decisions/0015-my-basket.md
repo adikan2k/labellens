@@ -1,6 +1,6 @@
 # 0015: My basket
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18.
+Status: accepted. Date: 2026-11-18.
 
 People don't shop one product at a time. A basket lets them see a week's shopping together and find a better version of each item, while LabelLens still only states facts.
 

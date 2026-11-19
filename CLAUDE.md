@@ -72,4 +72,4 @@ Variables are listed in `.env.example`. Never read `.env`. Neon and Neo4j creden
 - Start each phase in plan mode against `docs/SPEC.md`. No code until the plan is approved.
 - Small slices, one commit each, on a feature branch.
 - Before calling something done, show evidence: the command you ran and its output, or a screenshot at 375, 1280 and 1600 px for UI work.
-- After each phase, draft `docs/decisions/NNNN-<topic>.md` (what was chosen, what was rejected, why) for Aditya to rewrite in his own words.
+- After each phase, draft `docs/decisions/NNNN-<topic>.md` (what was chosen, what was rejected, why) for me to review and edit before it merges.

@@ -1,6 +1,6 @@
 # 0004: Serving tables, API and web app (phase 2)
 
-Status: accepted (draft for Aditya to rewrite) · Date: 2026-11-17 · Phase 2
+Status: accepted · Date: 2026-11-17 · Phase 2
 
 ## A compact serving table, not the marts as they are
 

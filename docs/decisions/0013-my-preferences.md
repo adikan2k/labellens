@@ -1,6 +1,6 @@
 # 0013: My preferences
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18.
+Status: accepted. Date: 2026-11-18.
 
 People asked for help planning what they eat. A diet plan would mean telling someone what to eat, which LabelLens doesn't do. What it can do is check every product against rules the person sets themselves.
 

@@ -1,7 +1,6 @@
 # 0005: Enrichment with Claude (phase 3)
 
-Status: draft for Aditya to rewrite.
-Date: 2026-11-18. Phase 3.
+Status: accepted. Date: 2026-11-18. Phase 3.
 
 ## Fill every missing category, not a subset
 

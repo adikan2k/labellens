@@ -2,7 +2,7 @@
 
 **The idea: the food label, redesigned.** The interface borrows the structure of the US Nutrition Facts panel: heavy black rules that group information, tight condensed type, and numbers set in a column you can scan. Colour appears only when it carries data.
 
-Claude Code builds every screen from the tokens in this file. If a screen needs something this file does not define, add it here first, then use it.
+Every screen is built from the tokens in this file. If a screen needs something this file does not define, add it here first, then use it.
 
 ---
 
