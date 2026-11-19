@@ -31,6 +31,11 @@ GET: dict[str, Any] = {
         "daily_cap_usd": 0.5,
         "source": SOURCE,
     },
+    "/additives": {
+        "additives": [{"slug": f"e{n}", "e_number": f"E{n}"} for n in range(300, 450)],
+        "source": SOURCE,
+    },
+    "/additives/e300": {"e_number": "E300", "product_count": 12, "examples": [PRODUCT]},
     "/graph/neighborhood": {
         "center": f"Product:{CODE}",
         "nodes": [{"id": f"Product:{CODE}"}, {"id": "Brand:x"}],
@@ -117,7 +122,7 @@ def test_a_healthy_deployment_passes_every_check(stub: tuple[Stub, str]) -> None
     _, base = stub
     results, printed = _run(base)
     assert all(r.ok for r in results), printed
-    assert len(results) == 10 + len(smoke.PAGES)
+    assert len(results) == 11 + len(smoke.PAGES)
     assert len(printed.splitlines()) == len(results) + 1  # one line per check, then a total
     assert printed.rstrip().endswith(f"{len(results)}/{len(results)} checks passed.")
 
@@ -201,3 +206,11 @@ def test_an_unreachable_host_fails_instead_of_crashing() -> None:
     results = smoke.run("http://127.0.0.1:9", "http://127.0.0.1:9", out=out, timeout=0.2)
     assert results and not any(r.ok for r in results)
     assert "Connect" in out.getvalue()  # ConnectError, or ConnectTimeout on Windows
+
+
+def test_an_empty_additive_guide_fails(stub: tuple[Stub, str]) -> None:
+    fake, base = stub
+    fake.overrides["/additives"] = (200, {"additives": [], "source": SOURCE})
+    results, _ = _run(base)
+    failed = [r.name for r in results if not r.ok]
+    assert failed == ["api /additives"]
