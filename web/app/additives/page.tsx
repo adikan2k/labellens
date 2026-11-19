@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { AdditiveFinder } from "@/components/additives/additive-finder";
@@ -23,7 +24,12 @@ export default function AdditivesPage() {
   );
 }
 
+/**
+ * Per request, not at build time: the build must not depend on which API version is deployed
+ * (the web and the API deploy separately). The list itself is cached for an hour.
+ */
 async function AdditivesList() {
+  await connection();
   let additives;
   try {
     additives = (await cachedAdditives()).additives;
