@@ -7,11 +7,14 @@
 @theme {
   /* Colour */
   --color-*: initial;
+  --color-page: #f4efe6;
   --color-paper: #ffffff;
+  --color-paper-muted: #b8b8b8;
   --color-ink: #000000;
   --color-ink-muted: #6b6b6b;
   --color-rule-light: #d9d9d9;
   --color-focus: #1a4bff;
+  --color-focus-inverse: #7d9bff;
 
   /* Nutri-Score scale: only for Nutri-Score grades */
   --color-grade-a: #038141;
@@ -65,17 +68,9 @@
   --container-measure: 68ch;
   /* Page width: header, footer, product page, dashboard */
   --container-page: 72rem;
-  /* Home column from 1024 px */
-  --container-hero: 48rem;
 }
 
 /* Type roles: size / line height, weight, width */
-@utility type-hero {
-  font-size: 5.5rem;
-  line-height: 5.5rem;
-  font-weight: 900;
-  font-stretch: 75%;
-}
 @utility type-display {
   font-size: 3.75rem;
   line-height: 3.75rem;
@@ -121,6 +116,43 @@
   font-stretch: 100%;
 }
 
+/* The home headline: sized by its container (an @container parent), so it fills the page width. */
+@utility type-poster {
+  font-size: clamp(3rem, 20.5cqi, 22rem);
+  line-height: 0.86;
+  font-weight: 900;
+  font-stretch: 62%;
+}
+
+/* A full-width ink band: paper text on ink, the inverse focus ring, links in the text colour. */
+@utility band-ink {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  & :focus-visible {
+    outline-color: var(--color-focus-inverse);
+  }
+  & a {
+    color: inherit;
+  }
+}
+
+/* The home ticker: two copies of the line, moved by exactly one copy's width. */
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@utility animate-ticker {
+  animation: ticker 40s linear infinite;
+  &:hover,
+  &:focus-within {
+    animation-play-state: paused;
+  }
+}
+
 /* Rules: structure, never decoration. Drawn as blocks so they can scale in. */
 @utility rule-heavy {
   display: block;
@@ -152,7 +184,7 @@
 
 @layer base {
   html {
-    background-color: var(--color-paper);
+    background-color: var(--color-page);
     color: var(--color-ink);
     font-family: var(--font-sans);
   }
@@ -202,6 +234,11 @@
     }
 
     /* `*` does not reach the view-transition pseudo-elements: page morphs become an instant swap. */
+    /* The ticker stands still rather than jumping to its last frame. */
+    .animate-ticker {
+      animation: none !important;
+    }
+
     ::view-transition-group(*),
     ::view-transition-old(*),
     ::view-transition-new(*) {

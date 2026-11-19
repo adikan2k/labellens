@@ -12,11 +12,14 @@ Claude Code builds every screen from the tokens in this file. If a screen needs 
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `paper` | `#FFFFFF` | Page and panel background |
+| `page` | `#F4EFE6` | The page: a warm off-white, so labels and panels stand out as white |
+| `paper` | `#FFFFFF` | Panels, inputs, labels and text on ink bands |
+| `paper-muted` | `#B8B8B8` | Secondary text on ink bands (10.6:1 on `ink`) |
 | `ink` | `#000000` | Text, rules, primary buttons |
 | `ink-muted` | `#6B6B6B` | Secondary text, axis labels |
 | `rule-light` | `#D9D9D9` | Hairline separators inside a group |
-| `focus` | `#1A4BFF` | Keyboard focus ring only |
+| `focus` | `#1A4BFF` | Keyboard focus ring only (5.3:1 on `page`) |
+| `focus-inverse` | `#7D9BFF` | Focus ring on ink bands: 8:1 there, where `focus` manages 3.5:1 |
 
 **Data colours (Nutri-Score scale, used only for Nutri-Score data)**
 
@@ -33,7 +36,9 @@ Rules for colour:
 - Never use a Nutri-Score colour for anything except a Nutri-Score grade.
 - Never show a grade by colour alone; the letter is always present.
 - Text on grade chips: white on A; black on B, C, D and E. Checked 2026-11-17 against WCAG AA (4.5:1): white on A is 5.0:1, black on B 9.1, C 13.8, D 7.8, E 5.1. White on D (2.7) and E (4.2) fails, so the earlier "white on D and E" was changed. `web/components/label/grade-chip.test.tsx` recomputes these from the tokens.
-- No gradients, no tinted backgrounds, no shadows. Depth comes from rules.
+- No gradients, no shadows. Depth comes from rules, and from white panels on the warm page.
+- Two grounds only: `page` with `ink` text, and ink bands (`ink` ground, `paper` text, `paper-muted` secondary). `ink-muted` on `page` is 4.65:1, checked by `web/app/tokens.test.ts`.
+- The Nutri-Score colours may be large (the home page's grade strip), but still only for Nutri-Score data, and always with the letter.
 
 ### Type
 
@@ -41,7 +46,7 @@ One family: **Archivo** (variable, with weight and width axes), from Google Font
 
 | Role | Size / line height | Weight | Width | Notes |
 | --- | --- | --- | --- | --- |
-| Hero | 88 / 88 | 900 | 75 | Home headline at 1024 px wide and up (Display below that) |
+| Poster | 20.5% of its container / 0.86 | 900 | 62 | The home headline only. Fills the page width: about 70 px on a phone, 230 px at 1280 px |
 | Display | 60 / 60 | 900 | 75 | Product name on the product page; home headline on phones and tablets |
 | Title | 36 / 40 | 800 | 85 | Page titles, "Nutrition Facts" panel heading |
 | Heading | 21 / 26 | 700 | 100 | Section headings |
@@ -80,6 +85,7 @@ Rules are structure, never decoration. If a rule does not separate two groups of
 - Corner radius: 0 for panels and inputs (labels are rectangles); 2 px for buttons and chips.
 - One border style for panels: 2 px `ink`.
 - Layers: page, panel, popover. Popovers use a 2 px `ink` border, not a shadow.
+- Ink bands run the full window width; their content sits on the page width inside them.
 
 ### Motion
 
@@ -99,16 +105,15 @@ Animate only `transform`, `opacity` and `clip-path`. Hold 60 frames a second on 
 
 | In this file | In code |
 | --- | --- |
-| Colours | `paper`, `ink`, `ink-muted`, `rule-light`, `focus` (e.g. `text-ink-muted`) |
+| Colours | `page`, `paper`, `paper-muted`, `ink`, `ink-muted`, `rule-light`, `focus`, `focus-inverse` (e.g. `text-ink-muted`) |
 | Nutri-Score A to E | `grade-a` … `grade-e` |
-| Type roles | `type-hero`, `type-display`, `type-title`, `type-heading`, `type-body`, `type-data-label`, `type-data-value`, `type-small` |
+| Type roles | `type-poster`, `type-display`, `type-title`, `type-heading`, `type-body`, `type-data-label`, `type-data-value`, `type-small` |
 | Rules | `rule-heavy`, `rule-medium`, `rule-thin`, `rule-hair` (block elements, so they can scale in) |
 | Spacing 4 … 96 px | `1`, `2`, `3`, `4`, `6`, `8`, `12`, `16`, `24` (e.g. `p-4` is 16 px) |
 | Radius 2 px | `rounded-control`; panels and inputs use `rounded-none` |
 | Panel border | `panel` |
 | Body line length | `max-w-measure` (68ch) |
 | Page width (header, footer, product page, dashboard) | `max-w-page` (72rem) |
-| Home column from 1024 px | `max-w-hero` (48rem) |
 | Motion | `ease-out`, `ease-in-out`, `--dur-fast`, `--dur-base`, `--dur-slow` |
 
 ---
@@ -119,52 +124,53 @@ The site is a single centred column for reading pages and a two-column split for
 
 ### Home
 
-The search box is the hero. No marketing section above it.
+A poster for the label. The page is warm `page`; the specimen and every panel are white `paper`, like a label stuck on a pack. Below the hero, full-width bands carry the data.
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│ LabelLens                              Dashboard  Graph  Ask│
-│                                                            │
-│                                                            │
-│   What's in it?                                (display)   │
-│   ████████████████████████████████████████  (rule-heavy)   │
-│   [ Search {count} US products by name, brand or barcode ] │
-│   ─────────────────────────────────────────────────────    │
-│   Try: Cheerios, Oreo, Coca-Cola                (small)    │
-│                                                            │
-│   ┌ live result list, one label row per product ───────┐   │
-│   │ Product name                      Brand      [ B ] │   │
-│   └────────────────────────────────────────────────────┘   │
-│                                                            │
-│ Contains data from Open Food Facts, available under ODbL.  │
-└────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│ ▌▌▌ LabelLens        Read a label  Dashboard  Graph  Ask  About│
+│                                                              │
+│ What's in it?                       (poster, full page width) │
+│ ████████████████████████████████████████████ rule-heavy      │
+│                                                              │
+│ [ Search 985,260 US products ]          ┌ specimen ─────┐    │
+│ Name, brand or barcode. Try: …          │ Nutrition     │ 2° │
+│ Scan a barcode or photograph the label  │ Facts  [C]    │    │
+│                                         │ ▌▌▌▌▌▌▌▌▌▌▌▌  │    │
+│ (results appear here)                   └───────────────┘    │
+│                                          Next label           │
+│▓ 985,260 products · 74% score C or worse · 70% ultra-proc… ▓▓│ ticker (ink)
+│ The shelf, graded                                            │
+│ ┌─A─┬──B──┬─────C─────┬──────D──────┬─────E─────┐             │
+│ │ 9%│ 17% │    22%    │     27%     │    25%    │  grade strip│
+│ └───┴─────┴───────────┴─────────────┴───────────┘             │
+│ ┌ Read a label ┐ ┌ Ask a question ┐ ┌ Compare two ┐ tiles      │
+│▓ How it's measured: 0.98 · 98% · 97% · 184 ms ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│ (ink)
+│▓ LabelLens (huge)                         attribution ▓▓▓▓▓▓▓│ footer (ink)
+└──────────────────────────────────────────────────────────────┘
 ```
 
-The product count in the placeholder comes from `/stats/overview`, never hard-coded.
+**The hero.**
+- **Poster headline:** "What's in it?" in Poster, filling the page width (it sizes to its container), over `rule-heavy`.
+- **Search on the left, specimen on the right** (stacked on phones, search first). The search is unchanged: count in the placeholder from `/stats/overview`, the "Try:" examples, "Scan a barcode or photograph the label".
+- **The specimen** is a real product's Nutrition Facts panel, the same component as the product page, printing in on load. Above it: the product's name, brand and grade chip. Under it: the product's real EAN-13 barcode, drawn from its digits, which the site's own scanner can read off the screen. The panel is tilted 2 degrees (a transform, so it is not motion). "Next label" shows the next of three products (A, C and E), and the new one prints in.
+- **Typing in the search hides the specimen and everything below the hero,** so results sit right under the box.
 
-**Width and size.** The home column is `max-w-measure` on phones and `max-w-hero` (48 rem) from 1024 px, where the headline uses Hero and the search box gains height. Results and the panels below are the same width as the search box.
+**The bands, in order.**
+- **Ticker (ink band):** the dashboard's findings as one line of `type-data-value` in `paper`, separated by " · ", scrolling slowly (40 s per loop, transform only). It pauses on hover and focus and stands still under reduced motion. The copy that scrolls in from the right is `aria-hidden`; screen readers get the list once.
+- **The shelf, graded:** a full-width strip of the five grade colours, each block as wide as its share of graded US products, with the letter large, the percentage and the count, in the chip's text colour for that grade. On phones it becomes five rows: letter, a bar as long as the share, the percentage. It links to the dashboard. This is where the page's colour comes from, and it is all data.
+- **Ways in:** three label panels: read a label from a photo, ask a question, compare two products. Each has a title, one line, and an arrow. The dashboard and the graph follow as text links.
+- **How it's measured (ink band):** four numbers in Display, each with a one-line label and a link to its eval report: the agent's fact score, label values read right, MCP tool choice, search p95.
+- **Footer (ink band):** see "Footer".
 
-**Before anything is typed**, the space under the search holds two short sections, so a first visit sees what the site knows and where else to go. Both hide as soon as the box has text, so results always sit directly under it.
-
-```
-│   What the data says                            (heading)  │
-│   ─────────────────────────────────────────── rule-thin    │
-│   63% of graded US products score C or worse        →     │
-│   80% of products with a NOVA group are ultra-processed →  │
-│   Citric acid is in more products than any other…    →     │
-│                                                            │
-│   More ways in                                  (heading)  │
-│   ─────────────────────────────────────────── rule-thin    │
-│   Read a label from a photo   Any pack, even unknown →     │
-│   Compare two products   Their labels side by side   →     │
-│   Explore the graph      What shares an ingredient   →     │
-│   Ask a question         An agent that cites its rows →    │
-```
-
-- The findings are the dashboard's own headings, computed from the same numbers; each links to its chart. They need the API; if it is asleep the section is left out, never shown empty.
-- Rows are `type-data-label` (finding or name) with `type-small` `ink-muted` descriptions, separated by `rule-hair`.
+Everything below the hero needs `/stats/overview`; if the API is asleep, the ticker and the strip are left out, never shown empty.
 
 **Scanner.** On devices with a camera, "Scan a barcode" sits on its own line under the "Try:" line, as an underlined text button like the examples, followed by a link, "or photograph the label", to Read a label. It opens a panel (2 px `ink` border, square) right under that line, above the results: the live camera picture at full panel width, one `type-small` line under it that says what is happening ("Point the camera at the barcode. The picture stays on this device."), and a "Cancel" button. A read goes straight to the product page; a barcode the snapshot lacks says so, with links to photograph its label instead and to add the product on Open Food Facts. No scanning animation or overlay, so reduced motion needs nothing special. Focus moves to "Cancel" when the panel opens and back to "Scan a barcode" when it closes; Escape closes it.
+
+### Header and footer
+
+- **Header:** on `page`. A small barcode mark (seven bars) beside the wordmark, then Read a label, Dashboard, Graph, Ask and About. On phones the links wrap under the wordmark.
+- **Footer:** an ink band. The wordmark large (Display), the links again, and the Open Food Facts attribution (rule 6) in `paper-muted`, its links in `paper`.
 
 ### Product page
 

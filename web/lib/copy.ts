@@ -19,12 +19,45 @@ export function missingValues(names: string[]): string | null {
 
 export const SWAP_RULE =
   "Same category, a better Nutri-Score, and no additive that Open Food Facts flags for high overexposure risk.";
-/** The other ways into the site, under the empty home search. */
+/** Ways into the site from home: the first three are tiles, the rest links. */
 export const HOME_WAYS_IN = [
-  { href: "/label", title: "Read a label from a photo", note: "Any pack, even one LabelLens has never seen" },
-  { href: "/compare", title: "Compare two products", note: "Their labels side by side, per 100 g" },
-  { href: "/graph", title: "Explore the graph", note: "Products, brands and the ingredients they share" },
-  { href: "/ask", title: "Ask a question", note: "An agent that answers from the data and cites it" },
+  { href: "/label", title: "Read a label", note: "Photograph any pack, even one LabelLens has never seen, and see it explained." },
+  { href: "/ask", title: "Ask a question", note: "An AI agent looks it up in the data, step by step, and cites what it used." },
+  { href: "/compare", title: "Compare two products", note: "Their labels side by side, per 100 g, with every difference." },
+  { href: "/dashboard", title: "The dashboard", note: "The US packaged-food landscape" },
+  { href: "/graph", title: "The food graph", note: "Products, brands and the ingredients they share" },
+] as const;
+
+/** The home page's live label. */
+export const SPECIMEN = {
+  label: "A real label from the data",
+  caption: "A real product's label and barcode. Scan it from your phone.",
+  next: "Next label",
+} as const;
+
+/** The home page's bands (DESIGN.md, Home). */
+export const SHELF = {
+  tickerLabel: "What the data says",
+  pause: "Pause",
+  play: "Play",
+  title: "The shelf, graded",
+  caption: (total: string) =>
+    `Every one of the ${total} US products with a Nutri-Score, sized by how many get each grade.`,
+  listLabel: "Products by Nutri-Score",
+  link: "See the dashboard",
+  waysTitle: "More ways in",
+  measuredTitle: "How it’s measured",
+  measuredCaption:
+    "Every claim on this site has an eval behind it, with error bars, and every report lists its misses.",
+  report: "Read the report",
+} as const;
+
+/** The four numbers on the home page, each from an eval report in evals/results/. */
+export const MEASURED = [
+  { value: "0.98", label: "Fact score for the ask agent, against 0.26 for search alone", file: "evals/results/ask_agent.md" },
+  { value: "98%", label: "Of nutrient values read right from real label photos", file: "evals/results/label_reading_claude-haiku-5-5.md" },
+  { value: "29/30", label: "Requests where Claude picks the right LabelLens tool", file: "evals/results/mcp_tools.md" },
+  { value: "184 ms", label: "Search, 95th percentile, on the live site", file: "evals/results/search_latency_public.md" },
 ] as const;
 
 /** The /label page: reading a food label from a photo. */

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${archivo.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-paper text-ink">
+      <body className="flex min-h-full flex-col bg-page text-ink">
         <Header />
         {/* Focusable only from code: RouteFocus moves focus here after a navigation. */}
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
