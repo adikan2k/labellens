@@ -19,3 +19,13 @@ test("header links home and to the pages that exist", () => {
     ["About", "/about"],
   ]);
 });
+
+test("on a phone the header keeps four links; the footer has the rest", () => {
+  render(<Header />);
+  const nav = screen.getByRole("navigation", { name: "Main" });
+  const phoneOnly = Array.from(nav.querySelectorAll("li"))
+    .filter((li) => !li.className.split(" ").includes("hidden"))
+    .map((li) => li.textContent);
+  expect(phoneOnly).toEqual(["Read a label", "Additives", "Dashboard", "Ask"]);
+  expect(nav.querySelector("li.hidden")?.className).toBe("hidden md:list-item");
+});

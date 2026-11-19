@@ -169,7 +169,7 @@ Everything below the hero needs `/stats/overview`; if the API is asleep, the tic
 
 ### Header and footer
 
-- **Header:** on `page`. A small barcode mark (seven bars) beside the wordmark, then Read a label, Dashboard, Graph, Ask and About. On phones the links wrap under the wordmark.
+- **Header:** on `page`. A small barcode mark (seven bars) beside the wordmark, then Read a label, Additives, Dashboard, Graph, Ask and About, and "My basket (n)" once the basket has something in it. Below `md` (768 px) it is two lines that never wrap further: the wordmark with the basket count at the right, then Read a label, Additives, Dashboard and Ask; Graph and About are in the footer, which always has every link.
 - **Footer:** an ink band. The wordmark large (Display), the links again, and the Open Food Facts attribution (rule 6) in `paper-muted`, its links in `paper`.
 
 ### Product page
