@@ -157,7 +157,12 @@ def explain(conn: DictConnection, reading: LabelReading) -> dict[str, Any]:
     found: dict[str, dict[str, Any]] = {}
     unmatched: list[str] = []
     for term in reading.additives:
-        row = additives_module.get_additive(conn, term)
+        # "tocopherols (vitamin E)": the whole term, then without and inside its brackets.
+        row = None
+        for form in name_forms(" ".join(term.split()).casefold()):
+            row = additives_module.get_additive(conn, form)
+            if row is not None:
+                break
         if row is None:
             unmatched.append(term)
         else:

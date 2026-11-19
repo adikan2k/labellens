@@ -7,6 +7,7 @@ import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
 import { IngredientList } from "@/components/product/ingredient-list";
 import { SwapList } from "@/components/product/swap-list";
+import { NutrientFlags } from "@/components/product/nutrient-flags";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SettleChip } from "@/components/product/settle-chip";
 import type { Product, Swap } from "@/lib/api";
@@ -107,6 +108,7 @@ function ProductLayout({ product, swaps }: { product: Product; swaps: Swap[] | n
       <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div className="lg:sticky lg:top-8">
           <NutritionPanel nutrition={product.nutrition} />
+          <NutrientFlags nutrition={product.nutrition} categoryId={product.category_main} />
         </div>
       </aside>
 

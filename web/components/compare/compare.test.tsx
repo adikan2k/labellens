@@ -69,7 +69,15 @@ describe("CompareTable", () => {
       "Processing", "Additives", "Ingredients",
     ]); // prettier-ignore
     const sugars = screen.getByRole("rowheader", { name: "Sugars" }).closest("tr")!;
-    expect(within(sugars).getByText("33 g")).toBeTruthy();
+    // UK front-of-pack criteria: 4.4 g is low (5 g or under), 33 g is high (over 22.5 g).
+    const cells = [...sugars.querySelectorAll("td")].map((td) => td.textContent);
+    expect(cells[0]).toBe("4.4 g · Low");
+    expect(cells[1]).toMatch(/^33 g · High/);
+    expect([...sugars.querySelectorAll("[data-flag]")].map((f) => f.getAttribute("data-flag"))).toEqual([
+      "low",
+      "high",
+    ]);
+
     expect(within(sugars).getByText("29 g more")).toBeTruthy();
     const energy = screen.getByRole("rowheader", { name: "Energy" }).closest("tr")!;
     expect(within(energy).getByText("17 kcal more")).toBeTruthy();

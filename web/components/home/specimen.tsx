@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { GradeChip } from "@/components/label/primitives";
+import { NutrientFlags } from "@/components/product/nutrient-flags";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import type { Product } from "@/lib/api";
 import { SPECIMEN } from "@/lib/copy";
@@ -35,6 +36,7 @@ export function Specimen({ products }: { products: Product[] }) {
           <GradeChip grade={product.nutriscore_grade} />
         </div>
         <NutritionPanel key={product.code} nutrition={product.nutrition} />
+        <NutrientFlags nutrition={product.nutrition} categoryId={product.category_main} />
         <Barcode code={product.code} className="pt-4" />
       </div>
       {products.length > 1 && (
