@@ -24,6 +24,10 @@ export type SwapsResponse = Schemas["SwapsResponse"];
 export type GraphNeighborhood = Schemas["GraphNeighborhood"];
 export type GraphNode = Schemas["GraphNode"];
 export type GraphEdge = Schemas["GraphEdge"];
+export type AdditiveListItem = Schemas["AdditiveListItem"];
+export type AdditiveList = Schemas["AdditiveList"];
+export type AdditiveGuide = Schemas["AdditiveGuide"];
+export type CategoryUse = Schemas["CategoryUse"];
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
 
@@ -86,4 +90,13 @@ export function getNeighborhood(
 
 export function getStats(): Promise<StatsOverview> {
   return request<StatsOverview>("/stats/overview");
+}
+
+export function getAdditives(): Promise<AdditiveList> {
+  return request<AdditiveList>("/additives");
+}
+
+/** One additive by its guide slug (its Open Food Facts id without "en:"). */
+export function getAdditive(slug: string): Promise<AdditiveGuide> {
+  return request<AdditiveGuide>(`/additives/${encodeURIComponent(slug)}`);
 }

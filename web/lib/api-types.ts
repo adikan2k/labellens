@@ -135,6 +135,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/additives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every additive at least one named US product lists, most common first */
+        get: operations["listAdditives"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/additives/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One additive, for the additive guide
+         * @description What it is (the explainer, written by AI from Open Food Facts' taxonomy), whether Open
+         *     Food Facts flags it, how many named US products list it, the categories that use it
+         *     most, and up to six example products, best-ranked first. The slug is the Open Food
+         *     Facts id without "en:" (e330); other ids are used whole.
+         */
+        get: operations["getAdditive"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/label": {
         parameters: {
             query?: never;
@@ -516,6 +556,37 @@ export interface components {
             daily_cap_usd: number;
             source: components["schemas"]["Source"];
         };
+        AdditiveListItem: {
+            /** @example en:e330 */
+            additive_id: string;
+            /** @example e330 */
+            slug: string;
+            /** @example E330 */
+            e_number: string | null;
+            /** @example Citric acid */
+            name: string;
+            function: string | null;
+            flagged: boolean;
+            /** @description Named US products that list it. */
+            product_count: number;
+        };
+        AdditiveList: {
+            additives: components["schemas"]["AdditiveListItem"][];
+            source: components["schemas"]["Source"];
+        };
+        CategoryUse: {
+            category_id: string;
+            name: string;
+            products: number;
+        };
+        AdditiveGuide: components["schemas"]["AdditiveListItem"] & {
+            explainer: components["schemas"]["Explainer"];
+            /** @description product_count as a share of all named US products. */
+            share_of_products: number;
+            top_categories: components["schemas"]["CategoryUse"][];
+            examples: components["schemas"]["ProductSummary"][];
+            source: components["schemas"]["Source"];
+        };
     };
     responses: {
         /** @description No product with this barcode in the snapshot. */
@@ -734,6 +805,52 @@ export interface operations {
                     "application/json": components["schemas"]["Error"];
                 };
             };
+            503: components["responses"]["Unavailable"];
+        };
+    };
+    listAdditives: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The additives. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdditiveList"];
+                };
+            };
+            503: components["responses"]["Unavailable"];
+        };
+    };
+    getAdditive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The additive. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdditiveGuide"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["InvalidRequest"];
             503: components["responses"]["Unavailable"];
         };
     };

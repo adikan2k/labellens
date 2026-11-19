@@ -124,7 +124,12 @@ create table {NEXT}.additives (
     explainer text,
     explainer_ai boolean not null default false,
     -- Open Food Facts marks a high overexposure risk (EFSA); swaps avoid these.
-    flagged boolean not null default false
+    flagged boolean not null default false,
+    -- The additive guide (agg_additive_usage): named products that list it, the top five
+    -- categories (category_id and products), and six example barcodes, best-ranked first.
+    product_count integer not null default 0,
+    top_categories jsonb not null default '[]',
+    example_codes text[] not null default '{{}}'
 );
 create table {NEXT}.ingredients (
     ingredient_id text primary key,
@@ -238,11 +243,17 @@ order by rank_pos
 # Every explainer is written by the model (phase 3), so explainer_ai is true where one exists.
 _EXPLAINER = {"explainer": "explainer", "explainer_ai": "explainer is not null"}
 
-# (DuckDB mart, {serving column: DuckDB expression}, serving table)
+# (DuckDB mart or join, {serving column: DuckDB expression}, serving table)
 LOOKUPS: list[tuple[str, dict[str, str], str]] = [
     (
-        "dim_additives",
-        {c: c for c in ("additive_id", "e_number", "name", "function", "flagged")} | _EXPLAINER,
+        "dim_additives join agg_additive_usage using (additive_id)",
+        {c: c for c in ("additive_id", "e_number", "name", "function", "flagged")}
+        | _EXPLAINER
+        | {
+            "product_count": "agg_additive_usage.product_count",
+            "top_categories": "to_json(top_categories)::varchar",
+            "example_codes": "example_codes",
+        },
         "additives",
     ),
     ("dim_ingredients", {c: c for c in ("ingredient_id", "name")} | _EXPLAINER, "ingredients"),

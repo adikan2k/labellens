@@ -16,8 +16,8 @@ export default function AboutPage() {
       <p className="pt-4">
         LabelLens explains the labels of packaged foods sold in the United States. Search for a
         product by name, brand or barcode to see its nutrition, additives and ingredients,{" "}
-        <Link href="/compare">compare two products</Link> side by side, or look across all of them
-        on the dashboard.
+        <Link href="/compare">compare two products</Link> side by side, look up any additive in the{" "}
+        <Link href="/additives">additive guide</Link>, or look across all of them on the dashboard.
       </p>
 
       <Section title="Where the data comes from">

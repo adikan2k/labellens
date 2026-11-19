@@ -287,6 +287,46 @@ A single column: the question box, then each agent step as a row in a label-styl
 - **Sharing:** `/basket?codes=…` (barcodes only) opens a read-only copy with "Save as my basket".
 - **Empty:** an invitation, with search, scan and read-a-label as the ways to start.
 
+### Additive guide
+
+`/additives` and `/additives/[slug]`. What each additive on a US label is, how common it is, and where it turns up. Every additive row elsewhere (product page, label read, basket) links to its guide page.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ Additives                                        (title)   │
+│ ████████████████████████████████████████████ rule-heavy    │
+│ 515 additives on US labels, most common first.   (body)    │
+│ [ Find an additive: name or E number ]  ☐ Flagged only     │
+│ E330  Citric acid · acidity regulator      100,764         │
+│ ─────────────────────────────────────────── rule-hair      │
+│ E322  Lecithins · emulsifier                38,120         │
+│ ...                                                        │
+└────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────┐
+│ E330                                       (type-data)     │
+│ Citric acid                                (display)       │
+│ Acidity regulator · Flagged by Open Food Facts             │
+│ ████████████████████████████████████████████ rule-heavy    │
+│ What it is: the explainer, with the AI note    (reading)   │
+│                                                            │
+│ 100,764        24%                         (type-display)  │
+│ US products    of named products                           │
+│ ─────────────────────────────────────────── rule-thin      │
+│ Used most in              (heading)                        │
+│ Sodas            ████████████████  8,210   ink bars        │
+│ Candy            ██████████        5,034                   │
+│ ─────────────────────────────────────────── rule-thin      │
+│ Products that list it     (heading, swap-list rows)        │
+└────────────────────────────────────────────────────────────┘
+```
+
+- **The list** is one column on the page width: E number in `type-data-value`, the name, its function in `type-small`, the count right-aligned in tabular figures. Typing filters by name or E number at once; "Flagged only" is a checkbox. The count is the order, so no sort control.
+- **Flagged** is words, never colour ("Flagged by Open Food Facts"), as everywhere else.
+- **Used most in** is a bar per category in `ink`, as long as its count against the first; numbers beside each bar. Colour stays with Nutri-Score.
+- **Products that list it** reuses the swap-list rows (name, brand, grade chip), best-ranked first, up to six.
+- **Facts only.** The guide says what an additive is, what it does and where it is used, and whether Open Food Facts flags it. It never says an additive is safe or unsafe, or to avoid one.
+
 ### Read a label
 
 `/label`. The photo step is a single column on the reading width; the result uses the product page's layout, because it is a product page for a pack LabelLens may not know.

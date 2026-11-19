@@ -12,6 +12,7 @@ test("header links home and to the pages that exist", () => {
   const links = Array.from(nav.querySelectorAll("a")).map((a) => [a.textContent, a.getAttribute("href")]);
   expect(links).toEqual([
     ["Read a label", "/label"],
+    ["Additives", "/additives"],
     ["Dashboard", "/dashboard"],
     ["Graph", "/graph"],
     ["Ask", "/ask"],

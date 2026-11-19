@@ -35,6 +35,8 @@ PAGES = (
     f"/product/{CODE}",
     f"/compare?codes={CODE},{SWAP_CODE}",
     "/label",
+    "/additives",
+    "/additives/e330",
 )
 MCP_VERSION = "2026-07-28"
 MCP_TOOLS = {"search_products", "get_product", "find_swaps", "explain_additive"}
@@ -108,6 +110,16 @@ def ready(c: httpx.Client, api: str, web: str) -> str:
     expect(body.get("ask_configured") is True, "the ask agent is not configured")
     expect(body.get("label_configured") is True, "the label reader is not configured")
     return f"${body.get('spent_today_usd')} of ${body.get('daily_cap_usd')} spent today"
+
+
+def additives(c: httpx.Client, api: str, web: str) -> str:
+    listed = _json(c.get(f"{api}/additives")).get("additives") or []
+    expect(len(listed) > 100, f"only {len(listed)} additives listed")
+    guide = _json(c.get(f"{api}/additives/{listed[0]['slug']}"))
+    expect(guide.get("product_count", 0) > 0, "the most common additive has no products")
+    expect(guide.get("examples"), "the most common additive has no example products")
+    top = f"{guide.get('e_number')} on {guide['product_count']:,} products"
+    return f"{len(listed)} additives, top {top}"
 
 
 def search(c: httpx.Client, api: str, web: str) -> str:
@@ -195,6 +207,7 @@ def checks(expect_unknown_404: bool) -> list[tuple[str, CheckFn]]:
         ("api /graph/neighborhood", graph),
         ("api POST /ask (too short)", ask_rejects_short),
         ("api /ready", ready),
+        ("api /additives", additives),
         ("mcp tools/list", mcp_tools),
         ("mcp tools/call get_product", mcp_get_product),
     ]

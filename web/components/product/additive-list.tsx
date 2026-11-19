@@ -1,8 +1,12 @@
+import Link from "next/link";
+
+import { additiveHref } from "@/lib/additives";
 import type { Additive } from "@/lib/api";
+import { ADDITIVES } from "@/lib/copy";
 
 import { ExpandableRow, ExplainerText } from "./expandable-row";
 
-/** Additives as rows that expand to show what each is and does. */
+/** Additives as rows that expand to show what each is and does, with a link to its guide page. */
 export function AdditiveList({ additives }: { additives: Additive[] }) {
   return (
     <ul>
@@ -30,6 +34,9 @@ export function AdditiveList({ additives }: { additives: Additive[] }) {
                   : "Open Food Facts does not list what it is used for."}
               </p>
             )}
+            <p className="type-small pt-2">
+              <Link href={additiveHref(additive.additive_id)}>{ADDITIVES.more(additive.name)}</Link>
+            </p>
           </ExpandableRow>
         </li>
       ))}

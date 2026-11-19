@@ -4,6 +4,7 @@ import { BasketLink } from "@/components/basket/add-to-basket";
 
 export const NAV_LINKS = [
   { href: "/label", label: "Read a label" },
+  { href: "/additives", label: "Additives" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/graph", label: "Graph" },
   { href: "/ask", label: "Ask" },
