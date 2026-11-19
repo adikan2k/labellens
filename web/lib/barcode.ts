@@ -41,3 +41,36 @@ export function matchesBarcode(read: string, stored: string): boolean {
 export function addProductUrl(code: string): string {
   return `https://world.openfoodfacts.org/cgi/product.pl?code=${encodeURIComponent(code)}`;
 }
+
+// EAN-13 encodings: left half in L or G by the first digit's parity pattern, right half in R.
+const L_CODES = ["0001101", "0011001", "0010011", "0111101", "0100011",
+                 "0110001", "0101111", "0111011", "0110111", "0001011"]; // prettier-ignore
+const G_CODES = ["0100111", "0110011", "0011011", "0100001", "0011101",
+                 "0111001", "0000101", "0010001", "0001001", "0010111"]; // prettier-ignore
+const R_CODES = L_CODES.map((code) => [...code].map((bit) => (bit === "0" ? "1" : "0")).join(""));
+const PARITY = ["LLLLLL", "LLGLGG", "LLGGLG", "LLGGGL", "LGLLGG",
+                "LGGLLG", "LGGGLL", "LGLGLG", "LGLGGL", "LGGLGL"]; // prettier-ignore
+
+/** The GS1 check digit for the first 12 digits of an EAN-13. */
+export function ean13CheckDigit(first12: string): number {
+  const sum = [...first12].reduce((total, d, i) => total + Number(d) * (i % 2 ? 3 : 1), 0);
+  return (10 - (sum % 10)) % 10;
+}
+
+/**
+ * The 95 modules of an EAN-13 ("1" a bar, "0" a space), guards included, or null when the
+ * code is not 13 digits with a correct check digit. A 12-digit UPC-A is the same with a 0
+ * in front.
+ */
+export function ean13Modules(code: string): string | null {
+  const digits = /^\d{12}$/.test(code) ? `0${code}` : code;
+  if (!/^\d{13}$/.test(digits) || ean13CheckDigit(digits.slice(0, 12)) !== Number(digits[12])) {
+    return null;
+  }
+  const parity = PARITY[Number(digits[0])];
+  const left = [...digits.slice(1, 7)]
+    .map((d, i) => (parity[i] === "L" ? L_CODES : G_CODES)[Number(d)])
+    .join("");
+  const right = [...digits.slice(7)].map((d) => R_CODES[Number(d)]).join("");
+  return `101${left}01010${right}101`;
+}

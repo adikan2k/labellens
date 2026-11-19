@@ -97,6 +97,11 @@ describe("scale on large screens (DESIGN.md, Type)", () => {
     const sizes = [...css.matchAll(/@utility type-[\w-]+ \{[^}]*\}/g)].map((m) => m[0]);
     expect(sizes.length).toBeGreaterThanOrEqual(8);
     for (const block of sizes) {
+      if (block.includes("cqi")) {
+        // The poster sizes to its container, between rem bounds, so it still scales.
+        expect(block).toMatch(/font-size: clamp\([\d.]+rem, [\d.]+cqi, [\d.]+rem\);/);
+        continue;
+      }
       expect(block).toMatch(/font-size: [\d.]+rem;/);
       expect(block).toMatch(/line-height: [\d.]+rem;/);
     }
@@ -108,5 +113,44 @@ describe("scale on large screens (DESIGN.md, Type)", () => {
   test("the base grows at 1600 and 2200 px, as a percentage", () => {
     expect(css).toMatch(/min-width: 1600px\)\s*\{\s*html\s*\{\s*font-size: 112.5%;/);
     expect(css).toMatch(/min-width: 2200px\)\s*\{\s*html\s*\{\s*font-size: 125%;/);
+  });
+});
+
+describe("the warm page and ink bands (DESIGN.md, Colour)", () => {
+  const css = readFileSync(join(WEB, "app", "globals.css"), "utf-8");
+  const colour = (name: string) => {
+    const match = css.match(new RegExp(`--color-${name}: (#[0-9a-f]{6});`));
+    if (!match) throw new Error(`no --color-${name}`);
+    return match[1];
+  };
+  const luminance = (hex: string) => {
+    const channel = (i: number) => {
+      const c = parseInt(hex.slice(1 + 2 * i, 3 + 2 * i), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * channel(0) + 0.7152 * channel(1) + 0.0722 * channel(2);
+  };
+  const contrast = (a: string, b: string) => {
+    const [hi, lo] = [luminance(colour(a)), luminance(colour(b))].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+
+  test("text meets WCAG AA on both grounds", () => {
+    expect(contrast("ink", "page")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("ink-muted", "page")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("paper", "ink")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast("paper-muted", "ink")).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test("the focus ring shows on both grounds (3:1 for a focus indicator)", () => {
+    expect(contrast("focus", "page")).toBeGreaterThanOrEqual(3);
+    expect(contrast("focus-inverse", "ink")).toBeGreaterThanOrEqual(3);
+    // On ink the inverse ring is far clearer than the usual blue (8:1 against 3.5:1).
+    expect(contrast("focus-inverse", "ink")).toBeGreaterThan(2 * contrast("focus", "ink"));
+  });
+
+  test("the ticker stands still under reduced motion", () => {
+    const reduced = css.slice(css.indexOf("prefers-reduced-motion: reduce"));
+    expect(reduced).toMatch(/\.animate-ticker\s*\{\s*animation: none !important;/);
   });
 });

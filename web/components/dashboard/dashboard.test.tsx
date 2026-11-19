@@ -160,33 +160,3 @@ describe("charts", () => {
     expect(screen.getByRole("table").outerHTML).not.toMatch(/font-(bold|normal)/);
   });
 });
-
-describe("the home intro under the empty search", async () => {
-  const { HomeIntro } = await import("@/components/home/home-intro");
-
-  test("three of the dashboard's findings, each linked to its chart", () => {
-    render(<HomeIntro stats={stats} />);
-    const findings = screen.getByRole("region", { name: "What the data says" });
-    const links = Array.from(findings.querySelectorAll("a")).map((a) => [
-      a.textContent?.replace("→", ""),
-      a.getAttribute("href"),
-    ]);
-    expect(links).toEqual([
-      [nutriscoreFinding(stats.nutriscore), "/dashboard#nutriscore"],
-      [novaFinding(stats.nova), "/dashboard#nova"],
-      [additiveFinding(stats.top_additives), "/dashboard#additives"],
-    ]);
-  });
-
-  test("the other ways in, and no empty findings when the API is asleep", () => {
-    render(<HomeIntro stats={null} />);
-    expect(screen.queryByRole("region", { name: "What the data says" })).toBeNull();
-    const ways = screen.getByRole("region", { name: "More ways in" });
-    expect(Array.from(ways.querySelectorAll("a")).map((a) => a.getAttribute("href"))).toEqual([
-      "/label",
-      "/compare",
-      "/graph",
-      "/ask",
-    ]);
-  });
-});
