@@ -193,6 +193,22 @@ Everything below the hero needs `/stats/overview`; if the API is asleep, the tic
 
 On phones the panel moves under the name, and swaps follow it.
 
+**High in, low in.** Under every Nutrition Facts panel (product page, label read, home specimen), plain words say which of fat, saturates, sugars and salt are high or low per 100 g (drinks per 100 ml), by the UK's front-of-pack criteria, the only published per-100 g standard. Medium is not shown.
+
+```
+│  Nutrition Facts panel           │
+│  ████████████████ rule-heavy     │
+│  High in sugars                  │  type-data-value, one per line
+│  Low in fat · Low in salt        │  type-data-label
+│  By the UK front-of-pack         │  type-small ink-muted, with the
+│  criteria, per 100 g.            │  source linked
+```
+
+- Words only, never colour: colour belongs to Nutri-Score.
+- "High in" lines come first and in `type-data-value`; "Low in" lines follow in `type-data-label`.
+- A nutrient the label doesn't list gets no flag. Nothing shows when no nutrient is high or low.
+- In the comparison table, a high or low value carries the word beside it ("32 g · High").
+
 ### Compare
 
 Two products in one label panel, no wider than the reading width (`max-w-measure`), so each value stays close to its label. Reached from a product page ("Compare with another product") or from a swap ("Compare"); the URL is `/compare?codes=A,B`.

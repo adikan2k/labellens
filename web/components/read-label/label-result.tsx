@@ -4,6 +4,7 @@ import { CompareTable } from "@/components/compare/compare-table";
 import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
 import { IngredientList } from "@/components/product/ingredient-list";
+import { NutrientFlags } from "@/components/product/nutrient-flags";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SwapList } from "@/components/product/swap-list";
 import { addProductUrl } from "@/lib/barcode";
@@ -31,6 +32,7 @@ export function LabelResult({ result }: { result: LabelResponse }) {
       <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div className="lg:sticky lg:top-8">
           <NutritionPanel nutrition={label.nutrition} />
+          <NutrientFlags nutrition={label.nutrition} categoryId={label.category_id} />
           {label.conversion_note && (
             <p className="type-small pt-3 text-ink-muted">{label.conversion_note}</p>
           )}

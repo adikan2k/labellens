@@ -11,6 +11,7 @@ import {
   type CompareRow,
 } from "@/lib/compare";
 import { PHOTO_CODE } from "@/lib/label";
+import { flagFor, THRESHOLD_SOURCE } from "@/lib/thresholds";
 import { productTitle } from "@/lib/metadata";
 
 /** Two products in one label panel (DESIGN.md, "Compare"): a real table, ruled like a label. */
@@ -40,7 +41,8 @@ export function CompareTable({ a, b }: { a: Product; b: Product }) {
             <RuleRow weight="medium" />
             <tr>
               <td colSpan={3} className="type-small pt-1 pb-1">
-                Per 100 g
+                Per 100 g. High and low by{" "}
+                <a href={THRESHOLD_SOURCE.url}>{THRESHOLD_SOURCE.name}</a>.
               </td>
             </tr>
             {groups.map((group, g) => (
@@ -49,7 +51,13 @@ export function CompareTable({ a, b }: { a: Product; b: Product }) {
                 {group.map((row, r) => (
                   <Fragment key={row.key}>
                     {r > 0 && <RuleRow weight="thin" />}
-                    <NutritionRow row={row} />
+                    <NutritionRow
+                      row={row}
+                      flags={[
+                        flagFor(row.key, a.nutrition[row.key], a.category_main),
+                        flagFor(row.key, b.nutrition[row.key], b.category_main),
+                      ]}
+                    />
                   </Fragment>
                 ))}
               </Fragment>
@@ -111,28 +119,38 @@ function ProductHead({ product }: { product: Product }) {
   );
 }
 
-function Value({ value, below }: { value: string | null; below?: ReactNode }) {
+type Flag = "low" | "high" | null;
+
+function Value({ value, below, flag }: { value: string | null; below?: ReactNode; flag?: Flag }) {
   return (
     <td className="px-2 py-1 text-right align-top whitespace-nowrap last:pr-[0px]">
       {value === null ? (
         <span className="type-data-label text-ink-muted">Not listed</span>
       ) : (
-        <span className="type-data-value">{value}</span>
+        <span className="type-data-value">
+          {value}
+          {flag && (
+            <span data-flag={flag} className="type-data-label">
+              {` · ${flag === "high" ? "High" : "Low"}`}
+            </span>
+          )}
+        </span>
       )}
       {below}
     </td>
   );
 }
 
-function NutritionRow({ row }: { row: CompareRow }) {
+function NutritionRow({ row, flags }: { row: CompareRow; flags: [Flag, Flag] }) {
   return (
     <tr data-row={row.key}>
       <th scope="row" className={`type-data-label py-1 text-left align-top ${row.indent ? "pl-4" : ""}`}>
         {row.label}
       </th>
-      <Value value={row.a} />
+      <Value value={row.a} flag={flags[0]} />
       <Value
         value={row.b}
+        flag={flags[1]}
         below={
           row.difference && (
             <span data-difference className="type-small block text-ink-muted">

@@ -388,3 +388,16 @@ def test_additives_the_model_left_out_are_found_among_the_ingredients(
         explained = explain(pg, label)
     assert [a["additive_id"] for a in explained["additives"]] == [known["additive_id"]]
     assert explained["unmatched_additives"] == []
+
+
+def test_an_additive_listed_with_brackets_is_matched_not_listed_as_unknown(
+    serving_url: str, known: dict[str, Any]
+) -> None:
+    """Production read "tocopherols (vitamin E)": matched as E306 but also listed as unknown."""
+    from api.app.label.service import explain
+
+    with DictConnection.connect(serving_url, row_factory=dict_row) as pg:
+        label = reading(ingredients=[], additives=[f"{known['e_number']} (a preservative)"])
+        explained = explain(pg, label)
+    assert [a["additive_id"] for a in explained["additives"]] == [known["additive_id"]]
+    assert explained["unmatched_additives"] == []
