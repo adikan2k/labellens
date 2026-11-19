@@ -18,6 +18,7 @@ export default function AboutPage() {
         product by name, brand or barcode to see its nutrition, additives and ingredients,{" "}
         <Link href="/compare">compare two products</Link> side by side, look up any additive in the{" "}
         <Link href="/additives">additive guide</Link>, or look across all of them on the dashboard.
+        Set <Link href="/preferences">your own rules</Link>, and every product says which it meets.
       </p>
 
       <Section title="Where the data comes from">

@@ -175,6 +175,20 @@ describe("the basket page", () => {
     expect(push).toHaveBeenCalledWith("/basket");
   });
 
+  test("with rules set, it counts who meets them and names each miss", async () => {
+    const { writePreferences, NO_PREFERENCES } = await import("@/lib/preferences");
+    writePreferences({ ...NO_PREFERENCES, limits: { sugars_100g: 10 }, minGrade: "c" });
+    basket.writeBasket(["111", "222"]);
+    getProduct.mockImplementation(async (code: string) => ({
+      product: code === "111" ? product(code, { nutriscore_grade: "b", nutrition: { ...product(code).nutrition, sugars_100g: 5 } }) : product(code),
+      source,
+    }));
+    getSwaps.mockResolvedValue({ swaps: [], source });
+    render(<BasketView shared={null} />);
+    expect(await screen.findByRole("link", { name: "1 of 2 meet all your rules" })).toBeTruthy();
+    expect(screen.getByText("Misses your rules: sugars, Nutri-Score")).toBeTruthy();
+  });
+
   test("a barcode no longer in the data says so and can be removed", async () => {
     basket.writeBasket(["555"]);
     getProduct.mockRejectedValue(new Error("404"));

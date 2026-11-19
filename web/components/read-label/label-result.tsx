@@ -8,6 +8,7 @@ import { IngredientList } from "@/components/product/ingredient-list";
 import { NutrientFlags } from "@/components/product/nutrient-flags";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SwapList } from "@/components/product/swap-list";
+import { YourRules } from "@/components/preferences/your-rules";
 import { addProductUrl } from "@/lib/barcode";
 import { LABEL, SCAN } from "@/lib/copy";
 import { labelAsProduct, type LabelResponse } from "@/lib/label";
@@ -37,6 +38,7 @@ export function LabelResult({ result }: { result: LabelResponse }) {
           {label.conversion_note && (
             <p className="type-small pt-3 text-ink-muted">{label.conversion_note}</p>
           )}
+          <YourRules subject={{ ...label, nutriscore_grade: null, nova_group: null }} />
         </div>
       </aside>
 
