@@ -25,6 +25,8 @@ IMPLEMENTED = [
     ("get", "/search"),
     ("get", "/products/{code}"),
     ("get", "/stats/overview"),
+    ("get", "/additives"),
+    ("get", "/additives/{slug}"),
     ("post", "/label"),
     ("get", "/ready"),
 ]

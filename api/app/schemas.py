@@ -223,6 +223,35 @@ class StatsOverview(Model):
     source: Source
 
 
+class AdditiveListItem(Model):
+    additive_id: str
+    slug: str
+    e_number: str | None
+    name: str
+    function: str | None
+    flagged: bool
+    product_count: int = Field(ge=0)
+
+
+class AdditiveList(Model):
+    additives: list[AdditiveListItem]
+    source: Source
+
+
+class CategoryUse(Model):
+    category_id: str
+    name: str
+    products: int = Field(ge=0)
+
+
+class AdditiveGuide(AdditiveListItem):
+    explainer: Explainer | None
+    share_of_products: float = Field(ge=0, le=1)
+    top_categories: list[CategoryUse]
+    examples: list[ProductSummary]
+    source: Source
+
+
 class LabelIngredient(Ingredient):
     """An ingredient as printed. `ingredient_id` is ours when we know the ingredient (and then
     it may have an explainer), else `label:<rank>`."""

@@ -172,6 +172,44 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
+  /additives:
+    get:
+      tags: [additives]
+      operationId: listAdditives
+      summary: Every additive at least one named US product lists, most common first
+      responses:
+        "200":
+          description: The additives.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdditiveList" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+
+  /additives/{slug}:
+    get:
+      tags: [additives]
+      operationId: getAdditive
+      summary: One additive, for the additive guide
+      description: |
+        What it is (the explainer, written by AI from Open Food Facts' taxonomy), whether Open
+        Food Facts flags it, how many named US products list it, the categories that use it
+        most, and up to six example products, best-ranked first. The slug is the Open Food
+        Facts id without "en:" (e330); other ids are used whole.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 120, example: e330 }
+      responses:
+        "200":
+          description: The additive.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdditiveGuide" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/InvalidRequest" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+
   /label:
     post:
       tags: [label]
@@ -743,3 +781,52 @@ components:
         spent_today_usd: { type: number, minimum: 0 }
         daily_cap_usd: { type: number }
         source: { $ref: "#/components/schemas/Source" }
+
+    AdditiveListItem:
+      type: object
+      required: [additive_id, slug, e_number, name, function, flagged, product_count]
+      properties:
+        additive_id: { type: string, example: "en:e330" }
+        slug: { type: string, example: e330 }
+        e_number: { type: [string, "null"], example: E330 }
+        name: { type: string, example: Citric acid }
+        function: { type: [string, "null"] }
+        flagged: { type: boolean }
+        product_count: { type: integer, minimum: 0, description: Named US products that list it. }
+
+    AdditiveList:
+      type: object
+      required: [additives, source]
+      properties:
+        additives:
+          type: array
+          items: { $ref: "#/components/schemas/AdditiveListItem" }
+        source: { $ref: "#/components/schemas/Source" }
+
+    CategoryUse:
+      type: object
+      required: [category_id, name, products]
+      properties:
+        category_id: { type: string }
+        name: { type: string }
+        products: { type: integer, minimum: 0 }
+
+    AdditiveGuide:
+      allOf:
+        - $ref: "#/components/schemas/AdditiveListItem"
+        - type: object
+          required: [explainer, share_of_products, top_categories, examples, source]
+          properties:
+            explainer: { $ref: "#/components/schemas/Explainer" }
+            share_of_products:
+              type: number
+              minimum: 0
+              maximum: 1
+              description: product_count as a share of all named US products.
+            top_categories:
+              type: array
+              items: { $ref: "#/components/schemas/CategoryUse" }
+            examples:
+              type: array
+              items: { $ref: "#/components/schemas/ProductSummary" }
+            source: { $ref: "#/components/schemas/Source" }

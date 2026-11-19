@@ -25,6 +25,7 @@ from starlette.concurrency import run_in_threadpool
 from starlette.datastructures import UploadFile as StarletteUpload
 from starlette.exceptions import HTTPException
 
+from api.app import additive_guide as guide_module
 from api.app import graph as graph_module
 from api.app import products
 from api.app import search as search_module
@@ -35,6 +36,8 @@ from api.app.db import UNAVAILABLE, Database, DatabaseNotConfigured, DictConnect
 from api.app.label import images as label_images
 from api.app.mcp.server import create_mcp
 from api.app.schemas import (
+    AdditiveGuide,
+    AdditiveList,
     AskRequest,
     Error,
     GraphNeighborhood,
@@ -370,6 +373,32 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             daily_cap_usd=settings.ask_daily_spend_cap_usd,
             source=source(request),
         )
+
+    @app.get("/additives", responses={503: {"model": Error}})
+    def additives(request: Request, response: Response, conn: Conn) -> AdditiveList:
+        """Every additive at least one named US product lists, most common first."""
+        response.headers["Cache-Control"] = "public, max-age=3600"
+        return AdditiveList(
+            additives=guide_module.list_additives(conn),  # type: ignore[arg-type]
+            source=source(request),
+        )
+
+    @app.get(
+        "/additives/{slug}",
+        responses={404: {"model": Error}, 422: {"model": Error}, 503: {"model": Error}},
+    )
+    def additive(
+        request: Request,
+        response: Response,
+        conn: Conn,
+        slug: Annotated[str, Path(min_length=1, max_length=120)],
+    ) -> AdditiveGuide:
+        """One additive: what it is, how common it is, where it is used, example products."""
+        found = guide_module.get_guide(conn, slug)
+        if found is None:
+            raise HTTPException(404, f"No additive {slug} in this snapshot.")
+        response.headers["Cache-Control"] = "public, max-age=3600"
+        return AdditiveGuide(**found, source=source(request))
 
     @app.get("/stats/overview", responses={503: {"model": Error}})
     def stats(request: Request, response: Response, conn: Conn) -> StatsOverview:

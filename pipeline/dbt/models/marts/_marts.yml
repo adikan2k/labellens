@@ -170,6 +170,39 @@ models:
       - name: has_flagged_additive
         data_tests: [not_null]
 
+  - name: agg_additive_usage
+    description: >-
+      How each additive is used across named US products, for the additive guide: how many
+      list it, the top five categories, and six example products, best-ranked first.
+    data_tests:
+      - row_count_between:
+          arguments:
+            min_rows: 1
+            max_rows: 5000
+    columns:
+      - name: additive_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_additives')
+                field: additive_id
+      - name: product_count
+        description: Named US products that list the additive.
+        data_tests:
+          - not_null
+          - in_range:
+              arguments:
+                min_value: 0
+                max_value: 2000000
+      - name: top_categories
+        description: Up to five {category_id, products}, most products first; "other" left out.
+        data_tests: [not_null]
+      - name: example_codes
+        description: Up to six barcodes of products that list it, best-ranked first.
+        data_tests: [not_null]
+
   - name: bridge_product_additives
     description: Which additives each product contains.
     data_tests:
