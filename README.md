@@ -1,105 +1,191 @@
+<div align="center">
+
+<img src="docs/readme/hero.jpg" alt="The LabelLens home page: a poster headline asking What's in it?, a product search box, and a live Nutrition Facts label printed beside it like a sticker" width="100%">
+
 # LabelLens
 
-LabelLens explains US food labels from the Open Food Facts database. It covers 985,260 named products. You can:
-- search for a product and read its label: Nutri-Score, NOVA, nutrients per 100 g, and additives in plain English;
-- find better swaps in the same category;
-- explore a food knowledge graph;
-- ask questions in plain English to an agent that shows its steps and cites its sources;
-- use all of it from inside Claude as an MCP App.
+**What's really in your food?**
 
-**Live:**
-- **Website:** [labellens-beige.vercel.app](https://labellens-beige.vercel.app)
-- **In Claude:** add `https://labellens-api-1036759996795.us-east4.run.app/mcp` as a custom connector, with no sign-in.
+A million US packaged foods from Open Food Facts, made readable: every label explained, every additive looked up, a better swap for every product, and an AI agent that answers questions from the data and shows its sources.
 
-It's built as one end-to-end system: a tested dbt pipeline, AI enrichment through the Batch API, Postgres with pgvector, Neo4j, a FastAPI service, a Next.js site, a tool-using agent and an MCP server. Every AI part is measured against a baseline, and the misses are published along with the wins.
+[![Live site](https://img.shields.io/badge/live-labellens--beige.vercel.app-000000?style=flat-square)](https://labellens-beige.vercel.app)
+[![CI](https://img.shields.io/github/actions/workflow/status/adikan2k/labellens/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/adikan2k/labellens/actions/workflows/ci.yml)
+[![Production smoke test](https://img.shields.io/github/actions/workflow/status/adikan2k/labellens/smoke.yml?branch=main&style=flat-square&label=production%20smoke%20test)](https://github.com/adikan2k/labellens/actions/workflows/smoke.yml)
+[![MCP eval](https://img.shields.io/github/actions/workflow/status/adikan2k/labellens/mcp-eval.yml?branch=main&style=flat-square&label=MCP%20eval)](https://github.com/adikan2k/labellens/actions/workflows/mcp-eval.yml)
+[![Data: ODbL](https://img.shields.io/badge/data-Open%20Food%20Facts%20·%20ODbL-1f6feb?style=flat-square)](https://world.openfoodfacts.org)
 
-| The product page | The label inside Claude (MCP App) |
-| --- | --- |
-| <img src="docs/design/phase-7/after-product-1280.jpg" width="420" alt="Product page for Lucky Charms: Nutri-Score, nutrition label, additives and swaps"> | <img src="docs/evidence/phase-6/claude-get-product.png" width="420" alt="The LabelLens label card rendered inside a Claude conversation"> |
+**[Try it live](https://labellens-beige.vercel.app)** · **[Use it inside Claude](#use-it-inside-claude)** · **[How it works](#how-it-works)** · **[How it's measured](#how-its-measured)** · **[Engineering notes](#engineering-notes)**
 
-## What's in it
+</div>
 
-- **Search and product pages.** Name, brand or barcode search with results as you type. Each page shows a Nutrition Facts panel per 100 g, the Nutri-Score and NOVA group, and additives with a short explainer. A flagged additive is marked when Open Food Facts flags it for a high overexposure risk.
-- **Better swaps.** Similar products in the same category with a better Nutri-Score, no flagged additive and a real barcode, each with the reason it's better.
-- **Scan a barcode.** On a phone, point the camera at a barcode to open its label. The reader runs in the browser, so the picture never leaves the device, and its WebAssembly is served from the site, not a CDN. A barcode missing from the snapshot links to adding it on Open Food Facts.
-- **Read a label from a photo.** Photograph any pack's ingredients or nutrition panel. Claude Haiku reads what's printed into structured data; LabelLens converts it to per 100 g in code, explains the additives, finds the product it most likely is, and suggests better-graded ones. It works for packs that aren't in the data at all. Photos go to Anthropic to be read and aren't stored.
-- **High in, low in.** Under every Nutrition Facts panel: which of fat, saturates, sugars and salt are high or low, by the UK's front-of-pack thresholds (per 100 g, or per 100 ml for drinks), with the source linked. The US has no per-100 g standard.
-- **My basket.** Products you're thinking of buying, looked at together: their Nutri-Score mix, how many are ultra-processed, every additive across them, and a one-tap better swap for each. Kept in the browser, no account; a share link carries only barcodes.
-- **Additive guide.** All 515 additives that named US products list, most common first: what each is, what it does, how many products list it, the categories that use it most, and example products. Every additive row on the site links to its page. Facts only: it never says to avoid one.
-- **My preferences.** Your own rules (limits for sugars, salt and saturated fat per 100 g, a minimum Nutri-Score, not ultra-processed, additives to avoid), kept in the browser. Product pages, label reads, comparisons and the basket say which rules each product meets, misses or can't be checked against. Every rule starts empty: the site never suggests a value.
-- **Compare.** Two products' labels side by side, per 100 g, with the difference on every row and their additives split into shared and unique. Open it from any product page or straight from a swap.
-- **Dashboard.** The US packaged-food landscape: grades, processing and additives by category.
-- **Graph explorer.** 27,662 products and their brands, categories, additives and ingredients in Neo4j.
-- **Ask.** A Claude Haiku agent with three tools: read-only SQL, fixed Cypher templates, and vector search over explainers. It streams each step, cites the rows it used and refuses medical advice. Limits: 10 questions an hour per visitor and $0.50 a day overall, after which it serves recorded runs.
-- **MCP App.** Four read-only tools, `search_products`, `get_product`, `find_swaps` and `explain_additive`. `get_product` and `find_swaps` render a label card inside Claude, and every tool also answers in plain text.
+---
 
-## Architecture
+## Why
+
+A Nutrition Facts panel tells you there are 22 g of sugars. It doesn't tell you whether that's a lot, what "E339" is, or whether the box next to it is better. That information exists, spread across a crowd-sourced database, regulators' thresholds and additive registries, but nobody reads it in a supermarket aisle.
+
+LabelLens puts it in one place. It states facts and published thresholds, and it never tells anyone what to eat.
+
+<table>
+<tr>
+<td align="center"><b>985,260</b><br><sub>named US products</sub></td>
+<td align="center"><b>515</b><br><sub>additives, each explained</sub></td>
+<td align="center"><b>0.98</b><br><sub>ask agent fact score<br>(baseline 0.26)</sub></td>
+<td align="center"><b>98%</b><br><sub>label values read right<br>from a photo</sub></td>
+<td align="center"><b>184 ms</b><br><sub>p95 search,<br>live API</sub></td>
+<td align="center"><b>~$6</b><br><sub>total model spend<br>for the whole project</sub></td>
+</tr>
+</table>
+
+## What you can do
+
+<table>
+<tr>
+<td width="50%" valign="top">
+<img src="docs/readme/product.jpg" alt="Product page for Cheerios: Nutri-Score C, NOVA 4, additives, a better swap and a Nutrition Facts panel" width="100%">
+<b>Look up any product.</b> Search by name, brand or barcode, or scan one with your phone's camera. Each page shows the Nutri-Score, the NOVA processing group, nutrients per 100 g with plain "high in" and "low in" flags, and every additive explained.
+</td>
+<td width="50%" valign="top">
+<img src="docs/readme/label-read.jpg" alt="Read a label: two photos of a coconut water carton and the Nutrition Facts read from them" width="100%">
+<b>Read a label from a photo.</b> Photograph any pack, even one that isn't in the data. Claude reads what's printed, the code converts it to per 100 g, explains the additives, finds the product it most likely is, and suggests better-graded ones.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="docs/readme/ask.jpg" alt="The ask page answering: breakfast cereals under 5 g sugar without artificial colours, with ten numbered sources" width="100%">
+<b>Ask a question.</b> A tool-using agent answers from the data with read-only SQL, graph queries and explainer search. It streams its steps, and it can only cite rows its tools actually returned. It refuses medical advice.
+</td>
+<td width="50%" valign="top">
+<img src="docs/readme/mcp-in-claude.jpg" alt="The LabelLens label card rendered inside a Claude conversation for Lucky Charms" width="100%">
+<b>Use it inside Claude.</b> An MCP App with four read-only tools. Ask Claude about a product, and the label renders as a card right in the conversation.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="docs/readme/basket.jpg" alt="My basket: four products, their Nutri-Score mix, high-in counts, and a one-tap swap under each" width="100%">
+<b>Plan a shop.</b> Put products in a basket to see them together: the grade mix, what's ultra-processed, every additive across them, and a one-tap better swap for each. Set your own rules (sugar, salt and saturated-fat limits, a minimum grade, additives to avoid), and every page says which ones a product meets.
+</td>
+<td width="50%" valign="top">
+<img src="docs/readme/additive-guide.jpg" alt="Additive guide page for E330 citric acid: what it is, 100,764 products, the categories that use it most" width="100%">
+<b>Learn what's in it.</b> A guide to all 515 additives that named US products list: what each one is, why it's used, how many products list it, which categories use it most, and whether Open Food Facts flags it.
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<img src="docs/readme/dashboard.jpg" alt="Dashboard: the US label landscape, with grades and processing by category" width="100%">
+<b>See the whole shelf.</b> A dashboard of the US packaged-food landscape: grades, processing and additives by category.
+</td>
+<td width="50%" valign="top">
+<img src="docs/readme/graph.jpg" alt="The food graph: Cheerios at the centre, linked to its brand, category, additives and ingredients" width="100%">
+<b>Explore the graph.</b> 27,662 products and their brands, categories, additives and ingredients in Neo4j. Pick any product to see what it connects to.
+</td>
+</tr>
+</table>
+
+<img src="docs/readme/shelf.jpg" alt="The shelf, graded: of 385,374 US products with a Nutri-Score, 14% are A, 11% B, 19% C, 24% D and 32% E" width="100%">
+
+<details>
+<summary><b>Everything else</b></summary>
+
+- **Compare** two products' labels side by side, per 100 g, with the difference on every row and their additives split into shared and unique.
+- **High in, low in** uses the UK's front-of-pack thresholds (per 100 g, or per 100 ml for drinks), the only published per-100 g standard. The source is linked beside the flags.
+- **Scanning** runs in the browser, so the camera picture never leaves the device. A barcode missing from the data links to adding it on Open Food Facts.
+- **The basket and your rules** live in your browser, with no account. A shared basket link carries barcodes and nothing else.
+
+</details>
+
+### Use it inside Claude
+
+Add `https://labellens-api-1036759996795.us-east4.run.app/mcp` as a custom connector in Claude. It needs no sign-in. The tools are `search_products`, `get_product`, `find_swaps` and `explain_additive`. `get_product` and `find_swaps` render a label card, and every tool also answers in plain text.
+
+## How it works
 
 ```mermaid
 flowchart LR
-    OFF[("Open Food Facts<br/>food.parquet, 8 GB")] --> ING["pipeline/ingest<br/>snapshot"]
-    ING --> DBT["dbt on DuckDB<br/>85 data tests, 1 unit test"]
-    DBT <--> ENR["pipeline/enrich<br/>Claude Batch API, cached"]
-    DBT --> LOAD["pipeline/load"]
+    OFF[("Open Food Facts<br/>food.parquet, 8 GB")] --> ING["Ingest<br/>snapshot"]
+    ING --> DBT["dbt on DuckDB<br/>85 data tests"]
+    DBT <--> ENR["Enrichment<br/>Claude Batch API, cached"]
+    DBT --> LOAD["Loaders"]
     LOAD --> PG[("Neon Postgres<br/>+ pgvector")]
     LOAD --> NEO[("Neo4j AuraDB")]
-    PG --> API["FastAPI on Cloud Run"]
+    PG --> API["FastAPI<br/>Cloud Run"]
     NEO --> API
-    API --> WEB["Next.js on Vercel"]
-    API --> MCP["/mcp<br/>MCP App"]
-    API --> ASK["/ask agent<br/>Claude Haiku"]
+    API --> WEB["Next.js<br/>Vercel"]
+    API --> MCP["MCP App<br/>/mcp"]
+    API --> ASK["Ask agent<br/>Claude Haiku"]
     ASK -.traces.-> LF["Langfuse"]
 ```
 
-- **Data:** the US subset of the export (1,002,769 products) goes through staging, intermediate and mart models in dbt, with tests on every key, range and relationship.
-- **Enrichment:** Claude fills in categories for 674,384 products that Open Food Facts' tags leave unplaced, and writes 1,019 additive and ingredient explainers.
-- **Serving:** Postgres holds the serving tables, swapped in atomically on each load. Neo4j holds the graph subset, capped to fit AuraDB Free.
-- **Operations:**
-  - Dagster runs the pipeline locally.
-  - GitHub Actions runs CI and a production smoke test every 6 hours.
-  - A weekly pipeline build checks the newest export without publishing it.
+1. **Data.** The US subset of the Open Food Facts export (1,002,769 products) goes through staging, intermediate and mart models in dbt, with tests on every key, range and relationship.
+2. **Enrichment.** Claude fills in categories for 674,384 products that Open Food Facts' tags leave unplaced, and writes 1,019 additive and ingredient explainers. It runs through the Batch API and is cached, so reruns cost nothing.
+3. **Serving.** Postgres holds the serving tables, swapped in atomically on each load, with pgvector for explainer search. Neo4j holds the graph subset, capped to fit AuraDB Free.
+4. **Apps.** One FastAPI service serves the website, the ask agent and the MCP server. The Next.js site caches what it can and renders the rest per request.
+5. **Operations.** GitHub Actions runs CI, deploys the API on merge with keyless auth (Workload Identity Federation), smoke-tests production every 6 hours, reruns the MCP eval when its tools change, and builds the newest export weekly without publishing it.
 
-## Results
+| Layer | Built with |
+| --- | --- |
+| Data | DuckDB, dbt, Dagster, Python (uv, Ruff, Pyright, pytest) |
+| AI | Claude Haiku (agent, enrichment, label reading), Claude Sonnet (eval judge and comparisons), Voyage AI embeddings, Langfuse tracing |
+| Storage | Neon Postgres with pgvector, Neo4j AuraDB |
+| API | FastAPI on Google Cloud Run, MCP server mounted at `/mcp` |
+| Web | Next.js 16 (Cache Components), React, Tailwind CSS v4, Vitest, on Vercel |
 
-Each linked result is a report in [`evals/results/`](evals/results/); the data-test count comes from `dbt build`. Ranges are 95% confidence intervals; with samples this small, read them before comparing.
+## How it's measured
+
+Every AI feature is measured against a baseline before it ships, and the misses are published with the wins. Each linked result is a report in [`evals/results/`](evals/results/). Ranges are 95% confidence intervals; with samples this small, read them before comparing.
 
 | Eval | What it measures | Target | Measured |
 | --- | --- | --- | --- |
 | Data tests | dbt tests on keys, relationships, accepted values, ranges, completeness, row counts | 30 or more, all passing | **85 data tests and 1 unit test, all passing** |
-| [Category accuracy](evals/results/category_accuracy_claude-haiku-5-5-full-silver.md) | AI category on 200 products, against labels from a larger AI model (Claude Opus), not a person | 90% | Haiku **90.0% (85.1–93.4%)**, Sonnet 92.0%. Open Food Facts' own tags: 87.5% |
 | [Ask agent](evals/results/ask_agent.md) | 50 questions with facts computed from the data, graded by Claude Sonnet, against a baseline with explainer search only | Beat the baseline | Fact score **0.98 (0.93–1.00)** against **0.26 (0.14–0.40)**; 42/43 fully correct; 5/5 advice requests refused |
+| [Label reading](evals/results/label_reading_claude-haiku-5-5.md) | 30 real label photos from Open Food Facts, read by `POST /label` and checked against the photos | Measured | **98% (95–99%) of nutrient values right**; every value right on 85% (68–94%) of labels; additives 93% precision, 98% recall |
 | [MCP tool selection](evals/results/mcp_tools.md) | 30 natural requests: right tool and right arguments, from the tool definitions alone | 90% | **29/30, 97% (83–99%)**, three fresh runs in a row; runs in CI |
+| [Category accuracy](evals/results/category_accuracy_claude-haiku-5-5-full-silver.md) | AI category on 200 products, against labels from a larger model (Claude Opus) | 90% | Haiku **90.0% (85.1–93.4%)**, Sonnet 92.0%. Open Food Facts' own tags: 87.5% |
 | [Search latency](evals/results/search_latency_public.md) | 200 searches against the live API | p95 under 300 ms | **p95 184 ms**, p50 104 ms |
 | [Graph and swaps](evals/results/graph_latency_public.md) | 100 products, live API | Under 1 s | p95 406 ms (graph), 233 ms (swaps) |
 | [Lighthouse](evals/results/lighthouse.md) | Home, product and dashboard pages on mobile | 90 in every category | 98 to 100 in every category |
-| [Label reading](evals/results/label_reading_claude-haiku-5-5.md) | 30 real label photos from Open Food Facts, read by `POST /label`'s code and checked against the photos | Measured | **98% (95–99%) of nutrient values right**; every value right on 85% (68–94%) of labels; additives 93% precision, 98% recall (tuned on this set). Against Open Food Facts' own data, uncorrected: 71% |
 | [Prompt caching](evals/results/ask_caching.md) | 10 agent runs with and without a cached prompt | Cheaper, same answers | **64% cheaper per run** |
-| [Cold start](evals/results/cold_start.md) | First request after Cloud Run and Neon both scaled to zero | Timed and noted | **22.6 s after an hour idle** (3.9 s after 25 minutes), then about 0.1 s; 16 s of it was startup, cut to 0.4 s since (not yet re-timed after an hour) |
+| [Cold start](evals/results/cold_start.md) | First requests after the API and database sit idle | Timed and noted | 22.6 s after an hour idle, before app startup was cut from 16 s to 0.4 s; the database wake now costs about 1 s, then about 0.1 s per request |
 
 **What these numbers don't show:**
-- The category labels were made by Claude Opus, not by a person, so that result compares two models.
-- The ask eval's questions were written by the same author as the agent's prompt.
+- The category labels came from Claude Opus, not from a person, so that result compares two models.
+- I wrote both the ask eval's questions and the agent's prompt.
 - The MCP eval runs on Haiku. Claude itself is a larger model, so this is the stricter test.
 
 ## Engineering notes
 
-A few problems found along the way, with the fix and how it was checked. The full reasoning is in [`docs/decisions/`](docs/decisions/).
+Problems I hit along the way, with the fix and how it was checked. The reasoning behind every major choice, including what was rejected, is in [`docs/decisions/`](docs/decisions/).
 
-- **The agent's SQL is safe because of the database, not a parser.** The agent writes its own SQL, but runs it as a role that can read five tables and nothing else. Every query runs in a read-only transaction with a 3-second timeout and a 50-row cap. Graph queries are fixed templates. A citation the model invents is dropped, because only rows a tool actually returned can be cited. Tests try writes, other tables and slow queries, and all of them fail safely.
-- **The eval caught a regression the demo hid.** Telling the agent to list each product once (one product has many barcodes) also made it de-duplicate counts: 1,178 cereals instead of 1,323. The fact score fell to 0.88. The fix was scoped to lists, and the score went to 0.98. Expected facts come from truth queries kept in the dataset, so when the data changed, only the six questions it touched were rerun.
+- **The agent's SQL is safe because of the database, not a parser.** The agent writes its own SQL but runs it as a role that can read five tables and nothing else. Every query runs in a read-only transaction with a 3-second timeout and a 50-row cap, and graph queries are fixed templates. A citation the model invents is dropped, because only rows a tool actually returned can be cited. Tests try writes, other tables and slow queries, and all of them fail safely.
+- **The eval caught a regression the demo hid.** Telling the agent to list each product once (one product can have many barcodes) also made it de-duplicate counts: 1,178 cereals instead of 1,323. The fact score fell to 0.88. The fix was scoped to lists, and the score went to 0.98. Expected facts come from truth queries kept in the dataset, so when the data changed, only the six questions it touched were rerun.
 - **Only 1 of 11 production runs reached Langfuse.** Cloud Run's front end samples a few requests for its own tracing, and OpenTelemetry's default sampler followed that decision, so the rest were silently dropped. The one trace that arrived had the same id as the one request Google sampled. Each run now starts a trace of its own. The same digging found that the Anthropic SDK's own spans counted every model call's cost twice.
 - **"Healthier swaps" offered restaurant menus.** Open Food Facts lists menu items and shop-weighed goods under 16- to 24-digit codes, and 34,200 of them qualified as swaps (Doritos was offered Quiznos). A GS1 check-digit test now keeps swaps to real barcodes. The products themselves stay searchable.
 - **The rate limit was easy to reset on IPv6.** Phones and homes rotate their IPv6 address within a /64 block, and each new address got a fresh 10 questions an hour. A client is now an IPv4 address or an IPv6 /64.
 - **Prompt caching was measured before it was trusted.** The fixed prompt and tools come to 3,344 tokens. Caching them made a run 64% cheaper across 10 questions with the same answers. The cost accounting now prices cache reads and writes correctly.
+- **A preview build broke because web and API deploy separately.** A new page prerendered against the production API, which didn't have its endpoint yet. Pages that read new endpoints now render per request, so either side can ship first.
 
 ## Cost
 
 - **Model calls:** about $6 for the whole project. $5.18 of that was the one-off category fill: 604,507 inputs on Haiku through the Batch API.
-- **Evals:** cached, so rerunning any of them costs $0. A paid run needs `--limit`, prints an estimate first and only sends with `--yes`.
+- **Evals:** cached, so rerunning any of them costs $0. A paid run needs `--limit`, prints an estimate first, and only sends with `--yes`.
 - **Hosting:** free tiers throughout (Neon, AuraDB, Cloud Run, Vercel, Langfuse Hobby, Voyage AI).
-- **The public ask agent:** capped at $0.50 a day.
+- **The public ask agent:** limited to 10 questions an hour per visitor and $0.50 a day overall, after which it serves recorded runs.
 
-## Run it
+## How I built it
+
+I built LabelLens phase by phase against a written [spec](docs/SPEC.md) and [design system](docs/DESIGN.md), with the help of [Claude Code](https://claude.com/claude-code) as a pair programmer. I set the product direction, the architecture and the rules; Claude Code helped write, test and debug the code; and every change went through a pull request that I reviewed before merging.
+
+The working rules are in [`CLAUDE.md`](CLAUDE.md):
+- every feature ships with a test or an eval;
+- no paid model call runs without a `--limit` and a printed cost estimate;
+- model names live only in config;
+- the UI uses only the tokens in the design system;
+- every UI change is checked with screenshots at phone, laptop and wide-screen widths.
+
+## Run it locally
+
+<details>
+<summary><b>Setup and commands</b></summary>
 
 Requires [uv](https://docs.astral.sh/uv/), Node 22, pnpm and Docker. Copy `.env.example` to `.env` and fill it in; `.env` is never committed.
 
@@ -118,14 +204,16 @@ uv run python scripts/smoke.py           # read-only checks against production
 
 Every other command (loading, enrichment, evals, deploys) is listed in [`CLAUDE.md`](CLAUDE.md).
 
+</details>
+
 | Folder | What it holds |
 | --- | --- |
-| `pipeline/` | ingest, dbt models, enrichment, loaders, Dagster |
-| `api/` | FastAPI service, the ask agent, the MCP server, and their tests |
-| `web/` | Next.js app |
-| `evals/` | eval datasets, runners, caches and results |
-| `scripts/` | deploy, smoke test, labeller, card preview and other tools |
-| `docs/` | [spec](docs/SPEC.md), [design](docs/DESIGN.md), [data profile](docs/data-profile.md), [decision notes](docs/decisions/) |
+| [`pipeline/`](pipeline/) | ingest, dbt models, enrichment, loaders, Dagster |
+| [`api/`](api/) | FastAPI service, the ask agent, the MCP server, and their tests |
+| [`web/`](web/) | Next.js app |
+| [`evals/`](evals/) | eval datasets, runners, caches and results |
+| [`scripts/`](scripts/) | deploy, smoke test, warm-up, labeller, card preview and other tools |
+| [`docs/`](docs/) | [spec](docs/SPEC.md), [design](docs/DESIGN.md), [data profile](docs/data-profile.md), [decisions](docs/decisions/) |
 
 ## Limits
 

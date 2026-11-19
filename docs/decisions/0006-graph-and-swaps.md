@@ -1,6 +1,6 @@
 # 0006: Food graph and swaps (phase 4)
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18. Phase 4.
+Status: accepted. Date: 2026-11-18. Phase 4.
 
 ## Swaps live in Postgres, not the graph
 

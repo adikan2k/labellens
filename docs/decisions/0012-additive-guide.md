@@ -1,6 +1,6 @@
 # 0012: The additive guide
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18.
+Status: accepted. Date: 2026-11-18.
 
 Additives were explained only where they appeared: one row on one product page. Nobody could ask the other way round: what is E471, how common is it, and what kind of food is it in? Awareness was the point of this feature, and that needs a page per additive.
 

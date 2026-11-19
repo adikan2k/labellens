@@ -70,3 +70,16 @@ now pays the library load instead of the first search.
 
 A minimum of one instance would remove the cold start entirely but bills every hour; it is
 not needed unless the remeasure disappoints.
+
+## After a night idle (2026-11-19, 06:03 UTC)
+
+| Request | Time |
+| --- | ---: |
+| `GET /health`, first request | 0.13 s |
+| `GET /products/{code}`, first database query | 1.06 s |
+| Product, search, stats and additive guide after that | 0.09 to 0.15 s |
+
+The Cloud Run instance was already up (the 6-hourly smoke test keeps it busy often enough),
+so this run measured Neon waking from its idle pause, about 1 s, not a scale from zero. A
+full scale-from-zero on the current revision is still unmeasured; the warm-up script
+(`uv run python -m scripts.warm`) removes both before a demo.

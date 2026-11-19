@@ -1,6 +1,6 @@
 # 0003: Pipeline (phase 1)
 
-Status: accepted (draft for Aditya to rewrite) · Date: 2026-11-17 · Phase 1
+Status: accepted · Date: 2026-11-17 · Phase 1
 
 ## One scan of the export, then views
 

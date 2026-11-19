@@ -1,6 +1,6 @@
 # 0014: High in, low in
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18.
+Status: accepted. Date: 2026-11-18.
 
 A Nutrition Facts panel gives the grams but not what they mean. Someone reading "22 g sugars" can't tell whether that's a lot. A published threshold can tell them, as a fact, without LabelLens saying what to eat.
 

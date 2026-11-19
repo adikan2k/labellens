@@ -1,6 +1,6 @@
 # 0011: The home page, turned up
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18.
+Status: accepted. Date: 2026-11-18.
 
 The site read as white and blank: correct, quiet, and forgettable in a demo. Looking through the food and AI sites on minimal.gallery, the memorable ones had type that fills the screen, one strong colour on a warm ground, full-width bands, and (for the AI ones) the working product in the hero.
 

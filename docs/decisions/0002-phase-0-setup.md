@@ -1,6 +1,6 @@
 # 0002: Phase 0 setup choices
 
-Status: accepted (draft for Aditya to rewrite) · Date: 2026-11-17 · Phase 0
+Status: accepted · Date: 2026-11-17 · Phase 0
 
 ## Repo outside OneDrive
 

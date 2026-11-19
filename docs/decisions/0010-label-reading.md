@@ -1,6 +1,6 @@
 # 0010: Reading a label from a photo
 
-Status: draft for Aditya to rewrite. Date: 2026-11-18.
+Status: accepted. Date: 2026-11-18.
 
 LabelLens could only explain products already in Open Food Facts. A photo of the pack removes that limit: `POST /label` and the `/label` page read any label, then explain it from the data.
 
