@@ -10,10 +10,14 @@ import { cacheLife } from "next/cache";
 
 import {
   ApiError,
+  getAdditive,
+  getAdditives,
   getProduct,
   getStats,
   getNeighborhood,
   getSwaps,
+  type AdditiveGuide,
+  type AdditiveList,
   type GraphNeighborhood,
   type ProductResponse,
   type StatsOverview,
@@ -50,4 +54,23 @@ export async function cachedNeighborhood(code: string): Promise<GraphNeighborhoo
   "use cache";
   cacheLife("hours");
   return getNeighborhood(code, { depth: 2 });
+}
+
+/** Every additive US products list, most common first. */
+export async function cachedAdditives(): Promise<AdditiveList> {
+  "use cache";
+  cacheLife("hours");
+  return getAdditives();
+}
+
+/** One additive's guide, or null when this snapshot has no additive with that slug. */
+export async function cachedAdditive(slug: string): Promise<AdditiveGuide | null> {
+  "use cache";
+  cacheLife("hours");
+  try {
+    return await getAdditive(slug);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
 }

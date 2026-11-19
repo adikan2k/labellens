@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { CHIP_CLASSES, GradeChip, Rule } from "@/components/label/primitives";
+import { additiveHref } from "@/lib/additives";
 import { getProduct, getSwaps, type NutriscoreGrade, type Product, type Swap } from "@/lib/api";
 import {
   removeFromBasket,
@@ -247,10 +248,10 @@ function Additives({ summary }: { summary: BasketSummary }) {
         <ul>
           {summary.additives.map(({ additive, products }) => (
             <li key={additive.additive_id} className="border-b border-rule-light py-2">
-              <span className="type-data-label">
+              <Link href={additiveHref(additive.additive_id)} className="type-data-label">
                 {additive.e_number && <span className="type-data-value pr-2">{additive.e_number}</span>}
                 {additive.name}
-              </span>
+              </Link>
               <span className="type-small block text-ink-muted">
                 In {products.length} product{products.length === 1 ? "" : "s"}
                 {additive.flagged ? " · Flagged by Open Food Facts" : ""}

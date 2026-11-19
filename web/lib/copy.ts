@@ -25,6 +25,7 @@ export const HOME_WAYS_IN = [
   { href: "/ask", title: "Ask a question", note: "An AI agent looks it up in the data, step by step, and cites what it used." },
   { href: "/compare", title: "Compare two products", note: "Their labels side by side, per 100 g, with every difference." },
   { href: "/basket", title: "My basket", note: "Your products together, with better swaps" },
+  { href: "/additives", title: "The additive guide", note: "What each additive is, and where it turns up" },
   { href: "/dashboard", title: "The dashboard", note: "The US packaged-food landscape" },
   { href: "/graph", title: "The food graph", note: "Products, brands and the ingredients they share" },
 ] as const;
@@ -53,6 +54,37 @@ export const BASKET = {
   loading: "Looking up your products…",
   missing: (code: string) => `${code} is no longer in the data.`,
   swapLine: (name: string, reason: string) => `Better swap: ${name}. ${reason}.`,
+} as const;
+
+/** The additive guide (DESIGN.md, "Additive guide"). */
+export const ADDITIVES = {
+  title: "Additives",
+  intro: (count: number) =>
+    `${count.toLocaleString("en-US")} additives turn up on US labels. Here is what each one is, what it does, and how often it is used, most common first.`,
+  findLabel: "Find an additive",
+  findPlaceholder: "Name or E number",
+  flaggedOnly: "Flagged by Open Food Facts only",
+  flagged: "Flagged by Open Food Facts",
+  shown: (shown: number, total: number) =>
+    shown === total ? `${total} additives` : `${shown} of ${total} additives`,
+  none: "No additive matches. Try its E number, such as E330.",
+  products: "US products list it",
+  share: "of named US products",
+  usedMostIn: "Used most in",
+  noCategories: "Open Food Facts gives no category for the products that list it.",
+  examples: "Products that list it",
+  noExplainer: (fn: string | null) =>
+    fn
+      ? `Used as: ${fn.toLowerCase()}. LabelLens has no longer explainer for it yet.`
+      : "Open Food Facts does not list what it is used for.",
+  flaggedNote:
+    "Open Food Facts rates this additive a high risk of overexposure: of people eating more than is considered acceptable. It is their flag, not a ban or a safety ruling.",
+  facts:
+    "Facts from Open Food Facts. The guide says what an additive is and where it is used, not whether to eat it.",
+  more: (name: string) => `More about ${name}`,
+  notFoundTitle: "No such additive",
+  notFoundBody: "This snapshot has no additive at that address.",
+  unavailable: "The additive guide is not ready. Try again in a few seconds.",
 } as const;
 
 /** The home page's live label. */

@@ -101,6 +101,14 @@ describe("AdditiveList", () => {
     expect(screen.getByText("Used as: antioxidant, sequestrant.")).toBeTruthy();
   });
 
+  test("an open row links to the additive's guide page", () => {
+    render(<AdditiveList additives={additives} />);
+    fireEvent.click(screen.getByRole("button", { name: /E330\s*Citric acid/ }));
+    expect(screen.getByRole("link", { name: "More about Citric acid" }).getAttribute("href")).toBe(
+      "/additives/e330",
+    );
+  });
+
   test("an additive with no listed function says so", () => {
     render(<AdditiveList additives={additives} />);
     fireEvent.click(screen.getByRole("button", { name: /Quillaia extract/ }));
