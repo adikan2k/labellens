@@ -11,6 +11,7 @@ import {
   type CompareRow,
 } from "@/lib/compare";
 import { PHOTO_CODE } from "@/lib/label";
+import { RulesCompareRow } from "@/components/preferences/your-rules";
 import { flagFor, THRESHOLD_SOURCE } from "@/lib/thresholds";
 import { productTitle } from "@/lib/metadata";
 
@@ -77,6 +78,7 @@ export function CompareTable({ a, b }: { a: Product; b: Product }) {
               a={String(a.ingredients.length)}
               b={String(b.ingredients.length)}
             />
+            <RulesCompareRow a={a} b={b} />
             <RuleRow weight="heavy" />
           </tbody>
         </table>

@@ -26,6 +26,7 @@ export const HOME_WAYS_IN = [
   { href: "/compare", title: "Compare two products", note: "Their labels side by side, per 100 g, with every difference." },
   { href: "/basket", title: "My basket", note: "Your products together, with better swaps" },
   { href: "/additives", title: "The additive guide", note: "What each additive is, and where it turns up" },
+  { href: "/preferences", title: "My preferences", note: "Your own rules, checked on every product" },
   { href: "/dashboard", title: "The dashboard", note: "The US packaged-food landscape" },
   { href: "/graph", title: "The food graph", note: "Products, brands and the ingredients they share" },
 ] as const;
@@ -54,6 +55,37 @@ export const BASKET = {
   loading: "Looking up your products…",
   missing: (code: string) => `${code} is no longer in the data.`,
   swapLine: (name: string, reason: string) => `Better swap: ${name}. ${reason}.`,
+} as const;
+
+/** My preferences and the Your rules box (DESIGN.md, "My preferences"). */
+export const PREFERENCES = {
+  title: "My preferences",
+  intro:
+    "Your own rules, checked on every product page, label read, comparison and your basket. Set only the ones you want; LabelLens doesn't suggest values. They're kept in this browser only: no account, nothing sent anywhere.",
+  limitsTitle: "Limits per 100 g",
+  limitUnit: "g or less",
+  limitsNote: "Leave a box empty for no limit.",
+  gradeLabel: "Nutri-Score",
+  gradeAny: "Any",
+  gradeSuffix: "or better",
+  ultraProcessed: "Not ultra-processed (NOVA 4)",
+  additivesTitle: "Additives to avoid",
+  findAdditive: "Find an additive to avoid",
+  findPlaceholder: "Name or E number",
+  avoid: "Avoid",
+  remove: "Remove",
+  noneAvoided: "No additives yet. Find one above, or open one from the additive guide.",
+  additivesUnavailable: "The additive list is not available right now. Try again in a minute.",
+  saved: "Saved in this browser.",
+  nothingSet: "No rules set.",
+  clear: "Clear my rules",
+  boxTitle: "Your rules",
+  edit: "Change your rules",
+  prompt: "Set your own rules for sugars, salt, Nutri-Score, additives and more.",
+  outcome: { meets: "Meets", misses: "Misses", unknown: "Not known" },
+  basketMeets: (meets: number, count: number) => `${meets} of ${count} meet all your rules`,
+  basketMisses: (shorts: string[]) => `Misses your rules: ${shorts.join(", ")}`,
+  compareRow: "Your rules",
 } as const;
 
 /** The additive guide (DESIGN.md, "Additive guide"). */

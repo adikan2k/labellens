@@ -15,7 +15,9 @@ import {
   writeBasket,
   type BasketSummary,
 } from "@/lib/basket";
-import { BASKET } from "@/lib/copy";
+import { BASKET, PREFERENCES } from "@/lib/copy";
+import { checkRules, hasRules, meetsAll, misses, type Preferences } from "@/lib/preferences";
+import { usePreferences } from "@/lib/use-preferences";
 import { useBasket } from "@/lib/use-basket";
 import { nutrientFlags } from "@/lib/thresholds";
 
@@ -72,6 +74,8 @@ export function BasketView({ shared }: { shared: string[] | null }) {
     [codes, loaded],
   );
   const swaps = useSwaps(shared ? [] : products);
+  const preferences = usePreferences();
+  const rules = hasRules(preferences) ? preferences : null;
   const summary = summarise(products);
   const pending = codes.some((c) => loaded[c] === undefined);
 
@@ -110,6 +114,16 @@ export function BasketView({ shared }: { shared: string[] | null }) {
       )}
 
       <Summary summary={summary} />
+      {rules && products.length > 0 && (
+        <p className="type-body pt-3">
+          <Link href="/preferences">
+            {PREFERENCES.basketMeets(
+              products.filter((p) => meetsAll(checkRules(rules, p))).length,
+              products.length,
+            )}
+          </Link>
+        </p>
+      )}
       {pending && <p className="type-small pt-3 text-ink-muted">{BASKET.loading}</p>}
 
       <ol aria-label="Products in the basket" className="pt-8">
@@ -125,7 +139,13 @@ export function BasketView({ shared }: { shared: string[] | null }) {
             );
           }
           return (
-            <Item key={code} product={item} swap={swaps[code] ?? null} readOnly={!!shared} />
+            <Item
+              key={code}
+              product={item}
+              swap={swaps[code] ?? null}
+              readOnly={!!shared}
+              rules={rules}
+            />
           );
         })}
       </ol>
@@ -150,8 +170,19 @@ function RemoveButton({ code, name }: { code: string; name: string }) {
   );
 }
 
-function Item({ product, swap, readOnly }: { product: Product; swap: Swap | null; readOnly: boolean }) {
+function Item({
+  product,
+  swap,
+  readOnly,
+  rules = null,
+}: {
+  product: Product;
+  swap: Swap | null;
+  readOnly: boolean;
+  rules?: Preferences | null;
+}) {
   const high = nutrientFlags(product.nutrition, product.category_main).filter((f) => f.level === "high");
+  const missed = rules ? misses(checkRules(rules, product)) : [];
   return (
     <li className="border-b border-rule-light py-4">
       <div className="flex items-start justify-between gap-4">
@@ -166,6 +197,11 @@ function Item({ product, swap, readOnly }: { product: Product; swap: Swap | null
           </span>
           {high.length > 0 && (
             <span className="type-small block pt-1">{high.map((f) => `High in ${f.name}`).join(" · ")}</span>
+          )}
+          {missed.length > 0 && (
+            <span data-rules="misses" className="type-small block pt-1">
+              {PREFERENCES.basketMisses(missed.map((c) => c.short))}
+            </span>
           )}
         </span>
         <span className="flex shrink-0 flex-col items-end gap-2">

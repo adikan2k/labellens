@@ -287,6 +287,34 @@ A single column: the question box, then each agent step as a row in a label-styl
 - **Sharing:** `/basket?codes=…` (barcodes only) opens a read-only copy with "Save as my basket".
 - **Empty:** an invitation, with search, scan and read-a-label as the ways to start.
 
+### My preferences
+
+`/preferences`. Someone's own rules, set once and kept in this browser only (no account). Every rule is optional and starts empty: the site never fills in or suggests a value.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│ My preferences                                   (title)   │
+│ ████████████████████████████████████████████ rule-heavy    │
+│ Your own rules, checked on every product...      (body)    │
+│ Limits per 100 g                     (heading)             │
+│ Sugars    [      ] g, at most                              │
+│ Salt      [      ] g, at most                              │
+│ Saturated fat [  ] g, at most                              │
+│ Nutri-Score   [ Any ▾ ]  or better                         │
+│ ☐ Not ultra-processed (NOVA 4)                             │
+│ Additives to avoid                   (heading)             │
+│ [ Find an additive ]  → matches as rows with "Avoid"       │
+│ E129 Allura red   Remove                                   │
+│ Saved in this browser.  Clear my rules       (small)       │
+└────────────────────────────────────────────────────────────┘
+```
+
+- Inputs are `panel` boxes like search, one column on the reading width. A change is saved at once; the status line says so.
+- **Your rules box** (product page and label read, under the high-in flags): a `rule-thin` above, the heading "Your rules", then one row per rule: the rule in `type-data-label`, the outcome in words on the right in `type-data-value` ("Meets", "Misses", "Not known"), and the product's value in `type-small` under a miss. Words only, no colour and no ticks: colour belongs to Nutri-Score. With no rules set, one `type-small` line links to `/preferences`.
+- **Compare** adds a "Your rules" row to the table: "Meets all 4" or "Misses 2", only when rules are set.
+- **My basket** adds "n of m meet all your rules" to the summary, and "Misses your rules: sugars, Nutri-Score" under each item that misses one.
+- **Wording:** always "your rules", never "recommended", "healthy" or "safe". Missing data is "Not known", never a pass.
+
 ### Additive guide
 
 `/additives` and `/additives/[slug]`. What each additive on a US label is, how common it is, and where it turns up. Every additive row elsewhere (product page, label read, basket) links to its guide page.

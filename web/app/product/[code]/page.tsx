@@ -11,6 +11,7 @@ import { AddToBasket } from "@/components/basket/add-to-basket";
 import { NutrientFlags } from "@/components/product/nutrient-flags";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SettleChip } from "@/components/product/settle-chip";
+import { YourRules } from "@/components/preferences/your-rules";
 import type { Product, Swap } from "@/lib/api";
 import { cachedProduct, cachedSwaps } from "@/lib/cached";
 import { compareHref } from "@/lib/compare";
@@ -110,6 +111,7 @@ function ProductLayout({ product, swaps }: { product: Product; swaps: Swap[] | n
         <div className="lg:sticky lg:top-8">
           <NutritionPanel nutrition={product.nutrition} />
           <NutrientFlags nutrition={product.nutrition} categoryId={product.category_main} />
+          <YourRules subject={product} />
         </div>
       </aside>
 

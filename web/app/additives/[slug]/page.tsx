@@ -5,6 +5,7 @@ import { Suspense } from "react";
 
 import { CategoryBars, ProductRows } from "@/components/additives/guide-parts";
 import { Rule } from "@/components/label/primitives";
+import { AvoidButton } from "@/components/preferences/avoid-button";
 import { ExplainerText } from "@/components/product/expandable-row";
 import type { AdditiveGuide } from "@/lib/api";
 import { cachedAdditive } from "@/lib/cached";
@@ -79,6 +80,11 @@ function Guide({ guide }: { guide: AdditiveGuide }) {
         {guide.e_number && <p className="type-data-value">{guide.e_number}</p>}
         <h1 className="type-display break-words">{guide.name}</h1>
         {sub && <p className="type-body pt-3 text-ink-muted">{sub}</p>}
+        <p className="pt-3">
+          <AvoidButton
+            additive={{ id: guide.additive_id, name: guide.name, e_number: guide.e_number }}
+          />
+        </p>
       </header>
       <Rule weight="heavy" />
 

@@ -37,6 +37,7 @@ PAGES = (
     "/label",
     "/additives",
     "/additives/e330",
+    "/preferences",
 )
 MCP_VERSION = "2026-07-28"
 MCP_TOOLS = {"search_products", "get_product", "find_swaps", "explain_additive"}
