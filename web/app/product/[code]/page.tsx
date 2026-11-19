@@ -7,6 +7,7 @@ import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
 import { IngredientList } from "@/components/product/ingredient-list";
 import { SwapList } from "@/components/product/swap-list";
+import { AddToBasket } from "@/components/basket/add-to-basket";
 import { NutrientFlags } from "@/components/product/nutrient-flags";
 import { NutritionPanel } from "@/components/product/nutrition-panel";
 import { SettleChip } from "@/components/product/settle-chip";
@@ -162,6 +163,7 @@ function ProductLayout({ product, swaps }: { product: Product; swaps: Swap[] | n
           <a href={product.off_url} className="type-data-value">
             Open in Open Food Facts
           </a>
+          <AddToBasket code={product.code} />
           <Link href={compareHref([product.code])} className="type-data-value">
             {COMPARE_WITH}
           </Link>

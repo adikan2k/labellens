@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AddToBasket } from "@/components/basket/add-to-basket";
 import { CompareTable } from "@/components/compare/compare-table";
 import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
@@ -82,6 +83,9 @@ export function LabelResult({ result }: { result: LabelResponse }) {
                 </Link>
                 {match.product.brand ? `, ${match.product.brand}` : ""}
                 {match.how === "barcode" ? " (by its barcode)" : " (by its name and brand)"}
+              </p>
+              <p className="pt-2">
+                <AddToBasket code={match.product.code} />
               </p>
               <div className="pt-6">
                 <CompareTable a={labelAsProduct(label)} b={match.product} />

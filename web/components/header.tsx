@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { BasketLink } from "@/components/basket/add-to-basket";
+
 export const NAV_LINKS = [
   { href: "/label", label: "Read a label" },
   { href: "/dashboard", label: "Dashboard" },
@@ -48,6 +50,9 @@ export function Header() {
               </Link>
             </li>
           ))}
+          <li className="empty:hidden">
+            <BasketLink className="type-small" />
+          </li>
         </ul>
       </nav>
     </header>

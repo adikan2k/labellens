@@ -24,9 +24,36 @@ export const HOME_WAYS_IN = [
   { href: "/label", title: "Read a label", note: "Photograph any pack, even one LabelLens has never seen, and see it explained." },
   { href: "/ask", title: "Ask a question", note: "An AI agent looks it up in the data, step by step, and cites what it used." },
   { href: "/compare", title: "Compare two products", note: "Their labels side by side, per 100 g, with every difference." },
+  { href: "/basket", title: "My basket", note: "Your products together, with better swaps" },
   { href: "/dashboard", title: "The dashboard", note: "The US packaged-food landscape" },
   { href: "/graph", title: "The food graph", note: "Products, brands and the ingredients they share" },
 ] as const;
+
+/** My basket (DESIGN.md, "My basket"). */
+export const BASKET = {
+  title: "My basket",
+  intro:
+    "The products you're thinking of buying, looked at together. It's kept in this browser only: no account, nothing sent anywhere but the barcodes LabelLens looks up.",
+  add: "Add to my basket",
+  added: "In my basket",
+  remove: "Remove",
+  swap: "Swap",
+  emptyTitle: "Start your basket",
+  emptyBody:
+    "Add products from their pages: search for them, scan a barcode, or photograph a label. Then see them together and swap the worst ones.",
+  full: (max: number) => `Your basket holds ${max} products at most. Remove one to add another.`,
+  sharedTitle: "A shared basket",
+  sharedNote: "Someone shared this basket with you. Saving it replaces yours.",
+  save: "Save as my basket",
+  share: "Share this basket",
+  copied: "Link copied",
+  additivesTitle: "Additives across the basket",
+  noAdditives: "None of these products lists an additive.",
+  gradeBarLabel: "Products by Nutri-Score",
+  loading: "Looking up your products…",
+  missing: (code: string) => `${code} is no longer in the data.`,
+  swapLine: (name: string, reason: string) => `Better swap: ${name}. ${reason}.`,
+} as const;
 
 /** The home page's live label. */
 export const SPECIMEN = {
