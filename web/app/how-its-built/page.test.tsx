@@ -40,9 +40,10 @@ test("every eval is listed with a link to its report", () => {
   expect(evals?.value).toBe(String(EVAL_RESULTS.length));
 });
 
-test("credits Claude Code as help, with the author's review", () => {
+test("says plainly who wrote the code and who approved the merges", () => {
   render(<HowItsBuiltPage />);
   const section = screen.getByRole("heading", { name: "How I worked" }).closest("section")!;
-  expect(section.textContent).toContain("with the help of Claude Code");
-  expect(section.textContent).toContain("a pull request that I reviewed before merging");
+  expect(section.textContent).toContain("in four days");
+  expect(section.textContent).toContain("with Claude Code writing most of the code");
+  expect(section.textContent).toContain("I approved each merge after seeing its test output and screenshots");
 });
