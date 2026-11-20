@@ -2,7 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiError, type SearchResponse } from "@/lib/api";
-import { NO_MATCH, WAKING_UP } from "@/lib/copy";
+import { NO_MATCH, SEARCH_SLOW, WAKING_UP } from "@/lib/copy";
 
 const searchProducts = vi.fn();
 vi.mock("@/lib/api", async (original) => ({
@@ -104,6 +104,36 @@ describe("LiveSearch", () => {
       await vi.advanceTimersByTimeAsync(200);
     });
     expect(screen.getByRole("link", { name: /Cheerios/ })).toBeTruthy();
+  });
+
+  test("a search that takes more than two seconds says the API is waking up", async () => {
+    let finish: (body: SearchResponse) => void = () => {};
+    searchProducts.mockReturnValueOnce(new Promise<SearchResponse>((resolve) => (finish = resolve)));
+    render(<LiveSearch productCount={null} />);
+    await type("cheerios");
+    // A normal search answers long before this; nothing is said yet.
+    expect(screen.queryByText(SEARCH_SLOW)).toBeNull();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000);
+    });
+    expect(screen.getByRole("status").textContent).toContain(SEARCH_SLOW);
+
+    await act(async () => {
+      finish(cheerios);
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(screen.queryByText(SEARCH_SLOW)).toBeNull();
+    expect(screen.getByRole("link", { name: /Cheerios/ })).toBeDefined();
+  });
+
+  test("a fast search never shows the waking-up line, even later", async () => {
+    searchProducts.mockResolvedValue(cheerios);
+    render(<LiveSearch productCount={null} />);
+    await type("cheerios");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5000);
+    });
+    expect(screen.queryByText(SEARCH_SLOW)).toBeNull();
   });
 
   test("example buttons fill the search", async () => {

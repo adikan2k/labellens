@@ -145,7 +145,7 @@ Every AI feature is measured against a baseline before it ships, and the misses 
 | [Graph and swaps](evals/results/graph_latency_public.md) | 100 products, live API | Under 1 s | p95 406 ms (graph), 233 ms (swaps) |
 | [Lighthouse](evals/results/lighthouse.md) | Home, product and dashboard pages on mobile | 90 in every category | 98 to 100 in every category |
 | [Prompt caching](evals/results/ask_caching.md) | 10 agent runs with and without a cached prompt | Cheaper, same answers | **64% cheaper per run** |
-| [Cold start](evals/results/cold_start.md) | First requests after the API and database sit idle | Timed and noted | 22.6 s after an hour idle, before app startup was cut from 16 s to 0.4 s; the database wake now costs about 1 s, then about 0.1 s per request |
+| [Cold start](evals/results/cold_start.md) | First request after the API sits idle, from Cloud Run's own log | Timed and noted | **7 to 10 s** from zero, down from 22.6 s after app startup was cut from 16 s to about 1 s; then under 0.1 s per request. The database wakes in about 1 s |
 
 **What these numbers don't show:**
 - The category labels came from Claude Opus, not from a person, so that result compares two models.

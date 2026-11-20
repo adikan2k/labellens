@@ -455,6 +455,7 @@ The whole sequence takes under 900 ms. It runs once per page view, never on scro
 - Empty search: "No products match. Try a brand name or scan the barcode number."
 - Missing data: "Open Food Facts has no sugar value for this product." Never show a blank cell.
 - Errors say what failed and what to do: "Search is waking up. Try again in a few seconds."
+- A long wait says why. When a search runs past 2 seconds, the status line under the box (Small) says "Search is waking up after a quiet spell. The first one can take about 10 seconds; the rest are fast." It goes when the results arrive. No spinner.
 - AI-generated explainers carry a small note: "Written by AI from Open Food Facts data."
 
 ---

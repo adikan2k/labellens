@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState, useSyncExternalStore, ViewTransitio
 
 import { GradeChip } from "@/components/label/primitives";
 import { ApiError, searchProducts, type SearchResult } from "@/lib/api";
-import { NO_MATCH, SCAN, WAKING_UP } from "@/lib/copy";
+import { NO_MATCH, SCAN, SEARCH_SLOW, SEARCH_SLOW_AFTER_MS, WAKING_UP } from "@/lib/copy";
 
 import { BarcodeScanner } from "./barcode-scanner";
 
@@ -20,6 +20,8 @@ export function LiveSearch({ productCount }: { productCount: number | null }) {
   const [query, setQuery] = useState("");
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [attempt, setAttempt] = useState(0);
+  // The query whose search has been running long enough to say why.
+  const [slowFor, setSlowFor] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
   const statusId = useId();
@@ -29,18 +31,26 @@ export function LiveSearch({ productCount }: { productCount: number | null }) {
   useEffect(() => {
     if (!q) return;
     const controller = new AbortController();
+    // Fires only when the search is still running: a finished one clears it below.
+    const slow = setTimeout(() => setSlowFor(q), DEBOUNCE_MS + SEARCH_SLOW_AFTER_MS);
+    const finish = (next: Outcome) => {
+      clearTimeout(slow);
+      setSlowFor(null);
+      setOutcome(next);
+    };
     const timer = setTimeout(() => {
       searchProducts(q, { limit: 10, signal: controller.signal })
-        .then((body) => setOutcome({ q, results: body.results }))
+        .then((body) => finish({ q, results: body.results }))
         .catch((error: unknown) => {
           if ((error as { name?: string })?.name === "AbortError") return;
           const message =
             error instanceof ApiError && !error.wakingUp ? error.message : WAKING_UP;
-          setOutcome({ q, error: message });
+          finish({ q, error: message });
         });
     }, DEBOUNCE_MS);
     return () => {
       clearTimeout(timer);
+      clearTimeout(slow);
       controller.abort();
     };
   }, [q, attempt]);
@@ -101,6 +111,7 @@ export function LiveSearch({ productCount }: { productCount: number | null }) {
       <ScanLine />
 
       <div id={statusId} role="status" aria-live="polite" className="type-small pt-6">
+        {state.kind === "loading" && slowFor === q && <p>{SEARCH_SLOW}</p>}
         {state.kind === "done" && results.length === 0 && <p>{NO_MATCH}</p>}
         {state.kind === "done" && results.length > 0 && (
           <span className="sr-only">

@@ -1,6 +1,10 @@
 /** Interface wording from docs/DESIGN.md section 4. One place, so every page says it the same way. */
 
 export const WAKING_UP = "Search is waking up. Try again in a few seconds.";
+/** Shown while a search has been running this long: the API is starting after a quiet spell. */
+export const SEARCH_SLOW_AFTER_MS = 2000;
+export const SEARCH_SLOW =
+  "Search is waking up after a quiet spell. The first one can take about 10 seconds; the rest are fast.";
 export const NO_MATCH = "No products match. Try a brand name or scan the barcode number.";
 export const AI_NOTE = "Written by AI from Open Food Facts data.";
 export const AI_CATEGORY_NOTE =

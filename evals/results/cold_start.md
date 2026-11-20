@@ -83,3 +83,51 @@ The Cloud Run instance was already up (the 6-hourly smoke test keeps it busy oft
 so this run measured Neon waking from its idle pause, about 1 s, not a scale from zero. A
 full scale-from-zero on the current revision is still unmeasured; the warm-up script
 (`uv run python -m scripts.warm`) removes both before a demo.
+
+## Scale from zero on the current revision (2026-11-19 and 20)
+
+Read from Cloud Run's request log for revision `labellens-api-00022-79f`, not timed by hand:
+the first request to arrive at each of five new instances, and the next request after it.
+
+| New instance (UTC) | First request | Time | Next request |
+| --- | --- | ---: | ---: |
+| 2026-11-19 07:55 | `GET /health` (smoke test) | 7.82 s | 0.06 s |
+| 2026-11-19 17:30 | `POST /mcp` (Claude) | 7.45 s | under 0.01 s |
+| 2026-11-19 20:58 | `GET /health` (smoke test) | 7.78 s | 0.06 s |
+| 2026-11-20 02:12 | `POST /mcp` (Claude) | 7.07 s | under 0.01 s |
+| 2026-11-20 06:22 | `POST /mcp` (Claude) | 10.07 s | under 0.01 s |
+
+So a visitor who arrives after a quiet spell waits 7 to 10 s, as predicted above, not 22.6 s.
+App startup itself logged 0.3 to 1.9 s on this revision; the rest is Cloud Run starting an
+instance and importing the app.
+
+It happens often. The same log shows 28 instance starts on this revision between 2026-11-19
+01:14 and 2026-11-20 06:53, about one an hour, because the site is quiet and Cloud Run stops
+an idle instance after at most 15 minutes.
+
+To reproduce: `gcloud logging read` on the service for `textPayload:"Startup took"`, then the
+request log around each timestamp for `httpRequest.latency`.
+
+## The fix: a ping every 5 minutes, and a line that says what is happening
+
+- `scripts/keep_warm.py` creates one Cloud Scheduler job that asks for `/health` every 5
+  minutes, so an instance is almost always up. Minimum instances stays 0, and `/health` opens
+  no database connection, so Neon still pauses when idle (about 1 s to wake, measured above).
+  It is not a guarantee: Cloud Run can still replace an instance, and the first request after a
+  deploy starts a new one.
+- When a search on the home page runs longer than 2 seconds, the page now says the search is
+  waking up and that the first one can take about 10 seconds. Before, the loading state gave
+  no reason.
+
+## The ping is running (2026-11-20, 07:49 UTC)
+
+The job `labellens-keep-warm` was created in Cloud Scheduler at 07:45 UTC and run once by hand.
+Cloud Run's request log shows it:
+
+| Request | Time | Status |
+| --- | ---: | ---: |
+| `GET /health` from `Google-Cloud-Scheduler`, 07:49:08 | 0.016 s | 200 |
+
+Not yet measured: how many instance starts a day remain with the ping running. Before it,
+there was about one an hour. To check, count the `Startup took` lines after 2026-11-20 07:45
+in the same log; they should be rare outside deploys.
