@@ -145,7 +145,7 @@ A poster for the label. The page is warm `page`; the specimen and every panel ar
 │ │ 9%│ 17% │    22%    │     27%     │    25%    │  grade strip│
 │ └───┴─────┴───────────┴─────────────┴───────────┘             │
 │ ┌ Read a label ┐ ┌ Ask a question ┐ ┌ Compare two ┐ tiles      │
-│▓ How it's measured: 0.98 · 98% · 97% · 184 ms ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│ (ink)
+│▓ How it's measured: 0.98 · 98% · 97% · 175 ms ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│ (ink)
 │▓ LabelLens (huge)                         attribution ▓▓▓▓▓▓▓│ footer (ink)
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -250,9 +250,28 @@ A two-column grid of charts, each inside a panel opened by `rule-heavy` with its
 
 ### Graph explorer
 
-Full width below the header. The title, intro and search sit on the page width, lined up with the header; the graph below them fills the full width, and a panel on the right shows the selected node in label style. Nodes are black dots; the selected product is the only filled shape with its grade colour.
+Full width below the header. The title, intro and search sit on the page width, lined up with the header; the graph below them fills the full width, and from `xl` a panel on the right shows the selected node in label style (below the graph on narrower screens).
 
-Labels never overlap. A label shows only where it clears every other label, covers no other dot and fits inside the canvas; the most linked nodes are labelled first, and the centre product and the selected node always are. Zooming in reveals more labels, zooming out fewer, and hovering shows any node's name.
+**Three columns, left to right.** A neighbourhood always has the same three layers, so where a node sits says what it is:
+
+1. **This product**, level with the middle of the graph.
+2. **What it is linked to**, grouped by kind under a Data label heading with its count: brands, categories, additives, ingredients. A wider category the product is in only through a narrower one is listed in `ink-muted` with no line.
+3. **The products that share those things**, under "Most in common": the 16 that share the most, each with how many it shares at the right of its row. A product listed under several barcodes is shown once, and other listings of the centre product are left out.
+
+The three columns sit in one `panel`. Every row is 2rem tall, one line, truncated with the full name as its tooltip, so the lines between columns need no measuring.
+
+**Marks.** Each kind has its own shape, in `ink`: products are dots, brands squares, categories diamonds and additives triangles. Ingredients are dots in `ink-muted`. The centre product's dot is the only mark in a colour, its Nutri-Score grade. Shape, not colour, tells the kinds apart, because colour here only ever means a grade. The group headings name the kinds, so there is no separate key.
+
+**Lines.** `rule-light`, 1 px: curved from the product to what it is linked to, straight from there to the products that share it. Lines touching the selected or pointed-at node are `ink`, 1.5 px, drawn on top.
+
+**Selecting.** Every row is a button.
+- The selected row is `paper` on `ink`. Rows linked to it are bold; the rest are `ink-muted`. Pointing at or focusing a row shows the same, without selecting.
+- Selecting something in the middle narrows the right column to every product linked to it, under "Others with Oats".
+- Selecting a product on the right lists what it has in common with the centre in the panel, with "Centre the graph here".
+
+**Phones.** Below `md` the columns stack as three lists and the lines are left out; bold rows and the panel carry the links.
+
+Under the graph, a `details` list holds every node by kind, including the products that did not make the right column.
 
 ### Ask
 
@@ -434,7 +453,7 @@ The whole sequence takes under 900 ms. It runs once per page view, never on scro
 
 - Search result → product page: a View Transition morphs the result row's name and grade chip into their places on the product page.
 - Additive rows expand on click with a height animation (`dur-base`).
-- Graph: on selection, the camera eases to the node (`dur-slow`); new neighbours fade in.
+- Graph: nothing moves. Selecting a row changes weights and tones at once.
 - Dashboard bars grow from zero once, the first time each chart enters the viewport.
 
 **Never**
@@ -446,7 +465,7 @@ The whole sequence takes under 900 ms. It runs once per page view, never on scro
 
 **Reduced motion.** With `prefers-reduced-motion: reduce`, the label appears complete, View Transitions are replaced by an instant swap, and nothing moves on its own.
 
-**Tools.** Motion for component and layout animation; the browser View Transitions API for page morphs; Sigma.js (WebGL) for the graph. Add GSAP only if the label sequence needs a timeline that Motion cannot express.
+**Tools.** Motion for component and layout animation; the browser View Transitions API for page morphs; the graph is plain lists with SVG lines. Add GSAP only if the label sequence needs a timeline that Motion cannot express.
 
 ---
 

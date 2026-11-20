@@ -31,7 +31,7 @@ export const M = {
   labelWhole: { value: "85%", file: LABEL, evidence: "85% (68–94%) of 27" },
   mcpTools: { value: "29/30", file: MCP, evidence: "29/30: 97% (83–99%)" },
   category: { value: "90.0%", file: CATEGORY, evidence: "180/200: 90.0% (85.1–93.4%)" },
-  searchP95: { value: "184 ms", file: SEARCH, evidence: "| **p95** | **184.0** |" },
+  searchP95: { value: "175 ms", file: SEARCH, evidence: "| **p95** | **175.0** |" },
   graphP95: { value: "406 ms", file: GRAPH, evidence: "**406.0**" },
   swapsP95: { value: "233 ms", file: GRAPH, evidence: "**233.2**" },
   lighthouseHome: { value: "100", file: LIGHTHOUSE, evidence: "| Home | 100 |" },

@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 
 import { GradeChip, Panel, Rule } from "@/components/label/primitives";
 import { ApiError, getNeighborhood, type GraphNeighborhood, type GraphNode } from "@/lib/api";
-import { AI_NOTE } from "@/lib/copy";
-import { degree, groupByKind, KIND_NAMES, productCode } from "@/lib/graph-view";
+import { AI_NOTE, GRAPH } from "@/lib/copy";
+import { columns, groupByKind, KIND_NAMES, productCode } from "@/lib/graph-view";
 
-import { GraphCanvas } from "./graph-canvas";
+import { GraphColumns } from "./graph-columns";
 
 type Outcome = { code: string; data: GraphNeighborhood } | { code: string; error: ApiError };
 
@@ -16,9 +16,8 @@ export const NOT_IN_GRAPH =
   "The graph holds the most complete graded products, and this one is not among them.";
 
 /**
- * The graph explorer: a product's neighbourhood drawn with Sigma, a label-style panel for the
- * selected node, and the same nodes as a list, so everything works by keyboard and screen
- * reader too (the WebGL canvas itself is hidden from assistive technology).
+ * The graph explorer: a product's neighbourhood as three columns (GraphColumns), a label-style
+ * panel for the selected node, and every node as a list.
  */
 export function GraphExplorer({
   code: firstCode,
@@ -88,21 +87,23 @@ export function GraphExplorer({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 pt-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div className="grid grid-cols-1 gap-6 pt-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
       <div className="min-w-0">
-        <GraphCanvas data={data} selected={selected} onSelect={(id) => setSelection({ code, node: id })} />
-        <p className="type-small pt-2 text-ink-muted">
-          {data.nodes.length} nodes{data.truncated ? ", the best-ranked shown where there are more" : ""}.
-          Select a node to see it; centre the graph on any product.
+        <GraphColumns data={data} selected={selected} onSelect={(id) => setSelection({ code, node: id })} />
+        <p className="type-small max-w-measure pt-2 text-ink-muted">
+          {data.nodes.length} nodes{data.truncated ? ", the best-ranked shown where there are more" : ""}.{" "}
+          {GRAPH.caption}
         </p>
       </div>
       <SelectedPanel
         node={node}
         isCenter={node.id === data.center}
-        links={degree(data, node.id)}
+        hubNote={hubNote(data, node)}
+        shared={sharedWithCentre(data, node)}
+        centreName={data.nodes.find((n) => n.id === data.center)?.name ?? ""}
         onRecenter={() => recenter(node.id)}
       />
-      <details className="lg:col-span-2">
+      <details className="xl:col-span-2">
         <summary className="type-data-value cursor-pointer">Show the graph as a list</summary>
         <div className="grid grid-cols-1 gap-6 pt-3 sm:grid-cols-2 lg:grid-cols-3">
           {groupByKind(data).map(([kind, nodes]) => (
@@ -132,15 +133,40 @@ export function GraphExplorer({
   );
 }
 
+/** For something the centre is linked to: how many of the listed products share it. */
+function hubNote(data: GraphNeighborhood, node: GraphNode): string | null {
+  if (node.kind === "Product") return null;
+  const model = columns(data, node.id);
+  const hub = model?.groups.flatMap((g) => g.hubs).find((h) => h.node.id === node.id);
+  if (!model || !hub) return null;
+  return hub.direct ? GRAPH.hubLinks(model.peers.length) : GRAPH.widerCategory;
+}
+
+/** The names of what a product has in common with the centre; null for other nodes. */
+function sharedWithCentre(data: GraphNeighborhood, node: GraphNode): string[] | null {
+  if (node.kind !== "Product" || node.id === data.center) return null;
+  const model = columns(data, node.id);
+  const peer = model?.peers.find((p) => p.node.id === node.id);
+  if (!peer) return null;
+  const names = new Map(data.nodes.map((n) => [n.id, n.name]));
+  return peer.shares.map((id) => names.get(id) ?? id);
+}
+
 function SelectedPanel({
   node,
   isCenter,
-  links,
+  hubNote,
+  shared,
+  centreName,
   onRecenter,
 }: {
   node: GraphNode;
   isCenter: boolean;
-  links: number;
+  /** For a hub: how many of the products shown are linked to it. */
+  hubNote: string | null;
+  /** What a peer has in common with the centre. */
+  shared: string[] | null;
+  centreName: string;
   onRecenter: () => void;
 }) {
   const code = productCode(node.id);
@@ -161,8 +187,24 @@ function SelectedPanel({
           <p className="type-small pt-1 text-ink-muted">{AI_NOTE}</p>
         </div>
       )}
-      {(node.kind === "Brand" || node.kind === "Category") && (
-        <p className="type-body py-3">Linked to {links} of the products shown.</p>
+      {hubNote && <p className="type-body py-3">{hubNote}</p>}
+      {shared && (
+        <div className="py-3">
+          <h3 className="type-data-label pb-1">
+            {GRAPH.sharedWith(centreName)} ({shared.length})
+          </h3>
+          {shared.length > 0 ? (
+            <ul className="type-small">
+              {shared.map((name) => (
+                <li key={name} className="border-b border-rule-light py-1">
+                  {name}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="type-small">{GRAPH.nothingShared}</p>
+          )}
+        </div>
       )}
       {code && (
         <p className="flex flex-wrap gap-x-6 gap-y-2 py-3">

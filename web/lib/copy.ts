@@ -123,6 +123,26 @@ export const ADDITIVES = {
   unavailable: "The additive guide is not ready. Try again in a few seconds.",
 } as const;
 
+/** The graph page's three columns (DESIGN.md, Graph explorer). */
+export const GRAPH = {
+  centre: "This product",
+  hubs: "What it is linked to",
+  peers: "Products that share them",
+  peersTop: "Most in common",
+  peersOf: (name: string) => `Others with ${name}`,
+  noPeers: "No other product here shares it.",
+  inCommon: "in common",
+  caption:
+    "Lines join things that are linked. The number beside a product is how many of the middle column it shares. A product listed under several barcodes is shown once.",
+  sharedWith: (name: string) => `In common with ${name}`,
+  hubLinks: (others: number) =>
+    others === 0
+      ? "Of the products shown, only this one is linked to it."
+      : `This product and ${others} of the others shown are linked to it.`,
+  widerCategory: "A wider category. This product is in it through a narrower one.",
+  nothingShared: "It shares nothing in the middle column directly.",
+} as const;
+
 /** The home page's live label. */
 export const SPECIMEN = {
   label: "A real label from the data",

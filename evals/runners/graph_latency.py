@@ -108,7 +108,7 @@ graph holds, one request at a time per endpoint, end to end from the client.
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 {rows}
 
-The browser adds the layout and first frame on top (measured separately with a
+The browser adds the first draw on top (measured separately with a
 `performance.mark("graph-rendered")`).
 """
 

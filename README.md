@@ -32,7 +32,7 @@ LabelLens puts it in one place. It states facts and published thresholds, and it
 <td align="center"><b>515</b><br><sub>additives, each explained</sub></td>
 <td align="center"><b>0.98</b><br><sub>ask agent fact score<br>(baseline 0.26)</sub></td>
 <td align="center"><b>98%</b><br><sub>label values read right<br>from a photo</sub></td>
-<td align="center"><b>184 ms</b><br><sub>p95 search,<br>live API</sub></td>
+<td align="center"><b>175 ms</b><br><sub>p95 search,<br>live API</sub></td>
 <td align="center"><b>~$6</b><br><sub>total model spend<br>for the whole project</sub></td>
 </tr>
 </table>
@@ -76,8 +76,8 @@ LabelLens puts it in one place. It states facts and published thresholds, and it
 <b>See the whole shelf.</b> A dashboard of the US packaged-food landscape: grades, processing and additives by category.
 </td>
 <td width="50%" valign="top">
-<img src="docs/readme/graph.jpg" alt="The food graph: Cheerios at the centre, linked to its brand, category, additives and ingredients" width="100%">
-<b>Explore the graph.</b> 27,662 products and their brands, categories, additives and ingredients in Neo4j. Pick any product to see what it connects to.
+<img src="docs/readme/graph.jpg" alt="The food graph in three columns: Cheerios, what it is linked to, and the products that share the most with it" width="100%">
+<b>Explore the graph.</b> 27,662 products and their brands, categories, additives and ingredients in Neo4j. Pick any product to see what it is linked to and which products share the most with it.
 </td>
 </tr>
 </table>
@@ -141,7 +141,7 @@ Every AI feature is measured against a baseline before it ships, and the misses 
 | [Label reading](evals/results/label_reading_claude-haiku-5-5.md) | 30 real label photos from Open Food Facts, read by `POST /label` and checked against the photos | Measured | **98% (95–99%) of nutrient values right**; every value right on 85% (68–94%) of labels; additives 93% precision, 98% recall |
 | [MCP tool selection](evals/results/mcp_tools.md) | 30 natural requests: right tool and right arguments, from the tool definitions alone | 90% | **29/30, 97% (83–99%)**, three fresh runs in a row; runs in CI |
 | [Category accuracy](evals/results/category_accuracy_claude-haiku-5-5-full-silver.md) | AI category on 200 products, against labels from a larger model (Claude Opus) | 90% | Haiku **90.0% (85.1–93.4%)**, Sonnet 92.0%. Open Food Facts' own tags: 87.5% |
-| [Search latency](evals/results/search_latency_public.md) | 200 searches against the live API | p95 under 300 ms | **p95 184 ms**, p50 104 ms |
+| [Search latency](evals/results/search_latency_public.md) | 200 searches against the live API | p95 under 300 ms | **p95 175 ms**, p50 98 ms |
 | [Graph and swaps](evals/results/graph_latency_public.md) | 100 products, live API | Under 1 s | p95 406 ms (graph), 233 ms (swaps) |
 | [Lighthouse](evals/results/lighthouse.md) | Home, product and dashboard pages on mobile | 90 in every category | 98 to 100 in every category |
 | [Prompt caching](evals/results/ask_caching.md) | 10 agent runs with and without a cached prompt | Cheaper, same answers | **64% cheaper per run** |
