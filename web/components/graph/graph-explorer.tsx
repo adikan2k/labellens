@@ -4,9 +4,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { GradeChip, Panel, Rule } from "@/components/label/primitives";
+import type { NutriscoreGrade } from "@/lib/api";
 import { ApiError, getNeighborhood, type GraphNeighborhood, type GraphNode } from "@/lib/api";
 import { AI_NOTE } from "@/lib/copy";
-import { degree, groupByKind, KIND_NAMES, productCode } from "@/lib/graph-view";
+import {
+  degree,
+  groupByKind,
+  keyEntries,
+  KIND_NAMES,
+  type NodeShape,
+  productCode,
+} from "@/lib/graph-view";
 
 import { GraphCanvas } from "./graph-canvas";
 
@@ -90,10 +98,12 @@ export function GraphExplorer({
   return (
     <div className="grid grid-cols-1 gap-6 pt-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div className="min-w-0">
+        <GraphKey data={data} />
         <GraphCanvas data={data} selected={selected} onSelect={(id) => setSelection({ code, node: id })} />
         <p className="type-small pt-2 text-ink-muted">
           {data.nodes.length} nodes{data.truncated ? ", the best-ranked shown where there are more" : ""}.
-          Select a node to see it; centre the graph on any product.
+          Point at a mark to see its name. Select one to read about it; centre the graph on any
+          product.
         </p>
       </div>
       <SelectedPanel
@@ -129,6 +139,48 @@ export function GraphExplorer({
         </div>
       </details>
     </div>
+  );
+}
+
+const GRADE_TEXT: Record<NutriscoreGrade, string> = {
+  a: "text-grade-a",
+  b: "text-grade-b",
+  c: "text-grade-c",
+  d: "text-grade-d",
+  e: "text-grade-e",
+};
+
+/** One of the graph's marks, drawn the way the canvas draws it. */
+function Mark({ shape, className = "" }: { shape: NodeShape; className?: string }) {
+  return (
+    <svg viewBox="0 0 12 12" aria-hidden="true" className={`inline-block h-3 w-3 ${className}`}>
+      {shape === "circle" && <circle cx="6" cy="6" r="5" fill="currentColor" />}
+      {shape === "square" && <rect x="1" y="1" width="10" height="10" fill="currentColor" />}
+      {shape === "diamond" && <path d="M6 0 12 6 6 12 0 6Z" fill="currentColor" />}
+      {shape === "triangle" && <path d="M6 1 11.5 11H.5Z" fill="currentColor" />}
+    </svg>
+  );
+}
+
+/** What each mark in the graph is, with how many are shown (DESIGN.md, Graph explorer). */
+function GraphKey({ data }: { data: GraphNeighborhood }) {
+  const center = data.nodes.find((n) => n.id === data.center);
+  const grade = center?.nutriscore_grade ?? null;
+  return (
+    <ul aria-label="Key" className="type-small flex flex-wrap gap-x-6 gap-y-1 pb-2">
+      {center && (
+        <li className="flex items-center gap-2">
+          <Mark shape="circle" className={grade ? GRADE_TEXT[grade] : ""} />
+          {grade ? "This product, in its Nutri-Score colour" : "This product"}
+        </li>
+      )}
+      {keyEntries(data).map((entry) => (
+        <li key={entry.kind} className="flex items-center gap-2">
+          <Mark shape={entry.shape} className={entry.muted ? "text-ink-muted" : ""} />
+          {KIND_NAMES[entry.kind]} ({entry.count})
+        </li>
+      ))}
+    </ul>
   );
 }
 

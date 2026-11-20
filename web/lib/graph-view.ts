@@ -2,9 +2,9 @@
  * Turns a /graph/neighborhood response into a laid-out graphology graph for Sigma, and the
  * groupings the side panel and the accessible list use. Pure, so it is tested without WebGL.
  *
- * DESIGN.md: nodes are black dots; the centre product is the only filled shape in its grade
- * colour; edges are rule-light. Colours come from the CSS tokens (readTokens), never from
- * hex codes here.
+ * DESIGN.md: each kind of node has its own shape (KIND_SHAPE) in ink; ingredients, the most
+ * numerous, are ink-muted; the centre product is the only shape in its grade colour; edges
+ * are rule-light. Colours come from the CSS tokens (readTokens), never from hex codes here.
  */
 import Graph from "graphology";
 import forceAtlas2 from "graphology-layout-forceatlas2";
@@ -35,6 +35,7 @@ export type NodeAttributes = {
   y: number;
   size: number;
   color: string;
+  shape: NodeShape;
   label: string;
   kind: GraphNode["kind"];
   grade: NutriscoreGrade | null;
@@ -43,8 +44,25 @@ export type NodeAttributes = {
   labelShown?: boolean;
 };
 
-// Screen pixels (Sigma's default sizing): small dots, the centre product clearly larger.
-export const NODE_SIZE = { center: 9, product: 3.5, other: 3 };
+// Screen pixels (Sigma's default sizing): small marks, the centre product clearly larger.
+// Squares, diamonds and triangles need a little more room than a dot to read as shapes.
+export const NODE_SIZE = { center: 9, product: 3.5, other: 4.5, ingredient: 3 };
+
+export type NodeShape = "circle" | "square" | "diamond" | "triangle";
+
+/** One shape per kind, so the kinds can be told apart without colour (DESIGN.md). */
+export const KIND_SHAPE: Record<GraphNode["kind"], NodeShape> = {
+  Product: "circle",
+  Brand: "square",
+  Category: "diamond",
+  Additive: "triangle",
+  Ingredient: "circle",
+};
+
+function sizeOf(kind: GraphNode["kind"]): number {
+  if (kind === "Product") return NODE_SIZE.product;
+  return kind === "Ingredient" ? NODE_SIZE.ingredient : NODE_SIZE.other;
+}
 
 // Kinds in a ring around the centre, so the layout starts readable and stays deterministic.
 const RING: Record<GraphNode["kind"], number> = {
@@ -64,8 +82,9 @@ export function toGraph(data: GraphNeighborhood, tokens: Tokens): Graph<NodeAttr
     graph.addNode(node.id, {
       x: radius * Math.cos(angle),
       y: radius * Math.sin(angle),
-      size: node.kind === "Product" ? NODE_SIZE.product : NODE_SIZE.other,
-      color: node.kind === "Product" ? tokens.ink : tokens.inkMuted,
+      size: sizeOf(node.kind),
+      color: node.kind === "Ingredient" ? tokens.inkMuted : tokens.ink,
+      shape: KIND_SHAPE[node.kind],
       label: node.name,
       kind: node.kind,
       grade: node.nutriscore_grade ?? null,
@@ -80,6 +99,7 @@ export function toGraph(data: GraphNeighborhood, tokens: Tokens): Graph<NodeAttr
       y: 0,
       size: NODE_SIZE.center,
       color: grade ? tokens.grade[grade] : tokens.ink,
+      shape: KIND_SHAPE[center.kind],
       label: center.name,
       kind: center.kind,
       grade,
@@ -162,6 +182,27 @@ export function pickLabels(
     if (clear || forced.includes(box.id)) kept.push(box);
   }
   return new Set(kept.map((k) => k.id));
+}
+
+/**
+ * Which label to keep when two would overlap. Brands, categories and additives come first:
+ * they are few, and they say what the products around them share. Then the most linked.
+ */
+export function labelPriority(kind: GraphNode["kind"], links: number): number {
+  const hub = kind === "Brand" || kind === "Category" || kind === "Additive";
+  return (hub ? 1000 : 0) + links * 2 + (kind === "Product" ? 0 : 1);
+}
+
+/** The key above the graph: each kind present, in KIND_ORDER, with how many are shown. */
+export function keyEntries(
+  data: GraphNeighborhood,
+): { kind: GraphNode["kind"]; shape: NodeShape; muted: boolean; count: number }[] {
+  return groupByKind(data).map(([kind, nodes]) => ({
+    kind,
+    shape: KIND_SHAPE[kind],
+    muted: kind === "Ingredient",
+    count: nodes.length,
+  }));
 }
 
 export const KIND_ORDER: GraphNode["kind"][] = ["Product", "Brand", "Category", "Additive", "Ingredient"];

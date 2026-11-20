@@ -5,6 +5,9 @@ import type { GraphNeighborhood } from "@/lib/api";
 import {
   degree,
   groupByKind,
+  keyEntries,
+  KIND_SHAPE,
+  labelPriority,
   layout,
   pickLabels,
   productCode,
@@ -50,11 +53,50 @@ describe("graph view", () => {
     expect(graph.size).toBe(3); // the repeated edge is drawn once
     expect(graph.getNodeAttribute("Product:1", "color")).toBe("grade-c");
     expect(graph.getNodeAttribute("Product:2", "color")).toBe("ink");
-    expect(graph.getNodeAttribute("Brand:general mills", "color")).toBe("ink-muted");
+    expect(graph.getNodeAttribute("Brand:general mills", "color")).toBe("ink");
     expect(graph.getNodeAttribute("Product:1", "size")).toBeGreaterThan(
       graph.getNodeAttribute("Product:2", "size"),
     );
     graph.forEachEdge((_, attrs) => expect(attrs.color).toBe("rule-light"));
+  });
+
+  test("each kind has its own shape; only ingredients are muted", () => {
+    const withIngredient: GraphNeighborhood = {
+      ...DATA,
+      nodes: [
+        ...DATA.nodes,
+        { id: "Category:cereals", kind: "Category", name: "Cereals", nutriscore_grade: null, detail: null },
+        { id: "Ingredient:en:oats", kind: "Ingredient", name: "Oats", nutriscore_grade: null, detail: null },
+      ],
+    };
+    const graph = toGraph(withIngredient, TOKENS);
+    const shape = (id: string) => graph.getNodeAttribute(id, "shape");
+    expect(shape("Product:1")).toBe("circle");
+    expect(shape("Product:2")).toBe("circle");
+    expect(shape("Brand:general mills")).toBe("square");
+    expect(shape("Category:cereals")).toBe("diamond");
+    expect(shape("Additive:en:e307")).toBe("triangle");
+    expect(shape("Ingredient:en:oats")).toBe("circle");
+    expect(graph.getNodeAttribute("Ingredient:en:oats", "color")).toBe("ink-muted");
+    // Products and ingredients share the dot, so the tone has to tell them apart.
+    const dots = Object.entries(KIND_SHAPE).filter(([, s]) => s === "circle").map(([k]) => k);
+    expect(dots).toEqual(["Product", "Ingredient"]);
+
+    expect(keyEntries(withIngredient)).toEqual([
+      { kind: "Product", shape: "circle", muted: false, count: 2 },
+      { kind: "Brand", shape: "square", muted: false, count: 1 },
+      { kind: "Category", shape: "diamond", muted: false, count: 1 },
+      { kind: "Additive", shape: "triangle", muted: false, count: 1 },
+      { kind: "Ingredient", shape: "circle", muted: true, count: 1 },
+    ]);
+  });
+
+  test("brands, categories and additives are labelled before products and ingredients", () => {
+    // A brand with one link still outranks a product with many.
+    expect(labelPriority("Brand", 1)).toBeGreaterThan(labelPriority("Product", 40));
+    expect(labelPriority("Additive", 1)).toBeGreaterThan(labelPriority("Ingredient", 40));
+    expect(labelPriority("Category", 5)).toBeGreaterThan(labelPriority("Category", 2));
+    expect(labelPriority("Ingredient", 3)).toBeGreaterThan(labelPriority("Product", 3));
   });
 
   test("the layout is finite, deterministic and centred on the product", () => {
@@ -167,6 +209,15 @@ describe("GraphExplorer", () => {
     expect(within(panel).getByRole("img", { name: "Nutri-Score C" })).toBeTruthy();
     expect(api.getNeighborhood).toHaveBeenCalledWith("1", expect.objectContaining({ depth: 2 }));
     expect(screen.getByText(/4 nodes, the best-ranked shown/)).toBeTruthy();
+    const key = within(screen.getByRole("list", { name: "Key" }))
+      .getAllByRole("listitem")
+      .map((li) => li.textContent);
+    expect(key).toEqual([
+      "This product, in its Nutri-Score colour",
+      "Products (2)",
+      "Brands (1)",
+      "Additives (1)",
+    ]);
   });
 
   test("selecting a node from the list shows it, with its explainer and the AI note", async () => {

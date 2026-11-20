@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import type { GraphNeighborhood } from "@/lib/api";
 import {
   type LabelBox,
+  labelPriority,
   layout,
   type NodeAttributes,
   pickLabels,
@@ -43,6 +44,7 @@ const LABEL_GAP = 4;
 // Start downloading Sigma as soon as this module loads in the browser, not after the data
 // arrives, so the two overlap. (WebGL cannot run on the server.)
 const sigmaModule = typeof window === "undefined" ? null : import("sigma");
+const shapesModule = typeof window === "undefined" ? null : import("sigma/rendering");
 
 function cssMs(name: string, fallback: number): number {
   const value = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
@@ -88,10 +90,8 @@ function relabel(
       height: LABEL_HEIGHT,
     });
   });
-  // Shared brands, categories and additives say more about the neighbourhood than one more
-  // product, so links come first and non-products break ties.
   const priority = (id: string) =>
-    graph.degree(id) * 2 + (graph.getNodeAttribute(id, "kind") === "Product" ? 0 : 1);
+    labelPriority(graph.getNodeAttribute(id, "kind"), graph.degree(id));
   const shown = pickLabels(boxes, forced, priority, { dots, bounds });
   graph.updateEachNodeAttributes((id, attrs) =>
     attrs.labelShown === shown.has(id) ? attrs : { ...attrs, labelShown: shown.has(id) },
@@ -120,9 +120,23 @@ export function GraphCanvas({ data, selected, onSelect }: Props) {
     let cancelled = false;
     const graph = toGraph(data, readTokens());
     layout(graph, data.center);
-    void (sigmaModule ?? import("sigma")).then(({ default: Sigma, DEFAULT_STYLES }) => {
+    void Promise.all([
+      sigmaModule ?? import("sigma"),
+      shapesModule ?? import("sigma/rendering"),
+    ]).then(([{ default: Sigma, DEFAULT_STYLES }, shapes]) => {
       if (cancelled || !container.current) return;
       const instance = new Sigma(graph, container.current, {
+        // One shape per kind of node (KIND_SHAPE in graph-view); the names are Sigma's own.
+        primitives: {
+          nodes: {
+            shapes: [
+              shapes.sdfCircle(),
+              shapes.sdfSquare(),
+              shapes.sdfDiamond(),
+              shapes.sdfTriangle(),
+            ],
+          },
+        },
         settings: {
           stagePadding: 24,
           zoomDuration: 0,
@@ -133,6 +147,7 @@ export function GraphCanvas({ data, selected, onSelect }: Props) {
           nodes: [
             DEFAULT_STYLES.nodes,
             {
+              shape: { attribute: "shape", defaultValue: "circle" },
               labelVisibility: {
                 when: (attrs, state) =>
                   state.isHovered || state.isHighlighted || attrs.labelShown === true,

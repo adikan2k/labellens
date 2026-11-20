@@ -145,7 +145,7 @@ A poster for the label. The page is warm `page`; the specimen and every panel ar
 │ │ 9%│ 17% │    22%    │     27%     │    25%    │  grade strip│
 │ └───┴─────┴───────────┴─────────────┴───────────┘             │
 │ ┌ Read a label ┐ ┌ Ask a question ┐ ┌ Compare two ┐ tiles      │
-│▓ How it's measured: 0.98 · 98% · 97% · 184 ms ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│ (ink)
+│▓ How it's measured: 0.98 · 98% · 97% · 175 ms ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│ (ink)
 │▓ LabelLens (huge)                         attribution ▓▓▓▓▓▓▓│ footer (ink)
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -250,9 +250,11 @@ A two-column grid of charts, each inside a panel opened by `rule-heavy` with its
 
 ### Graph explorer
 
-Full width below the header. The title, intro and search sit on the page width, lined up with the header; the graph below them fills the full width, and a panel on the right shows the selected node in label style. Nodes are black dots; the selected product is the only filled shape with its grade colour.
+Full width below the header. The title, intro and search sit on the page width, lined up with the header; the graph below them fills the full width, and a panel on the right shows the selected node in label style. Each kind of node has its own shape, in `ink`: products are dots, brands squares, categories diamonds and additives triangles. Ingredients, the most numerous, are smaller dots in `ink-muted`. The centre product is the only mark in a colour, its Nutri-Score grade. Shape, not colour, tells the kinds apart, because colour here only ever means a grade.
 
-Labels never overlap. A label shows only where it clears every other label, covers no other dot and fits inside the canvas; the most linked nodes are labelled first, and the centre product and the selected node always are. Zooming in reveals more labels, zooming out fewer, and hovering shows any node's name.
+A key sits directly above the graph in Small: the centre product's mark first, then each kind that is present with its mark and how many are shown. It wraps onto more lines on a phone.
+
+Labels never overlap. A label shows only where it clears every other label, covers no other dot and fits inside the canvas; brands, categories and additives are labelled first, then the most linked nodes, and the centre product and the selected node always are. Zooming in reveals more labels, zooming out fewer, and hovering shows any node's name.
 
 ### Ask
 
