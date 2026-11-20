@@ -6,6 +6,8 @@
 
 **What's really in your food?**
 
+Built by **Aditya Kanbargi** · [Portfolio](https://adityakanbargi.vercel.app/) · [LinkedIn](https://www.linkedin.com/in/adikan2k/)
+
 A million US packaged foods from Open Food Facts, made readable: every label explained, every additive looked up, a better swap for every product, and an AI agent that answers questions from the data and shows its sources.
 
 [![Live site](https://img.shields.io/badge/live-labellens--beige.vercel.app-000000?style=flat-square)](https://labellens-beige.vercel.app)
@@ -14,7 +16,7 @@ A million US packaged foods from Open Food Facts, made readable: every label exp
 [![MCP eval](https://img.shields.io/github/actions/workflow/status/adikan2k/labellens/mcp-eval.yml?branch=main&style=flat-square&label=MCP%20eval)](https://github.com/adikan2k/labellens/actions/workflows/mcp-eval.yml)
 [![Data: ODbL](https://img.shields.io/badge/data-Open%20Food%20Facts%20·%20ODbL-1f6feb?style=flat-square)](https://world.openfoodfacts.org)
 
-**[Try it live](https://labellens-beige.vercel.app)** · **[Use it inside Claude](#use-it-inside-claude)** · **[How it works](#how-it-works)** · **[How it's measured](#how-its-measured)** · **[Engineering notes](#engineering-notes)**
+**[Try it live](https://labellens-beige.vercel.app)** · **[Use it inside Claude](#use-it-inside-claude)** · **[How it works](#how-it-works)** · **[How it's measured](#how-its-measured)** · **[Engineering notes](#engineering-notes)** · **[How I built it](#how-i-built-it)**
 
 </div>
 
@@ -100,20 +102,33 @@ Add `https://labellens-api-1036759996795.us-east4.run.app/mcp` as a custom conne
 
 ## How it works
 
+The architecture, from the source data at the top to the three apps at the bottom:
+
 ```mermaid
-flowchart LR
-    OFF[("Open Food Facts<br/>food.parquet, 8 GB")] --> ING["Ingest<br/>snapshot"]
-    ING --> DBT["dbt on DuckDB<br/>94 data tests"]
-    DBT <--> ENR["Enrichment<br/>Claude Batch API, cached"]
-    DBT --> LOAD["Loaders"]
-    LOAD --> PG[("Neon Postgres<br/>+ pgvector")]
-    LOAD --> NEO[("Neo4j AuraDB")]
-    PG --> API["FastAPI<br/>Cloud Run"]
+flowchart TB
+    OFF[("Open Food Facts export<br/>food.parquet, 8 GB")]
+    ING["Ingest<br/>a dated snapshot"]
+    DBT["dbt on DuckDB<br/>94 data tests"]
+    ENR["Enrichment<br/>Claude Batch API, cached"]
+    LOAD["Loaders"]
+    PG[("Neon Postgres<br/>+ pgvector")]
+    NEO[("Neo4j AuraDB")]
+    API["FastAPI on Cloud Run"]
+    WEB["Website<br/>Next.js on Vercel"]
+    ASK["Ask agent<br/>Claude Haiku"]
+    MCP["MCP App at /mcp<br/>inside Claude"]
+    LF["Langfuse"]
+
+    OFF --> ING --> DBT --> LOAD
+    DBT <--> ENR
+    LOAD --> PG
+    LOAD --> NEO
+    PG --> API
     NEO --> API
-    API --> WEB["Next.js<br/>Vercel"]
-    API --> MCP["MCP App<br/>/mcp"]
-    API --> ASK["Ask agent<br/>Claude Haiku"]
-    ASK -.traces.-> LF["Langfuse"]
+    API --> WEB
+    API --> ASK
+    API --> MCP
+    ASK -.traces.-> LF
 ```
 
 1. **Data.** The US subset of the Open Food Facts export (1,002,769 products) goes through staging, intermediate and mart models in dbt, with tests on every key, range and relationship.
@@ -173,7 +188,22 @@ Problems I hit along the way, with the fix and how it was checked. The reasoning
 
 ## How I built it
 
-I built LabelLens phase by phase against a written [spec](docs/SPEC.md) and [design system](docs/DESIGN.md), with the help of [Claude Code](https://claude.com/claude-code) as a pair programmer. I set the product direction, the architecture and the rules; Claude Code helped write, test and debug the code; and every change went through a pull request that I reviewed before merging.
+**In four days, with Claude Code writing most of the code.** The first commit is dated 17 November 2026 and the fortieth pull request merged on 20 November: 70 commits in all. I worked with [Claude Code](https://claude.com/claude-code) throughout, and it wrote nearly all of the code, tests and docs. The commit history shows that, so I would rather say it here.
+
+**What I did.**
+- Started from a written [spec](docs/SPEC.md) and [design system](docs/DESIGN.md), and had each phase planned and approved before any code was written.
+- Made the calls on scope, hosting and spending: which features to add, Cloud Run for the API, and what each paid step would cost before it ran.
+- Set up the cloud accounts, keys and secrets myself. Claude Code is barred from reading `.env`.
+- Approved every merge.
+
+**How a change got merged.** Each change went through a pull request with CI: lint, types and tests for the Python and the web app. I approved each merge in the Claude Code session, after it showed me the test output and, for anything visual, screenshots. Those approvals are not recorded on GitHub, which is why the pull requests show no reviews.
+
+**Three times I overruled it.**
+- **The look.** The first version followed the design system to the letter, and every page looked white and blank to me. I pointed it at galleries of food and AI sites and had the home page redesigned around the label ([decision 0011](docs/decisions/0011-bold-home.md)).
+- **The graph.** A review of the live site called the graph page a tangle. Claude Code's fix was to give the dots shapes and a key. I asked whether that layout was the right way to draw the data at all. It was not, and the page was rebuilt as three columns ([decision 0016](docs/decisions/0016-graph-in-columns.md)).
+- **The gold labels.** The plan had me hand-label 200 products to score the category model. I tried a blind check of 30 and stopped, because I could not place most of the products myself. A larger model labelled them instead, and the result is reported as agreement between two models, not as accuracy ([decision 0005](docs/decisions/0005-enrichment.md)).
+
+**It also got things wrong.** One example: [#37](https://github.com/adikan2k/labellens/pull/37) said the keep-warm ping never touched the database. It did, every ten minutes, and [#38](https://github.com/adikan2k/labellens/pull/38) corrected it. The [engineering notes](#engineering-notes) list others, each with how it was caught.
 
 The working rules are in [`CLAUDE.md`](CLAUDE.md):
 - every feature ships with a test or an eval;
@@ -222,9 +252,11 @@ Every other command (loading, enrichment, evals, deploys) is listed in [`CLAUDE.
 - Questions sent to the ask agent are kept in its trace log (Langfuse), which doesn't delete them on its free plan. The site says so next to the question box.
 - LabelLens shows label facts. It doesn't give medical or dietary advice.
 
-## Data and licence
+## Licence
 
-Contains data from [Open Food Facts](https://world.openfoodfacts.org), available under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/). Individual contents are under the Database Contents License, and product images under CC BY-SA. Images are linked from Open Food Facts, not re-hosted, with one exception: the four sample label photos in `web/public/label-samples/` are copies, credited there and on the page, under CC BY-SA 3.0.
+**Code:** [MIT](LICENSE).
+
+**Data:** not MIT. Contains data from [Open Food Facts](https://world.openfoodfacts.org), available under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/). Individual contents are under the Database Contents License, and product images under CC BY-SA. Images are linked from Open Food Facts, not re-hosted, with one exception: the four sample label photos in `web/public/label-samples/` are copies, credited there and on the page, under CC BY-SA 3.0.
 
 Tables this project publishes that are derived from the Open Food Facts database (the dbt marts, the serving tables, the graph, the evaluation datasets and the 284-row test fixture in `pipeline/tests/fixtures/`) remain under the ODbL.
 

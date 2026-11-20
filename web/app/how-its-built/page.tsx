@@ -139,13 +139,14 @@ export default function HowItsBuiltPage() {
 
       <Section title="How I worked">
         <p>
-          I built LabelLens phase by phase against a written{" "}
+          I built LabelLens in four days, phase by phase against a written{" "}
           <a href={repoFileUrl("docs/SPEC.md")}>spec</a> and{" "}
-          <a href={repoFileUrl("docs/DESIGN.md")}>design system</a>, with the help of{" "}
-          <a href="https://claude.com/claude-code">Claude Code</a> as a pair programmer. I set the
-          product direction, the architecture and the rules; Claude Code helped write, test and
-          debug the code; and every change went through a pull request that I reviewed before
-          merging.
+          <a href={repoFileUrl("docs/DESIGN.md")}>design system</a>, with{" "}
+          <a href="https://claude.com/claude-code">Claude Code</a> writing most of the code. I
+          made the calls on scope, design, hosting and spending. Every change went through a pull
+          request with automated checks, and I approved each merge after seeing its test output
+          and screenshots. The <a href={`${REPO_URL}#how-i-built-it`}>README</a> says where I
+          overruled it.
         </p>
         <ul className="list-disc space-y-2 pt-3 pl-6">
           {BUILT.rules.map((rule) => (

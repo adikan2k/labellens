@@ -73,4 +73,5 @@ Variables are listed in `.env.example`. Never read `.env`. Neon and Neo4j creden
 - Start each phase in plan mode against `docs/SPEC.md`. No code until the plan is approved.
 - Small slices, one commit each, on a feature branch.
 - Before calling something done, show evidence: the command you ran and its output, or a screenshot at 375, 1280 and 1600 px for UI work.
+- Every pull request has an "Author's review" section (`.github/pull_request_template.md`). I write it myself before merging: what I checked, and what I changed or rejected. Claude Code leaves it empty and reminds me when I ask for a merge.
 - After each phase, draft `docs/decisions/NNNN-<topic>.md` (what was chosen, what was rejected, why) for me to review and edit before it merges.
