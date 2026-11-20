@@ -258,6 +258,8 @@ Labels never overlap. A label shows only where it clears every other label, cove
 
 A single column: the question box, then each agent step as a row in a label-style panel (tool name, what it looked up, row count), then the answer with numbered citations that link to the rows.
 
+The steps stay open after the answer arrives, because they are the evidence for it; "Hide steps" closes them and "Show steps (n)" opens them again. Each new question opens them. When no step has arrived 5 seconds after asking, a Small line under "Reading the question…" says the agent is starting up and how long the first question can take. It goes with the first step.
+
 ### My basket
 
 `/basket`. The products someone is thinking of buying, looked at together. Kept in the browser only (no account), 30 at most. "Add to my basket" sits in the link row on product pages and under a label read that matched a product; the header shows the count once it is above zero.

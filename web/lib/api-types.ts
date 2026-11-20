@@ -203,6 +203,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/warm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Build the lazy services, for the scheduled keep-warm ping
+         * @description Builds the ask agent and the label reader if they are not built yet, so the first
+         *     question or label on a new instance does not wait for their libraries. Runs no database
+         *     query (a ping never wakes the database) and no model call. The source's snapshot
+         *     date is null until another request has read it.
+         */
+        get: operations["getWarm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ready": {
         parameters: {
             query?: never;
@@ -545,6 +568,11 @@ export interface components {
              * @enum {string|null}
              */
             suggestions_kind: "swaps" | "category" | null;
+            source: components["schemas"]["Source"];
+        };
+        Warm: {
+            ask_configured: boolean;
+            label_configured: boolean;
             source: components["schemas"]["Source"];
         };
         Ready: {
@@ -901,6 +929,26 @@ export interface operations {
                 };
             };
             503: components["responses"]["Unavailable"];
+        };
+    };
+    getWarm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Which lazy services are configured. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Warm"];
+                };
+            };
         };
     };
     getReady: {

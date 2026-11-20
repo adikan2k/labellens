@@ -262,6 +262,23 @@ paths:
               schema: { $ref: "#/components/schemas/Error" }
         "503": { $ref: "#/components/responses/Unavailable" }
 
+  /warm:
+    get:
+      tags: [health]
+      operationId: getWarm
+      summary: Build the lazy services, for the scheduled keep-warm ping
+      description: |
+        Builds the ask agent and the label reader if they are not built yet, so the first
+        question or label on a new instance does not wait for their libraries. Runs no database
+        query (a ping never wakes the database) and no model call. The source's snapshot
+        date is null until another request has read it.
+      responses:
+        "200":
+          description: Which lazy services are configured.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Warm" }
+
   /ready:
     get:
       tags: [health]
@@ -767,6 +784,14 @@ components:
           enum: [swaps, category, null]
           description: >-
             Swaps for the matched product, or well-graded products in the label's category.
+        source: { $ref: "#/components/schemas/Source" }
+
+    Warm:
+      type: object
+      required: [ask_configured, label_configured, source]
+      properties:
+        ask_configured: { type: boolean }
+        label_configured: { type: boolean }
         source: { $ref: "#/components/schemas/Source" }
 
     Ready:

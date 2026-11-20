@@ -22,6 +22,8 @@ import {
   ASK_PRIVACY_NOTE,
   ASK_REFUSED_NOTE,
   ASK_REPLAY_NOTE,
+  ASK_SLOW,
+  ASK_SLOW_AFTER_MS,
   ASK_UNAVAILABLE,
   ASK_WAKING_UP,
   retryIn,
@@ -55,7 +57,10 @@ function failureMessage(error: unknown): string {
 export function AskPanel() {
   const [question, setQuestion] = useState("");
   const [state, setState] = useState<State>({ kind: "idle" });
-  const [showSteps, setShowSteps] = useState(false);
+  // Open by default: the steps are the evidence for the answer. The reader can hide them.
+  const [showSteps, setShowSteps] = useState(true);
+  // Nothing has come back for a while: the agent is loading on a new instance.
+  const [slow, setSlow] = useState(false);
   const controller = useRef<AbortController | null>(null);
   const inputId = useId();
   const stepsId = useId();
@@ -67,13 +72,20 @@ export function AskPanel() {
     controller.current?.abort();
     const abort = new AbortController();
     controller.current = abort;
-    setShowSteps(false);
+    setShowSteps(true);
+    setSlow(false);
+    const slowTimer = setTimeout(() => setSlow(true), ASK_SLOW_AFTER_MS);
+    const heard = () => {
+      clearTimeout(slowTimer);
+      setSlow(false);
+    };
     let steps: AskStep[] = [];
     setState({ kind: "running", question: q, steps });
     try {
       const answer = await askQuestion(q, {
         signal: abort.signal,
         onStep: (step) => {
+          heard();
           steps = [...steps, step];
           setState({ kind: "running", question: q, steps });
         },
@@ -82,6 +94,8 @@ export function AskPanel() {
     } catch (error) {
       if ((error as { name?: string } | null)?.name === "AbortError") return;
       setState({ kind: "error", question: q, steps, message: failureMessage(error) });
+    } finally {
+      heard();
     }
   }
 
@@ -153,7 +167,12 @@ export function AskPanel() {
       </div>
 
       <div role="status" aria-live="polite" className="sr-only">
-        {running && (steps.length ? `Step ${steps.length}: ${steps[steps.length - 1].summary}` : "Looking it up")}
+        {running &&
+          (steps.length
+            ? `Step ${steps.length}: ${steps[steps.length - 1].summary}`
+            : slow
+              ? ASK_SLOW
+              : "Looking it up")}
         {state.kind === "done" && "Answer ready"}
         {state.kind === "error" && state.message}
       </div>
@@ -188,6 +207,9 @@ export function AskPanel() {
               <p className="type-data-label py-2 text-ink-muted">
                 {steps.length === 0 ? "Reading the question…" : "Working…"}
               </p>
+            )}
+            {running && steps.length === 0 && slow && (
+              <p className="type-small pb-2">{ASK_SLOW}</p>
             )}
             {state.kind === "done" && steps.length === 0 && (
               <p className="type-small py-2 text-ink-muted">Answered without looking anything up.</p>

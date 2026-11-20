@@ -24,6 +24,7 @@ EXPECTED_OPERATIONS = [
     ("get", "/additives/{slug}"),
     ("post", "/label"),
     ("get", "/ready"),
+    ("get", "/warm"),
     ("post", "/mcp"),
 ]
 

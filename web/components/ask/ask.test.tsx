@@ -2,7 +2,7 @@ import { act, cleanup, fireEvent, render, screen, within } from "@testing-librar
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { AskAnswer, AskStep } from "@/lib/ask";
-import { ASK_AI_NOTE, ASK_PRIVACY_NOTE, ASK_REFUSED_NOTE, ASK_REPLAY_NOTE } from "@/lib/copy";
+import { ASK_AI_NOTE, ASK_PRIVACY_NOTE, ASK_REFUSED_NOTE, ASK_REPLAY_NOTE, ASK_SLOW } from "@/lib/copy";
 
 const askQuestion = vi.fn();
 vi.mock("@/lib/ask", async (original) => ({
@@ -75,8 +75,8 @@ describe("AskPanel", () => {
 
     expect(askQuestion.mock.calls[0][0]).toBe("cereals under 5 g sugar");
     const panel = screen.getByRole("region", { name: "Steps" });
-    // Collapsed once the answer is in; the button opens it.
-    fireEvent.click(within(panel).getByRole("button", { name: "Show steps (2)" }));
+    // Still open once the answer is in: the steps are its evidence.
+    expect(within(panel).getByRole("button", { name: "Hide steps" })).toBeTruthy();
     const rows = within(panel).getAllByRole("listitem");
     expect(rows.map((r) => r.textContent)).toEqual([
       "1. Searched the products12 rowsCereals under 5 g sugar · 180 ms",
@@ -165,20 +165,77 @@ describe("AskPanel", () => {
     expect(askQuestion.mock.calls[0][0]).toBe("Healthier swaps for Nacho Cheese Doritos");
   });
 
-  test("Show steps names the list it opens and closes", async () => {
+  test("Hide steps names the list it closes and opens again", async () => {
     scripted(answer);
     render(<AskPanel />);
     await ask("cereals");
-    const toggle = screen.getByRole("button", { name: "Show steps (2)" });
+    const toggle = screen.getByRole("button", { name: "Hide steps" });
     const list = document.getElementById(toggle.getAttribute("aria-controls") ?? "");
     expect(list).not.toBeNull();
-    expect(list!.hidden).toBe(true);
-    expect(toggle.getAttribute("aria-expanded")).toBe("false");
-
-    fireEvent.click(toggle);
     expect(list!.hidden).toBe(false);
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
     expect(within(list!).getAllByRole("listitem")).toHaveLength(2);
+
+    fireEvent.click(toggle);
+    expect(list!.hidden).toBe(true);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(screen.getByRole("button", { name: "Show steps (2)" }));
+    expect(list!.hidden).toBe(false);
+  });
+
+  test("the next question shows its steps again after the last ones were hidden", async () => {
+    scripted(answer);
+    render(<AskPanel />);
+    await ask("cereals");
+    fireEvent.click(screen.getByRole("button", { name: "Hide steps" }));
+    await ask("cereals again");
+    expect(screen.getByRole("button", { name: "Hide steps" })).toBeTruthy();
+  });
+
+  test("a long wait before the first step says the agent is starting up", async () => {
+    vi.useFakeTimers();
+    try {
+      let step: (s: AskStep) => void = () => {};
+      let finish: (a: AskAnswer) => void = () => {};
+      askQuestion.mockImplementation(
+        (_q: string, options: { onStep?: (s: AskStep) => void }) =>
+          new Promise<AskAnswer>((resolve) => {
+            step = (s) => options.onStep?.(s);
+            finish = resolve;
+          }),
+      );
+      render(<AskPanel />);
+      await ask("cereals");
+      const panel = screen.getByRole("region", { name: "Steps" });
+      expect(within(panel).queryByText(ASK_SLOW)).toBeNull();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5000);
+      });
+      expect(within(panel).getByText(ASK_SLOW)).toBeTruthy();
+
+      // The first step is news enough: the line goes.
+      await act(async () => step(steps[0]));
+      expect(within(panel).queryByText(ASK_SLOW)).toBeNull();
+      await act(async () => finish(answer));
+      expect(screen.queryByText(ASK_SLOW)).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test("a quick answer never shows the starting-up line", async () => {
+    vi.useFakeTimers();
+    try {
+      scripted(answer);
+      render(<AskPanel />);
+      await ask("cereals");
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(10000);
+      });
+      expect(screen.queryByText(ASK_SLOW)).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   test("step rows wipe in, unless the reader prefers reduced motion", async () => {
@@ -188,7 +245,6 @@ describe("AskPanel", () => {
     scripted(answer, [steps[0]]);
     render(<AskPanel />);
     await ask("cereals");
-    fireEvent.click(screen.getByRole("button", { name: "Show steps (1)" }));
     expect(wiping()).toBe(1);
 
     cleanup();
@@ -196,7 +252,6 @@ describe("AskPanel", () => {
     scripted(answer, [steps[0]]);
     render(<AskPanel />);
     await ask("cereals");
-    fireEvent.click(screen.getByRole("button", { name: "Show steps (1)" }));
     expect(screen.getByText("1. Searched the products")).toBeTruthy();
     expect(wiping()).toBe(0);
   });

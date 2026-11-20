@@ -80,3 +80,9 @@ class Database:
                 return None
         value = self._meta.get("snapshot_date")
         return date.fromisoformat(value) if value else None
+
+    def known_snapshot_date(self) -> date | None:
+        """The snapshot date if it has been read already, without asking the database: for the
+        keep-warm ping, which must not wake it."""
+        value = self._meta.get("snapshot_date") if self._meta else None
+        return date.fromisoformat(value) if value else None

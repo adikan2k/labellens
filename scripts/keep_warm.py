@@ -6,16 +6,18 @@
 
 Cloud Run runs a minimum of 0 instances (SPEC section 9), and it stops an idle instance after
 at most 15 minutes. The next visitor then waits 7 to 10 seconds for a new one
-(evals/results/cold_start.md). This job asks for /health every 5 minutes, so an instance is
-almost always up. It is not a guarantee: Cloud Run may still replace an instance, and the first
-request after a deploy starts a new one.
+(evals/results/cold_start.md), and the first question waits about 15 more while the ask
+agent's libraries load. This job asks for /warm every 5 minutes, so an instance is almost
+always up with the agent and the label reader already built. It is not a guarantee: Cloud Run
+may still replace an instance, and the first request after a deploy starts a new one.
 
 What it costs: Cloud Scheduler bills per job, not per run, and the first 3 jobs of a billing
 account are free ($0.10 a month each after that). The pings are about 8,640 requests a month
 of a few milliseconds each, inside Cloud Run's free allowance. Minimum instances stays 0.
 
-/health opens no database connection, so the pings do not keep Neon's compute running. Neon
-still pauses after 5 idle minutes and takes about 1 second to wake on the next query.
+/warm runs no database query, so the pings do not keep Neon's compute running. Neon still
+pauses after 5 idle minutes and takes about 1 second to wake on the next query. /health is the
+wrong address for this: it reads the snapshot date from the database every ten minutes.
 """
 
 from __future__ import annotations
@@ -30,7 +32,8 @@ JOB = "labellens-keep-warm"
 API = "cloudscheduler.googleapis.com"
 # Well inside the 15 minutes Cloud Run keeps an idle instance, with room for a late run.
 SCHEDULE = "*/5 * * * *"
-DESCRIPTION = "Asks the LabelLens API for /health so Cloud Run keeps an instance up."
+PATH = "/warm"
+DESCRIPTION = "Asks the LabelLens API for /warm so an instance stays up with the agent loaded."
 
 
 def commands(
@@ -55,15 +58,15 @@ def commands(
         *where,
         f"--schedule={SCHEDULE}",
         "--time-zone=Etc/UTC",
-        f"--uri={url.rstrip('/')}/health",
+        f"--uri={url.rstrip('/')}{PATH}",
         "--http-method=GET",
-        # A cold start answers in about 10 s; past 30 s something else is wrong.
-        "--attempt-deadline=30s",
+        # A new instance takes about 10 s to start and up to 28 s more to build the agent.
+        "--attempt-deadline=60s",
         f"--description={DESCRIPTION}",
     ]
     return [
         ("Enable Cloud Scheduler", ["gcloud", "services", "enable", API, f"--project={project}"]),
-        (f"{'Update' if exists else 'Create'} the job: /health every 5 minutes", job),
+        (f"{'Update' if exists else 'Create'} the job: {PATH} every 5 minutes", job),
     ]
 
 
@@ -127,7 +130,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"There is no {JOB} job in {args.region}. Nothing to delete.")
         return 0
 
-    print(f"Pings {url.rstrip('/')}/health on the schedule {SCHEDULE} (UTC).")
+    print(f"Pings {url.rstrip('/')}{PATH} on the schedule {SCHEDULE} (UTC).")
     print("Cost: the first 3 Cloud Scheduler jobs of a billing account are free.")
     plan = commands(args.project, args.region, url, exists=exists, remove=args.remove)
     for title, command in plan:

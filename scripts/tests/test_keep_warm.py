@@ -9,12 +9,12 @@ def _plan(**kwargs: bool) -> dict[str, list[str]]:
     return dict(keep_warm.commands("my-project", "us-east4", URL, **kwargs))
 
 
-def test_the_job_asks_for_health_every_five_minutes() -> None:
+def test_the_job_asks_for_warm_every_five_minutes() -> None:
     job = next(c for title, c in _plan().items() if title.startswith("Create"))
     assert job[:5] == ["gcloud", "scheduler", "jobs", "create", "http"]
     assert keep_warm.JOB in job
     assert "--schedule=*/5 * * * *" in job
-    assert f"--uri={URL}/health" in job
+    assert f"--uri={URL}/warm" in job
     assert "--http-method=GET" in job
     assert "--location=us-east4" in job and "--project=my-project" in job
 
@@ -25,17 +25,22 @@ def test_the_ping_is_well_inside_cloud_runs_idle_window() -> None:
     assert minutes * 2 < 15
 
 
-def test_the_ping_never_touches_the_database() -> None:
-    # /health opens no connection, so the job does not keep Neon's compute running.
+def test_the_ping_goes_to_the_address_that_skips_the_database() -> None:
+    # /warm runs no query (api/tests/test_health.py); /health reads the snapshot date.
     job = next(c for title, c in _plan().items() if title.startswith("Create"))
     uri = next(a for a in job if a.startswith("--uri="))
-    assert uri.endswith("/health")
+    assert uri.endswith("/warm")
+
+
+def test_the_ping_waits_long_enough_for_a_new_instance_to_build_the_agent() -> None:
+    job = next(c for title, c in _plan().items() if title.startswith("Create"))
+    assert "--attempt-deadline=60s" in job
 
 
 def test_a_trailing_slash_on_the_address_does_not_double_up() -> None:
     plan = dict(keep_warm.commands("p", "us-east4", URL + "/"))
     job = next(c for title, c in plan.items() if title.startswith("Create"))
-    assert f"--uri={URL}/health" in job
+    assert f"--uri={URL}/warm" in job
 
 
 def test_the_api_is_enabled_before_the_job_is_made() -> None:

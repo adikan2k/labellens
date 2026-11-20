@@ -131,3 +131,32 @@ Cloud Run's request log shows it:
 Not yet measured: how many instance starts a day remain with the ping running. Before it,
 there was about one an hour. To check, count the `Startup took` lines after 2026-11-20 07:45
 in the same log; they should be rare outside deploys.
+
+## The first question, and a correction (2026-11-20)
+
+**The first question on a new instance took 20 to 22 s.** The ask agent's libraries load on the
+first `/ask`, not at startup (the fix above), so someone has to wait for them. Cloud Run's log
+for the last twelve loads:
+
+| | Time |
+| --- | ---: |
+| `Ask service ready in`, shortest | 8.96 s |
+| `Ask service ready in`, median (6 of 12 between 14 and 17 s) | 15.4 s |
+| `Ask service ready in`, longest | 27.93 s |
+| `POST /ask`, first question on an instance (four of them) | 20.55 to 22.05 s |
+| `POST /ask`, later questions on the same instance (six of them) | 3.72 to 4.49 s |
+
+A visitor who arrived on a cold instance and asked a question straight away waited for both:
+7 to 10 s for the instance and about 15 s for the libraries.
+
+**The ping now goes to `GET /warm`, not `/health`.** `/warm` builds the ask agent and the label
+reader, so the ping pays that wait once per instance and a visitor does not. It runs no
+database query; a test fails if it reaches the database.
+
+**Correction.** The section above says `/health` opens no database connection. That was
+wrong: `/health` returns the snapshot date, which is read from the database and cached for ten
+minutes. A ping to `/health` every 5 minutes therefore woke Neon about every ten minutes for
+nothing. `/warm` returns the date only if another request has already read it.
+
+**The Ask page says why a wait is long.** When no step has arrived 5 seconds after asking, it
+says the agent is starting up and that the first question can take about 20 seconds.

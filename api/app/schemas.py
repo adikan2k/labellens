@@ -288,6 +288,14 @@ class LabelResponse(Model):
     source: Source
 
 
+class Warm(Model):
+    """For the keep-warm ping. Builds the lazy services; no database query, no model call."""
+
+    ask_configured: bool
+    label_configured: bool
+    source: Source  # its snapshot_date is null until another request has read it
+
+
 class Ready(Model):
     """What a demo needs to know before it starts. Builds the lazy services; no model call."""
 
