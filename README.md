@@ -76,8 +76,8 @@ LabelLens puts it in one place. It states facts and published thresholds, and it
 <b>See the whole shelf.</b> A dashboard of the US packaged-food landscape: grades, processing and additives by category.
 </td>
 <td width="50%" valign="top">
-<img src="docs/readme/graph.jpg" alt="The food graph: Cheerios at the centre, linked to its brand, category, additives and ingredients" width="100%">
-<b>Explore the graph.</b> 27,662 products and their brands, categories, additives and ingredients in Neo4j. Pick any product to see what it connects to; each kind of node has its own shape, with a key.
+<img src="docs/readme/graph.jpg" alt="The food graph in three columns: Cheerios, what it is linked to, and the products that share the most with it" width="100%">
+<b>Explore the graph.</b> 27,662 products and their brands, categories, additives and ingredients in Neo4j. Pick any product to see what it is linked to and which products share the most with it.
 </td>
 </tr>
 </table>

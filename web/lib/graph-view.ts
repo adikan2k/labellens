@@ -1,57 +1,20 @@
 /**
- * Turns a /graph/neighborhood response into a laid-out graphology graph for Sigma, and the
- * groupings the side panel and the accessible list use. Pure, so it is tested without WebGL.
+ * Turns a /graph/neighborhood response into the three columns the graph page draws, and the
+ * groupings the side panel and the list view use. Pure, so it is tested without a browser.
  *
- * DESIGN.md: each kind of node has its own shape (KIND_SHAPE) in ink; ingredients, the most
- * numerous, are ink-muted; the centre product is the only shape in its grade colour; edges
- * are rule-light. Colours come from the CSS tokens (readTokens), never from hex codes here.
+ * A neighbourhood always has the same three layers: one product, the things it is linked to
+ * (its brand, categories, additives and ingredients, the "hubs"), and the other products linked
+ * to those same things (its "peers"). DESIGN.md, Graph explorer: the layers are drawn left to
+ * right, so where a node sits says what it is.
  */
-import Graph from "graphology";
-import forceAtlas2 from "graphology-layout-forceatlas2";
-
-import type { GraphNeighborhood, GraphNode, NutriscoreGrade } from "./api";
-
-export type Tokens = {
-  ink: string;
-  inkMuted: string;
-  ruleLight: string;
-  grade: Record<NutriscoreGrade, string>;
-};
-
-/** The colour tokens from globals.css, read at runtime (WebGL needs real colour values). */
-export function readTokens(root: Element = document.documentElement): Tokens {
-  const style = getComputedStyle(root);
-  const read = (name: string) => style.getPropertyValue(`--color-${name}`).trim();
-  return {
-    ink: read("ink"),
-    inkMuted: read("ink-muted"),
-    ruleLight: read("rule-light"),
-    grade: { a: read("grade-a"), b: read("grade-b"), c: read("grade-c"), d: read("grade-d"), e: read("grade-e") },
-  };
-}
-
-export type NodeAttributes = {
-  x: number;
-  y: number;
-  size: number;
-  color: string;
-  shape: NodeShape;
-  label: string;
-  kind: GraphNode["kind"];
-  grade: NutriscoreGrade | null;
-  isCenter: boolean;
-  /** Set by the canvas after each camera move: this label clears the others (pickLabels). */
-  labelShown?: boolean;
-};
-
-// Screen pixels (Sigma's default sizing): small marks, the centre product clearly larger.
-// Squares, diamonds and triangles need a little more room than a dot to read as shapes.
-export const NODE_SIZE = { center: 9, product: 3.5, other: 4.5, ingredient: 3 };
+import type { GraphNeighborhood, GraphNode } from "./api";
 
 export type NodeShape = "circle" | "square" | "diamond" | "triangle";
+type Kind = GraphNode["kind"];
+export type HubKind = Exclude<Kind, "Product">;
 
 /** One shape per kind, so the kinds can be told apart without colour (DESIGN.md). */
-export const KIND_SHAPE: Record<GraphNode["kind"], NodeShape> = {
+export const KIND_SHAPE: Record<Kind, NodeShape> = {
   Product: "circle",
   Brand: "square",
   Category: "diamond",
@@ -59,154 +22,8 @@ export const KIND_SHAPE: Record<GraphNode["kind"], NodeShape> = {
   Ingredient: "circle",
 };
 
-function sizeOf(kind: GraphNode["kind"]): number {
-  if (kind === "Product") return NODE_SIZE.product;
-  return kind === "Ingredient" ? NODE_SIZE.ingredient : NODE_SIZE.other;
-}
-
-// Kinds in a ring around the centre, so the layout starts readable and stays deterministic.
-const RING: Record<GraphNode["kind"], number> = {
-  Brand: 1,
-  Category: 1,
-  Additive: 1,
-  Ingredient: 1,
-  Product: 2,
-};
-
-export function toGraph(data: GraphNeighborhood, tokens: Tokens): Graph<NodeAttributes> {
-  const graph = new Graph<NodeAttributes>({ type: "directed", multi: false });
-  const others = data.nodes.filter((n) => n.id !== data.center);
-  others.forEach((node, i) => {
-    const angle = (2 * Math.PI * i) / Math.max(others.length, 1);
-    const radius = 10 * RING[node.kind];
-    graph.addNode(node.id, {
-      x: radius * Math.cos(angle),
-      y: radius * Math.sin(angle),
-      size: sizeOf(node.kind),
-      color: node.kind === "Ingredient" ? tokens.inkMuted : tokens.ink,
-      shape: KIND_SHAPE[node.kind],
-      label: node.name,
-      kind: node.kind,
-      grade: node.nutriscore_grade ?? null,
-      isCenter: false,
-    });
-  });
-  const center = data.nodes.find((n) => n.id === data.center);
-  if (center) {
-    const grade = center.nutriscore_grade ?? null;
-    graph.addNode(center.id, {
-      x: 0,
-      y: 0,
-      size: NODE_SIZE.center,
-      color: grade ? tokens.grade[grade] : tokens.ink,
-      shape: KIND_SHAPE[center.kind],
-      label: center.name,
-      kind: center.kind,
-      grade,
-      isCenter: true,
-    });
-  }
-  for (const edge of data.edges) {
-    if (graph.hasNode(edge.from) && graph.hasNode(edge.to) && !graph.hasEdge(edge.from, edge.to)) {
-      graph.addEdge(edge.from, edge.to, { color: tokens.ruleLight, size: 1 });
-    }
-  }
-  return graph;
-}
-
-/** Lays the graph out in place (ForceAtlas2, fixed iterations), centre pinned at the origin. */
-export function layout(graph: Graph<NodeAttributes>, center: string, iterations = 150): void {
-  if (graph.order < 2) return;
-  forceAtlas2.assign(graph, {
-    iterations,
-    settings: {
-      ...forceAtlas2.inferSettings(graph),
-      gravity: 0.5,
-      scalingRatio: 30,
-      adjustSizes: false,
-      barnesHutOptimize: false,
-    },
-  });
-  if (graph.hasNode(center)) {
-    const { x, y } = graph.getNodeAttributes(center);
-    graph.updateEachNodeAttributes((_, attrs) => ({ ...attrs, x: attrs.x - x, y: attrs.y - y }));
-  }
-}
-
-/** A label's box on screen, in CSS pixels. */
-export type LabelBox = { id: string; left: number; top: number; width: number; height: number };
-
-function apart(a: Omit<LabelBox, "id">, b: Omit<LabelBox, "id">, padding: number): boolean {
-  return (
-    a.left >= b.left + b.width + padding ||
-    b.left >= a.left + a.width + padding ||
-    a.top >= b.top + b.height + padding ||
-    b.top >= a.top + a.height + padding
-  );
-}
-
-/**
- * Which labels to draw so that none overlap. The forced ones (the centre product, the
- * selected node) are kept first; the rest go in order of priority, each kept only if its box,
- * padded, clears every label already kept, covers no other node's dot (`dots`, keyed by node)
- * and fits inside `bounds`. Sigma's own label grid only caps labels per grid cell, so long
- * names in neighbouring cells ran into each other.
- */
-export function pickLabels(
-  boxes: LabelBox[],
-  forced: readonly string[],
-  priority: (id: string) => number,
-  {
-    padding = 4,
-    dots = [],
-    bounds,
-  }: { padding?: number; dots?: LabelBox[]; bounds?: { width: number; height: number } } = {},
-): Set<string> {
-  const rank = (box: LabelBox) => {
-    const i = forced.indexOf(box.id);
-    return i >= 0 ? Number.MAX_SAFE_INTEGER - i : priority(box.id);
-  };
-  const ordered = [...boxes].sort((a, b) => rank(b) - rank(a) || a.id.localeCompare(b.id));
-  const inside = (box: LabelBox) =>
-    !bounds ||
-    (box.left >= 0 &&
-      box.top >= 0 &&
-      box.left + box.width <= bounds.width &&
-      box.top + box.height <= bounds.height);
-  const kept: LabelBox[] = [];
-  for (const box of ordered) {
-    const clear =
-      inside(box) &&
-      kept.every((k) => apart(box, k, padding)) &&
-      dots.every((d) => d.id === box.id || apart(box, d, 1));
-    if (clear || forced.includes(box.id)) kept.push(box);
-  }
-  return new Set(kept.map((k) => k.id));
-}
-
-/**
- * Which label to keep when two would overlap. Brands, categories and additives come first:
- * they are few, and they say what the products around them share. Then the most linked.
- */
-export function labelPriority(kind: GraphNode["kind"], links: number): number {
-  const hub = kind === "Brand" || kind === "Category" || kind === "Additive";
-  return (hub ? 1000 : 0) + links * 2 + (kind === "Product" ? 0 : 1);
-}
-
-/** The key above the graph: each kind present, in KIND_ORDER, with how many are shown. */
-export function keyEntries(
-  data: GraphNeighborhood,
-): { kind: GraphNode["kind"]; shape: NodeShape; muted: boolean; count: number }[] {
-  return groupByKind(data).map(([kind, nodes]) => ({
-    kind,
-    shape: KIND_SHAPE[kind],
-    muted: kind === "Ingredient",
-    count: nodes.length,
-  }));
-}
-
-export const KIND_ORDER: GraphNode["kind"][] = ["Product", "Brand", "Category", "Additive", "Ingredient"];
-export const KIND_NAMES: Record<GraphNode["kind"], string> = {
+export const KIND_ORDER: Kind[] = ["Product", "Brand", "Category", "Additive", "Ingredient"];
+export const KIND_NAMES: Record<Kind, string> = {
   Product: "Products",
   Brand: "Brands",
   Category: "Categories",
@@ -214,22 +31,126 @@ export const KIND_NAMES: Record<GraphNode["kind"], string> = {
   Ingredient: "Ingredients",
 };
 
+/** How many peers the right column lists before a hub is chosen. */
+export const PEER_LIMIT = 16;
+
+/** Something the centre product is linked to, and the other products linked to it too. */
+export type Hub = {
+  node: GraphNode;
+  /** False for a wider category the centre is in only through a narrower one. */
+  direct: boolean;
+  /** The other products linked to it, by node id. */
+  products: string[];
+};
+export type HubGroup = { kind: HubKind; hubs: Hub[] };
+
+/** Another product, and the hubs it has in common with the centre. */
+export type Peer = { node: GraphNode; shares: string[] };
+
+export type Columns = {
+  center: GraphNode;
+  groups: HubGroup[];
+  /** The right column, best match first. */
+  peers: Peer[];
+  /** Every other product in the neighbourhood, once per name. */
+  peersTotal: number;
+  /** The hub the right column is narrowed to, when one is selected. */
+  focus: GraphNode | null;
+};
+
+/** Case and punctuation aside: Open Food Facts lists one product under several barcodes. */
+function fold(name: string): string {
+  return (name.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []).join(" ");
+}
+
+/**
+ * The three columns for a neighbourhood.
+ *
+ * - Hubs are grouped by kind; in a group, the ones the centre is linked to directly come
+ *   first, then the ones with the most other products.
+ * - Peers are listed once per name (the listing that shares the most), and listings with the
+ *   centre's own name are left out: they are the same product under another barcode.
+ * - With the centre or a peer selected, the right column holds the PEER_LIMIT peers that share
+ *   the most. With a hub selected, it holds every peer linked to that hub.
+ */
+export function columns(data: GraphNeighborhood, selected: string): Columns | null {
+  const center = data.nodes.find((n) => n.id === data.center);
+  if (!center) return null;
+  const byId = new Map(data.nodes.map((n) => [n.id, n]));
+  const isProduct = (id: string) => byId.get(id)?.kind === "Product";
+
+  const direct = new Set(data.edges.filter((e) => e.from === center.id).map((e) => e.to));
+  const productsOf = new Map<string, string[]>();
+  for (const edge of data.edges) {
+    if (edge.from === center.id || !isProduct(edge.from) || isProduct(edge.to)) continue;
+    const list = productsOf.get(edge.to) ?? [];
+    if (!list.includes(edge.from)) list.push(edge.from);
+    productsOf.set(edge.to, list);
+  }
+
+  const groups: HubGroup[] = [];
+  for (const kind of KIND_ORDER) {
+    if (kind === "Product") continue;
+    const hubs = data.nodes
+      .filter((n) => n.kind === kind)
+      .map((node) => ({ node, direct: direct.has(node.id), products: productsOf.get(node.id) ?? [] }))
+      .sort(
+        (a, b) =>
+          Number(b.direct) - Number(a.direct) ||
+          b.products.length - a.products.length ||
+          a.node.name.localeCompare(b.node.name),
+      );
+    if (hubs.length) groups.push({ kind, hubs });
+  }
+  const hubOrder = new Map(groups.flatMap((g) => g.hubs).map((hub, i) => [hub.node.id, i]));
+
+  // Every other product with what it shares, then one per name.
+  const all: Peer[] = data.nodes
+    .filter((n) => n.kind === "Product" && n.id !== center.id)
+    .map((node) => ({
+      node,
+      shares: [...hubOrder.keys()].filter(
+        (hub) => direct.has(hub) && (productsOf.get(hub) ?? []).includes(node.id),
+      ),
+    }));
+  const centerName = fold(center.name);
+  const byName = new Map<string, Peer>();
+  for (const peer of all) {
+    const name = fold(peer.node.name);
+    if (name === centerName) continue;
+    const kept = byName.get(name);
+    if (!kept || peer.shares.length > kept.shares.length) byName.set(name, peer);
+  }
+  const middle = (peer: Peer) =>
+    peer.shares.reduce((sum, hub) => sum + (hubOrder.get(hub) ?? 0), 0) / (peer.shares.length || 1);
+  const ranked = [...byName.values()].sort(
+    (a, b) => b.shares.length - a.shares.length || middle(a) - middle(b),
+  );
+
+  const chosen = byId.get(selected);
+  const focus = chosen && chosen.kind !== "Product" ? chosen : null;
+  let peers = focus
+    ? ranked.filter((peer) => (productsOf.get(focus.id) ?? []).includes(peer.node.id))
+    : ranked.slice(0, PEER_LIMIT);
+  // A product picked from the list view is shown even when it did not make the column.
+  if (chosen && chosen.kind === "Product" && chosen.id !== center.id) {
+    const own = all.find((peer) => peer.node.id === chosen.id);
+    if (own && !peers.some((peer) => peer.node.id === chosen.id)) peers = [...peers, own];
+  }
+  return { center, groups, peers, peersTotal: ranked.length, focus };
+}
+
 /** Nodes grouped by kind (centre first among products), for the panel and the list view. */
-export function groupByKind(data: GraphNeighborhood): [GraphNode["kind"], GraphNode[]][] {
+export function groupByKind(data: GraphNeighborhood): [Kind, GraphNode[]][] {
   return KIND_ORDER.map((kind) => {
     const nodes = data.nodes
       .filter((n) => n.kind === kind)
       .sort((a, b) => Number(b.id === data.center) - Number(a.id === data.center));
-    return [kind, nodes] as [GraphNode["kind"], GraphNode[]];
+    return [kind, nodes] as [Kind, GraphNode[]];
   }).filter(([, nodes]) => nodes.length > 0);
 }
 
 /** The barcode in a product node id ("Product:0016000275287" -> "0016000275287"). */
 export function productCode(nodeId: string): string | null {
   return nodeId.startsWith("Product:") ? nodeId.slice("Product:".length) : null;
-}
-
-/** How many of the shown nodes link to this one, for brand and category nodes in the panel. */
-export function degree(data: GraphNeighborhood, nodeId: string): number {
-  return data.edges.filter((e) => e.to === nodeId || e.from === nodeId).length;
 }

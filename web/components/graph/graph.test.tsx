@@ -1,186 +1,153 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
-import type { GraphNeighborhood } from "@/lib/api";
-import {
-  degree,
-  groupByKind,
-  keyEntries,
-  KIND_SHAPE,
-  labelPriority,
-  layout,
-  pickLabels,
-  productCode,
-  toGraph,
-  type Tokens,
-} from "@/lib/graph-view";
+import type { GraphEdge, GraphNeighborhood, GraphNode } from "@/lib/api";
+import { GRAPH } from "@/lib/copy";
+import { columns, groupByKind, KIND_SHAPE, PEER_LIMIT, productCode } from "@/lib/graph-view";
 
-const TOKENS: Tokens = {
-  ink: "ink",
-  inkMuted: "ink-muted",
-  ruleLight: "rule-light",
-  grade: { a: "grade-a", b: "grade-b", c: "grade-c", d: "grade-d", e: "grade-e" },
+const node = (id: string, kind: GraphNode["kind"], name: string, extra: Partial<GraphNode> = {}): GraphNode => ({
+  id,
+  kind,
+  name,
+  nutriscore_grade: null,
+  detail: null,
+  ...extra,
+});
+const link = (from: string, to: string, type: GraphEdge["type"] = "HAS_INGREDIENT"): GraphEdge => ({
+  from,
+  to,
+  type,
+});
+
+const source: GraphNeighborhood["source"] = {
+  name: "Open Food Facts",
+  url: "https://world.openfoodfacts.org",
+  licence: "ODbL-1.0",
+  licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
+  snapshot_date: "2026-11-17",
 };
 
+const BRAND = "Brand:general mills";
+const CEREALS = "Category:cereals";
+const GRAINS = "Category:grains";
+const E307 = "Additive:en:e307";
+const OATS = "Ingredient:en:oats";
+const SUGAR = "Ingredient:en:sugar";
+
+/** Cheerios, six things it is linked to, and four other products that share some of them. */
 const DATA: GraphNeighborhood = {
   center: "Product:1",
   nodes: [
-    { id: "Product:1", kind: "Product", name: "Cheerios", nutriscore_grade: "c", detail: null },
-    { id: "Brand:general mills", kind: "Brand", name: "General Mills", nutriscore_grade: null, detail: null },
-    { id: "Additive:en:e307", kind: "Additive", name: "E307 Tocopherol", nutriscore_grade: null, detail: "A form of vitamin E." },
-    { id: "Product:2", kind: "Product", name: "Wheaties", nutriscore_grade: "b", detail: null },
+    node("Product:1", "Product", "Cheerios", { nutriscore_grade: "c" }),
+    node(BRAND, "Brand", "General Mills"),
+    node(CEREALS, "Category", "Breakfast cereals"),
+    node(GRAINS, "Category", "Cereals and grains"),
+    node(E307, "Additive", "E307 Tocopherol", { detail: "A form of vitamin E." }),
+    node(OATS, "Ingredient", "Oats"),
+    node(SUGAR, "Ingredient", "Sugar"),
+    node("Product:2", "Product", "Wheaties", { nutriscore_grade: "b" }),
+    node("Product:3", "Product", "Oat Bar"),
+    node("Product:4", "Product", "Cheerios"), // the centre again, under another barcode
+    node("Product:5", "Product", "wheaties!"), // Wheaties again, sharing less
   ],
   edges: [
-    { from: "Product:1", to: "Brand:general mills", type: "MADE_BY" },
-    { from: "Product:1", to: "Additive:en:e307", type: "CONTAINS" },
-    { from: "Product:2", to: "Brand:general mills", type: "MADE_BY" },
-    { from: "Product:2", to: "Brand:general mills", type: "MADE_BY" },
+    link("Product:1", BRAND, "MADE_BY"),
+    link("Product:1", CEREALS, "IN"),
+    link(CEREALS, GRAINS, "CHILD_OF"),
+    link("Product:1", E307, "CONTAINS"),
+    link("Product:1", OATS),
+    link("Product:1", SUGAR),
+    link("Product:2", BRAND, "MADE_BY"),
+    link("Product:2", BRAND, "MADE_BY"), // repeated: counted once
+    link("Product:2", CEREALS, "IN"),
+    link("Product:2", SUGAR),
+    link("Product:3", OATS),
+    link("Product:4", BRAND, "MADE_BY"),
+    link("Product:4", OATS),
+    link("Product:5", SUGAR),
   ],
   truncated: true,
-  source: {
-    name: "Open Food Facts",
-    url: "https://world.openfoodfacts.org",
-    licence: "ODbL-1.0",
-    licence_url: "https://opendatacommons.org/licenses/odbl/1-0/",
-    snapshot_date: "2026-11-17",
-  },
+  source,
 };
 
 describe("graph view", () => {
-  test("the centre is the only node in a grade colour; the rest are ink, edges rule-light", () => {
-    const graph = toGraph(DATA, TOKENS);
-    expect(graph.order).toBe(4);
-    expect(graph.size).toBe(3); // the repeated edge is drawn once
-    expect(graph.getNodeAttribute("Product:1", "color")).toBe("grade-c");
-    expect(graph.getNodeAttribute("Product:2", "color")).toBe("ink");
-    expect(graph.getNodeAttribute("Brand:general mills", "color")).toBe("ink");
-    expect(graph.getNodeAttribute("Product:1", "size")).toBeGreaterThan(
-      graph.getNodeAttribute("Product:2", "size"),
-    );
-    graph.forEachEdge((_, attrs) => expect(attrs.color).toBe("rule-light"));
+  test("three columns: the product, what it is linked to by kind, and what shares it", () => {
+    const model = columns(DATA, DATA.center)!;
+    expect(model.center.name).toBe("Cheerios");
+    expect(model.groups.map((g) => [g.kind, g.hubs.map((h) => h.node.name)])).toEqual([
+      ["Brand", ["General Mills"]],
+      // The wider category is reached only through the narrower one: listed, not linked.
+      ["Category", ["Breakfast cereals", "Cereals and grains"]],
+      ["Additive", ["E307 Tocopherol"]],
+      ["Ingredient", ["Oats", "Sugar"]],
+    ]);
+    const grains = model.groups[1].hubs[1];
+    expect(grains.direct).toBe(false);
+    expect(model.groups[0].hubs[0]).toMatchObject({ direct: true, products: ["Product:2", "Product:4"] });
+    expect(model.focus).toBeNull();
   });
 
-  test("each kind has its own shape; only ingredients are muted", () => {
-    const withIngredient: GraphNeighborhood = {
+  test("peers are ranked by what they share, once per name, without the centre's other listings", () => {
+    const model = columns(DATA, DATA.center)!;
+    expect(model.peers.map((p) => [p.node.id, p.shares])).toEqual([
+      ["Product:2", [BRAND, CEREALS, SUGAR]],
+      ["Product:3", [OATS]],
+    ]);
+    // "Cheerios" again is the centre under another barcode; "wheaties!" is Wheaties sharing less.
+    expect(model.peersTotal).toBe(2);
+  });
+
+  test("selecting a hub narrows the right column to the products linked to it", () => {
+    const model = columns(DATA, OATS)!;
+    expect(model.focus?.name).toBe("Oats");
+    expect(model.peers.map((p) => p.node.name)).toEqual(["Oat Bar"]);
+    expect(columns(DATA, E307)!.peers).toEqual([]);
+  });
+
+  test("the right column stops at the limit, and still shows a product chosen from the list", () => {
+    const many: GraphNeighborhood = {
       ...DATA,
       nodes: [
         ...DATA.nodes,
-        { id: "Category:cereals", kind: "Category", name: "Cereals", nutriscore_grade: null, detail: null },
-        { id: "Ingredient:en:oats", kind: "Ingredient", name: "Oats", nutriscore_grade: null, detail: null },
+        ...Array.from({ length: PEER_LIMIT + 4 }, (_, i) => node(`Product:x${i}`, "Product", `Extra ${i}`)),
+      ],
+      edges: [
+        ...DATA.edges,
+        ...Array.from({ length: PEER_LIMIT + 4 }, (_, i) => link(`Product:x${i}`, SUGAR)),
       ],
     };
-    const graph = toGraph(withIngredient, TOKENS);
-    const shape = (id: string) => graph.getNodeAttribute(id, "shape");
-    expect(shape("Product:1")).toBe("circle");
-    expect(shape("Product:2")).toBe("circle");
-    expect(shape("Brand:general mills")).toBe("square");
-    expect(shape("Category:cereals")).toBe("diamond");
-    expect(shape("Additive:en:e307")).toBe("triangle");
-    expect(shape("Ingredient:en:oats")).toBe("circle");
-    expect(graph.getNodeAttribute("Ingredient:en:oats", "color")).toBe("ink-muted");
-    // Products and ingredients share the dot, so the tone has to tell them apart.
-    const dots = Object.entries(KIND_SHAPE).filter(([, s]) => s === "circle").map(([k]) => k);
-    expect(dots).toEqual(["Product", "Ingredient"]);
-
-    expect(keyEntries(withIngredient)).toEqual([
-      { kind: "Product", shape: "circle", muted: false, count: 2 },
-      { kind: "Brand", shape: "square", muted: false, count: 1 },
-      { kind: "Category", shape: "diamond", muted: false, count: 1 },
-      { kind: "Additive", shape: "triangle", muted: false, count: 1 },
-      { kind: "Ingredient", shape: "circle", muted: true, count: 1 },
-    ]);
+    const model = columns(many, many.center)!;
+    expect(model.peers).toHaveLength(PEER_LIMIT);
+    expect(model.peersTotal).toBe(PEER_LIMIT + 6);
+    const last = `Product:x${PEER_LIMIT + 3}`;
+    expect(model.peers.some((p) => p.node.id === last)).toBe(false);
+    const chosen = columns(many, last)!;
+    expect(chosen.peers).toHaveLength(PEER_LIMIT + 1);
+    expect(chosen.peers.at(-1)?.node.id).toBe(last);
+    // The folded listing can still be chosen by its own id.
+    expect(columns(DATA, "Product:5")!.peers.at(-1)?.node.id).toBe("Product:5");
   });
 
-  test("brands, categories and additives are labelled before products and ingredients", () => {
-    // A brand with one link still outranks a product with many.
-    expect(labelPriority("Brand", 1)).toBeGreaterThan(labelPriority("Product", 40));
-    expect(labelPriority("Additive", 1)).toBeGreaterThan(labelPriority("Ingredient", 40));
-    expect(labelPriority("Category", 5)).toBeGreaterThan(labelPriority("Category", 2));
-    expect(labelPriority("Ingredient", 3)).toBeGreaterThan(labelPriority("Product", 3));
+  test("a neighbourhood without its centre draws nothing", () => {
+    expect(columns({ ...DATA, center: "Product:404" }, "Product:404")).toBeNull();
   });
 
-  test("the layout is finite, deterministic and centred on the product", () => {
-    const first = toGraph(DATA, TOKENS);
-    const second = toGraph(DATA, TOKENS);
-    layout(first, DATA.center);
-    layout(second, DATA.center);
-    expect(first.getNodeAttributes("Product:1")).toMatchObject({ x: 0, y: 0 });
-    first.forEachNode((id, attrs) => {
-      expect(Number.isFinite(attrs.x) && Number.isFinite(attrs.y)).toBe(true);
-      expect(second.getNodeAttributes(id).x).toBeCloseTo(attrs.x);
+  test("each kind has its own shape; products and ingredients share the dot", () => {
+    expect(KIND_SHAPE).toEqual({
+      Product: "circle",
+      Brand: "square",
+      Category: "diamond",
+      Additive: "triangle",
+      Ingredient: "circle",
     });
   });
 
-  test("groups by kind with the centre first; ids and degrees", () => {
+  test("groups by kind with the centre first; product ids", () => {
     const groups = groupByKind(DATA);
-    expect(groups.map(([kind]) => kind)).toEqual(["Product", "Brand", "Additive"]);
+    expect(groups.map(([kind]) => kind)).toEqual(["Product", "Brand", "Category", "Additive", "Ingredient"]);
     expect(groups[0][1][0].id).toBe("Product:1");
     expect(productCode("Product:0016000275287")).toBe("0016000275287");
-    expect(productCode("Brand:x")).toBeNull();
-    expect(degree(DATA, "Brand:general mills")).toBe(3);
-  });
-
-  test("labels never overlap; forced labels win, then priority", () => {
-    const box = (id: string, left: number, top: number, width = 100) => ({
-      id,
-      left,
-      top,
-      width,
-      height: 16,
-    });
-    const boxes = [
-      box("center", 0, 0),
-      box("busy", 50, 8), // overlaps the centre
-      box("near", 0, 18), // 2 px below the centre: inside the padding
-      box("clear", 0, 40),
-      box("low", 10, 44), // overlaps "clear", which ranks higher
-      box("selected", 300, 0),
-      box("crowded", 320, 4), // overlaps the selected node
-    ];
-    const rank: Record<string, number> = { busy: 9, near: 1, clear: 5, low: 4, crowded: 99 };
-    const shown = pickLabels(boxes, ["center", "selected"], (id) => rank[id] ?? 0);
-    expect([...shown].sort()).toEqual(["center", "clear", "selected"]);
-    const kept = boxes.filter((b) => shown.has(b.id));
-    for (const a of kept) {
-      for (const b of kept) {
-        if (a === b) continue;
-        const apart =
-          a.left + a.width <= b.left || b.left + b.width <= a.left || a.top + a.height <= b.top || b.top + b.height <= a.top;
-        expect(apart).toBe(true);
-      }
-    }
-  });
-
-  test("labels cover no other node's dot and stay inside the canvas", () => {
-    const label = (id: string, left: number) => ({ id, left, top: 0, width: 60, height: 16 });
-    const dot = (id: string, left: number) => ({ id, left, top: 4, width: 8, height: 8 });
-    const shown = pickLabels(
-      [label("a", 0), label("b", 200), label("c", 120)],
-      [],
-      () => 0,
-      {
-        dots: [dot("a", -10), dot("b", 190), dot("x", 30), dot("c", 110)],
-        bounds: { width: 300, height: 100 },
-      },
-    );
-    // a covers x's dot; b's own dot does not count against it; c fits.
-    expect([...shown].sort()).toEqual(["b", "c"]);
-    const outside = pickLabels([label("edge", 260), label("centre", 260)], ["centre"], () => 0, {
-      bounds: { width: 300, height: 100 },
-    });
-    expect([...outside]).toEqual(["centre"]); // only a forced label may run past the edge
-  });
-
-  test("forced labels show even when they overlap each other", () => {
-    const shown = pickLabels(
-      [
-        { id: "a", left: 0, top: 0, width: 50, height: 16 },
-        { id: "b", left: 10, top: 0, width: 50, height: 16 },
-      ],
-      ["a", "b"],
-      () => 0,
-    );
-    expect(shown).toEqual(new Set(["a", "b"]));
+    expect(productCode(BRAND)).toBeNull();
   });
 });
 
@@ -189,7 +156,6 @@ vi.mock("@/lib/api", async (original) => ({
   ...(await original<typeof import("@/lib/api")>()),
   getNeighborhood: api.getNeighborhood,
 }));
-vi.mock("./graph-canvas", () => ({ GraphCanvas: () => <div data-testid="graph-canvas" /> }));
 
 const { GraphExplorer, NOT_IN_GRAPH } = await import("./graph-explorer");
 const { ApiError } = await import("@/lib/api");
@@ -199,8 +165,15 @@ afterEach(() => {
   api.getNeighborhood.mockReset();
 });
 
+/** The three-column drawing; the list view below it repeats every node. */
+const drawing = () => within(screen.getByTestId("graph-columns"));
+const pressed = () =>
+  drawing()
+    .getAllByRole("button", { pressed: true })
+    .map((b) => b.getAttribute("data-node"));
+
 describe("GraphExplorer", () => {
-  test("shows the centre product in the panel, and the nodes as a list", async () => {
+  test("shows the centre product in the panel, and the three columns", async () => {
     api.getNeighborhood.mockResolvedValue(DATA);
     render(<GraphExplorer code="1" />);
     const panel = await screen.findByRole("region", { name: "Selected node" });
@@ -208,26 +181,90 @@ describe("GraphExplorer", () => {
     expect(within(panel).getByRole("heading", { name: "Cheerios" })).toBeTruthy();
     expect(within(panel).getByRole("img", { name: "Nutri-Score C" })).toBeTruthy();
     expect(api.getNeighborhood).toHaveBeenCalledWith("1", expect.objectContaining({ depth: 2 }));
-    expect(screen.getByText(/4 nodes, the best-ranked shown/)).toBeTruthy();
-    const key = within(screen.getByRole("list", { name: "Key" }))
-      .getAllByRole("listitem")
-      .map((li) => li.textContent);
-    expect(key).toEqual([
-      "This product, in its Nutri-Score colour",
-      "Products (2)",
+    expect(screen.getByText(/11 nodes, the best-ranked shown/)).toBeTruthy();
+
+    expect(screen.getByRole("region", { name: GRAPH.centre })).toBeTruthy();
+    const hubs = within(screen.getByRole("region", { name: GRAPH.hubs }));
+    // The headings are the key: each kind is named beside its marks, with how many.
+    expect(hubs.getAllByRole("heading").map((h) => h.textContent)).toEqual([
       "Brands (1)",
+      "Categories (2)",
       "Additives (1)",
+      "Ingredients (2)",
     ]);
+    const peers = within(screen.getByRole("region", { name: GRAPH.peers }));
+    expect(peers.getByRole("heading").textContent).toBe(GRAPH.peersTop);
+    expect(peers.getAllByRole("button").map((b) => b.getAttribute("aria-label"))).toEqual([
+      "Wheaties, 3 in common",
+      "Oat Bar, 1 in common",
+    ]);
+    expect(pressed()).toEqual(["Product:1"]);
   });
 
-  test("selecting a node from the list shows it, with its explainer and the AI note", async () => {
+  test("selecting something it is linked to lists the products that share it", async () => {
     api.getNeighborhood.mockResolvedValue(DATA);
     render(<GraphExplorer code="1" />);
     await screen.findByRole("region", { name: "Selected node" });
-    fireEvent.click(screen.getByRole("button", { name: "E307 Tocopherol" }));
+    fireEvent.click(drawing().getByRole("button", { name: "Oats" }));
+    expect(pressed()).toEqual([OATS]);
+    const peers = within(screen.getByRole("region", { name: GRAPH.peers }));
+    expect(peers.getByRole("heading").textContent).toBe("Others with Oats");
+    expect(peers.getAllByRole("button").map((b) => b.getAttribute("data-node"))).toEqual(["Product:3"]);
     const panel = screen.getByRole("region", { name: "Selected node" });
+    // The same count as the column beside it: Oat Bar, once.
+    expect(within(panel).getByText("This product and 1 of the others shown are linked to it.")).toBeTruthy();
+
+    fireEvent.click(drawing().getByRole("button", { name: "E307 Tocopherol" }));
     expect(within(panel).getByText("A form of vitamin E.")).toBeTruthy();
     expect(within(panel).getByText("Written by AI from Open Food Facts data.")).toBeTruthy();
+    expect(screen.getByText(GRAPH.noPeers)).toBeTruthy();
+    expect(within(panel).getByText("Of the products shown, only this one is linked to it.")).toBeTruthy();
+
+    fireEvent.click(drawing().getByRole("button", { name: "Cereals and grains" }));
+    expect(within(panel).getByText(GRAPH.widerCategory)).toBeTruthy();
+  });
+
+  test("selecting another product says what it has in common with the centre", async () => {
+    api.getNeighborhood.mockResolvedValue(DATA);
+    render(<GraphExplorer code="1" />);
+    await screen.findByRole("region", { name: "Selected node" });
+    fireEvent.click(drawing().getByRole("button", { name: "Wheaties, 3 in common" }));
+    const panel = within(screen.getByRole("region", { name: "Selected node" }));
+    expect(panel.getByRole("heading", { name: "In common with Cheerios (3)" })).toBeTruthy();
+    expect(panel.getAllByRole("listitem").map((li) => li.textContent)).toEqual([
+      "General Mills",
+      "Breakfast cereals",
+      "Sugar",
+    ]);
+  });
+
+  test("lines are drawn between measured rows; the selected node's are strong; none is announced", async () => {
+    // jsdom lays nothing out, so give every element a box: the lines wait for one.
+    const box = vi.spyOn(Element.prototype, "getBoundingClientRect").mockReturnValue({
+      top: 10,
+      height: 20,
+      bottom: 30,
+      left: 0,
+      right: 100,
+      width: 100,
+      x: 0,
+      y: 10,
+      toJSON: () => ({}),
+    });
+    api.getNeighborhood.mockResolvedValue(DATA);
+    render(<GraphExplorer code="1" />);
+    await screen.findByRole("region", { name: "Selected node" });
+    const drawn = () => screen.getByTestId("graph-columns").querySelectorAll("[data-lines] path");
+    // Five from the centre (the wider category has none), four to the two peers.
+    await waitFor(() => expect(drawn()).toHaveLength(9));
+    fireEvent.click(drawing().getByRole("button", { name: "Wheaties, 3 in common" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("graph-columns").querySelectorAll("path.stroke-ink")).toHaveLength(3),
+    );
+    for (const lines of screen.getByTestId("graph-columns").querySelectorAll("[data-lines]")) {
+      expect(lines.getAttribute("aria-hidden")).toBe("true");
+    }
+    box.mockRestore();
   });
 
   test("another product becomes the centre without a page load", async () => {
@@ -235,13 +272,24 @@ describe("GraphExplorer", () => {
     const push = vi.spyOn(window.history, "pushState");
     render(<GraphExplorer code="1" />);
     await screen.findByRole("region", { name: "Selected node" });
-    fireEvent.click(screen.getByRole("button", { name: "Wheaties" }));
+    fireEvent.click(drawing().getByRole("button", { name: "Wheaties, 3 in common" }));
     fireEvent.click(screen.getByRole("button", { name: "Centre the graph here" }));
     expect(push).toHaveBeenCalledWith(null, "", "/graph?code=2");
     await waitFor(() =>
       expect(api.getNeighborhood).toHaveBeenLastCalledWith("2", expect.objectContaining({ depth: 2 })),
     );
     push.mockRestore();
+  });
+
+  test("the list view holds every node, and choosing one there selects it", async () => {
+    api.getNeighborhood.mockResolvedValue(DATA);
+    render(<GraphExplorer code="1" />);
+    await screen.findByRole("region", { name: "Selected node" });
+    const list = within(screen.getByRole("region", { name: "Products" }));
+    expect(list.getAllByRole("button")).toHaveLength(5);
+    fireEvent.click(list.getByRole("button", { name: "wheaties!" }));
+    // A listing folded out of the column is added to it while it is selected.
+    expect(pressed()).toEqual(["Product:5"]);
   });
 
   test("data fetched on the server is drawn without another request", () => {

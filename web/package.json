@@ -16,13 +16,10 @@
   },
   "dependencies": {
     "barcode-detector": "3.2.3",
-    "graphology": "^0.26.0",
-    "graphology-layout-forceatlas2": "^0.10.1",
     "motion": "^14.14.0",
     "next": "16.4.6",
     "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "sigma": "^4.0.6"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
@@ -34,7 +31,6 @@
     "@vitejs/plugin-react": "^6.3.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
-    "graphology-types": "^0.24.8",
     "jsdom": "^31.0.1",
     "openapi-typescript": "^7.13.0",
     "tailwindcss": "4.3.3",
