@@ -2,7 +2,7 @@
 
 Status: accepted. Date: 2026-11-20.
 
-A reviewer called the graph page the weakest on the site: "a tangle of unlabelled dots with no legend". The first fix gave each kind of node a shape and added a key. That made the tangle easier to read, but the layout itself was the problem.
+An AI review of the live site called the graph page the weakest on the site: "a tangle of unlabelled dots with no legend". The first fix gave each kind of node a shape and added a key. That made the tangle easier to read, but the layout itself was the problem.
 
 ## Chosen: draw the three layers the data already has
 

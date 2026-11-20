@@ -196,11 +196,11 @@ Problems I hit along the way, with the fix and how it was checked. The reasoning
 - Set up the cloud accounts, keys and secrets myself. Claude Code is barred from reading `.env`.
 - Approved every merge.
 
-**How a change got merged.** Each change went through a pull request with CI: lint, types and tests for the Python and the web app. I approved each merge in the Claude Code session, after it showed me the test output and, for anything visual, screenshots. Those approvals are not recorded on GitHub, which is why the pull requests show no reviews.
+**How a change got merged.** Each change went through a pull request with CI: lint, types and tests for the Python and the web app. I approved each merge in the Claude Code session, after it showed me the test output and, for anything visual, screenshots. Those approvals were not recorded on GitHub, which is why the first forty pull requests show no reviews. From #41 on, each pull request ends with an "Approval" section that says who approved it and on what evidence.
 
 **Three times I overruled it.**
 - **The look.** The first version followed the design system to the letter, and every page looked white and blank to me. I pointed it at galleries of food and AI sites and had the home page redesigned around the label ([decision 0011](docs/decisions/0011-bold-home.md)).
-- **The graph.** A review of the live site called the graph page a tangle. Claude Code's fix was to give the dots shapes and a key. I asked whether that layout was the right way to draw the data at all. It was not, and the page was rebuilt as three columns ([decision 0016](docs/decisions/0016-graph-in-columns.md)).
+- **The graph.** An AI review of the live site called the graph page a tangle. Claude Code's fix was to give the dots shapes and a key. I asked whether that layout was the right way to draw the data at all. It was not, and the page was rebuilt as three columns ([decision 0016](docs/decisions/0016-graph-in-columns.md)).
 - **The gold labels.** The plan had me hand-label 200 products to score the category model. I tried a blind check of 30 and stopped, because I could not place most of the products myself. A larger model labelled them instead, and the result is reported as agreement between two models, not as accuracy ([decision 0005](docs/decisions/0005-enrichment.md)).
 
 **It also got things wrong.** One example: [#37](https://github.com/adikan2k/labellens/pull/37) said the keep-warm ping never touched the database. It did, every ten minutes, and [#38](https://github.com/adikan2k/labellens/pull/38) corrected it. The [engineering notes](#engineering-notes) list others, each with how it was caught.
