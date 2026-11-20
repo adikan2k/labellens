@@ -190,16 +190,73 @@ def test_barcode_detection(text: str, expected: str | None) -> None:
     assert search.barcode_digits(text) == expected
 
 
+def _codes(rows: list[dict[str, Any]], limit: int = 10) -> list[str]:
+    return [r["code"] for r in search.one_per_product(rows, limit)]
+
+
 def test_one_listing_per_product_keeps_the_best_ranked() -> None:
     rows = [
         {"code": "1", "name": "Lucky Charms", "brand": "General Mills"},
         {"code": "2", "name": "lucky charms ", "brand": "general mills"},  # another pack size
-        {"code": "3", "name": "Lucky Charms", "brand": "Lucky Charms"},  # another brand: kept
+        {"code": "3", "name": "Lucky Charms!", "brand": "GENERAL MILLS"},  # punctuation, case
         {"code": "4", "name": None, "brand": None},
         {"code": "5", "name": None, "brand": None},
     ]
-    assert [r["code"] for r in search.one_per_product(rows, 10)] == ["1", "3", "4"]
-    assert [r["code"] for r in search.one_per_product(rows, 2)] == ["1", "3"]
+    assert _codes(rows) == ["1", "4"]
+    assert _codes(rows, 1) == ["1"]
+
+
+def test_a_brand_that_is_only_the_product_line_is_not_another_maker() -> None:
+    # Open Food Facts lists Honey Nut Cheerios under "General Mills" and under "Cheerios".
+    rows = [
+        {"code": "1", "name": "Honey Nut Cheerios", "brand": "General Mills"},
+        {"code": "2", "name": "Honey Nut Cheerios", "brand": "Cheerios"},
+        {"code": "3", "name": "Honey Nut Cheerios Protein", "brand": "General Mills"},
+        {"code": "4", "name": "Honey Nut Cheerios Protein", "brand": "Honey Nut Cheerios Protein"},
+        {"code": "5", "name": "Honey Nut Cheerios", "brand": None},
+    ]
+    assert _codes(rows) == ["1", "3"]
+    # The order they arrive in does not matter: the best-ranked one is kept either way.
+    assert _codes([rows[1], rows[0], rows[4]]) == ["2"]
+
+
+def test_different_makers_of_the_same_name_stay_apart() -> None:
+    rows = [
+        {"code": "1", "name": "Creamy Peanut Butter", "brand": "Jif"},
+        {"code": "2", "name": "Creamy Peanut Butter", "brand": "Skippy"},
+        {"code": "3", "name": "Creamy Peanut Butter", "brand": "Great Value"},
+    ]
+    assert _codes(rows) == ["1", "2", "3"]
+
+
+def test_a_longer_spelling_of_the_same_maker_is_the_same_maker() -> None:
+    rows = [
+        {"code": "1", "name": "Coconut Water", "brand": "The Vita Coco Company Inc."},
+        {"code": "2", "name": "Coconut Water", "brand": "Vita coco"},
+        {"code": "3", "name": "Coconut Water", "brand": "Foco"},
+        {"code": "4", "name": "Classic Mayo", "brand": "Chosen Foods"},
+        {"code": "5", "name": "Classic Mayo", "brand": "Chosen"},
+    ]
+    assert _codes(rows) == ["1", "3", "4"]
+
+
+def test_a_name_that_starts_with_its_brand_matches_the_name_without_it() -> None:
+    rows = [
+        {"code": "1", "name": "Catalina Crunch Cinnamon Toast Cereal", "brand": "Catalina Crunch"},
+        {"code": "2", "name": "Cinnamon Toast Cereal", "brand": "Catalina Crunch"},
+        {"code": "3", "name": "Cinnamon Toast Cereal", "brand": "General Mills"},
+    ]
+    assert _codes(rows) == ["1", "3"]
+    assert _codes([rows[1], rows[0]]) == ["2"]
+
+
+def test_only_a_leading_brand_is_dropped_from_a_name() -> None:
+    # "Organic" belongs to the name here, not only to the brand.
+    rows = [
+        {"code": "1", "name": "Organic Whole Milk", "brand": "Organic Valley"},
+        {"code": "2", "name": "Whole Milk", "brand": "Organic Valley"},
+    ]
+    assert _codes(rows) == ["1", "2"]
 
 
 def test_text_search_lists_each_product_once(
@@ -215,3 +272,5 @@ def test_text_search_lists_each_product_once(
     results = _get(client, word, limit=50)["results"]
     keys = [((r["name"] or "").casefold(), (r["brand"] or "").casefold()) for r in results]
     assert len(keys) == len(set(keys)), "a product appears twice"
+    # Nothing the rule would fold together is left in the list.
+    assert len(search.one_per_product(results, 50)) == len(results)
