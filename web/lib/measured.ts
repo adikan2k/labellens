@@ -40,6 +40,7 @@ export const M = {
   coldBefore: { value: "22.6 s", file: COLD, evidence: "22.64 s" },
   coldLow: { value: "7 s", file: COLD, evidence: "| 7.07 s |" },
   coldHigh: { value: "10 s", file: COLD, evidence: "| 10.07 s |" },
+  warmPing: { value: "5 minutes", file: COLD, evidence: "a ping every 5 minutes" },
   cachingSaving: { value: "64%", file: CACHING, evidence: "| -64% |" },
 } as const satisfies Record<string, Measure>;
 
@@ -115,7 +116,7 @@ export const EVAL_RESULTS: EvalResult[] = [
   },
   {
     name: "Waking up",
-    headline: `After a quiet spell, the first request takes ${M.coldLow.value.replace(" s", "")} to ${M.coldHigh.value} while the API starts (it was ${M.coldBefore.value}); the next ones take under 0.1 s.`,
+    headline: `After a quiet spell, the first request takes ${M.coldLow.value.replace(" s", "")} to ${M.coldHigh.value} while the API starts (it was ${M.coldBefore.value}); the next ones take under 0.1 s. A ping every ${M.warmPing.value} now keeps it awake most of the time.`,
     file: COLD,
   },
 ];

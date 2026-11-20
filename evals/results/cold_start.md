@@ -118,3 +118,16 @@ request log around each timestamp for `httpRequest.latency`.
 - When a search on the home page runs longer than 2 seconds, the page now says the search is
   waking up and that the first one can take about 10 seconds. Before, the loading state gave
   no reason.
+
+## The ping is running (2026-11-20, 07:49 UTC)
+
+The job `labellens-keep-warm` was created in Cloud Scheduler at 07:45 UTC and run once by hand.
+Cloud Run's request log shows it:
+
+| Request | Time | Status |
+| --- | ---: | ---: |
+| `GET /health` from `Google-Cloud-Scheduler`, 07:49:08 | 0.016 s | 200 |
+
+Not yet measured: how many instance starts a day remain with the ping running. Before it,
+there was about one an hour. To check, count the `Startup took` lines after 2026-11-20 07:45
+in the same log; they should be rare outside deploys.
