@@ -225,6 +225,10 @@ export const ASK_REFUSED_NOTE =
   "LabelLens doesn’t give medical or dietary advice. A doctor or registered dietitian can.";
 export const ASK_REPLAY_NOTE = "Recorded example run. Live answers come back tomorrow (UTC).";
 export const ASK_WAKING_UP = "The ask agent is waking up. Try again in a few seconds.";
+/** Shown when no step has arrived this long after asking: the agent is loading on a new instance. */
+export const ASK_SLOW_AFTER_MS = 5000;
+export const ASK_SLOW =
+  "The agent is starting up after a quiet spell. The first question can take about 20 seconds; the next ones take about 4.";
 export const ASK_UNAVAILABLE = "The ask agent is not available right now. Try again later.";
 
 /** "Try again in about 12 minutes." from a Retry-After in seconds. */

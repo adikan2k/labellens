@@ -29,6 +29,7 @@ IMPLEMENTED = [
     ("get", "/additives/{slug}"),
     ("post", "/label"),
     ("get", "/ready"),
+    ("get", "/warm"),
 ]
 
 

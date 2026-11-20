@@ -50,6 +50,7 @@ from api.app.schemas import (
     StatsOverview,
     SwapsResponse,
     Versions,
+    Warm,
 )
 
 API_VERSION = "0.3.0"
@@ -67,7 +68,8 @@ class Lazy:
     Their libraries (anthropic, langfuse with OpenTelemetry) take seconds to import, and on a
     fresh Cloud Run instance far longer: an hour-idle cold start spent 16 s in startup
     (evals/results/cold_start.md). A search never needs them, so only the first question or
-    label after a quiet spell pays (or GET /ready, which builds both on purpose)."""
+    label after a quiet spell pays (or GET /warm and GET /ready, which build both on
+    purpose)."""
 
     def __init__(
         self,
@@ -348,6 +350,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return error(request, 503, str(over))
         except LabelError as failure:
             return error(request, failure.status, str(failure))
+
+    @app.get("/warm")
+    def warm(request: Request) -> Warm:
+        """For the scheduled ping (scripts/keep_warm.py): builds the lazy services, so the
+        first question or label on a new instance does not wait for their libraries. It runs
+        no database query, so a ping never wakes Neon, and no model call."""
+        return Warm(
+            ask_configured=request.app.state.ask.get() is not None,
+            label_configured=request.app.state.label.get() is not None,
+            source=Source(snapshot_date=request.app.state.db.known_snapshot_date()),
+        )
 
     @app.get("/ready", responses={503: {"model": Error}})
     def ready(request: Request, conn: Conn) -> Ready:
