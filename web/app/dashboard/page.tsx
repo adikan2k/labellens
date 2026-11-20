@@ -49,7 +49,9 @@ async function Dashboard() {
     <>
       <p className="type-body max-w-measure pt-3 text-ink-muted">
         {formatCount(stats.product_count)} products sold in the US, from the Open Food Facts snapshot of{" "}
-        {stats.source.snapshot_date ?? "unknown date"}.
+        {stats.source.snapshot_date ?? "unknown date"}.{" "}
+        {stats.named_product_count < stats.product_count &&
+          `${formatCount(stats.named_product_count)} of them have a name and can be searched; the charts count them all.`}
       </p>
       <div className="grid gap-x-12 gap-y-16 pt-12 lg:grid-cols-2">
         <ChartPanel id="nutriscore" finding={nutriscoreFinding(stats.nutriscore)}>

@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { RouteFocus } from "@/components/route-focus";
-import { ROOT_TITLE, SITE_DESCRIPTION } from "@/lib/metadata";
+import { ROOT_TITLE, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL, social } from "@/lib/metadata";
 
 import "./globals.css";
 
@@ -17,8 +17,10 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: ROOT_TITLE,
   description: SITE_DESCRIPTION,
+  ...social(`${SITE_NAME}: ${SITE_TAGLINE}`, SITE_DESCRIPTION),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

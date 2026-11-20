@@ -177,6 +177,13 @@ describe("the bands", () => {
       expect(screen.getByText(m.value)).toBeTruthy();
     }
   });
+
+  test("the measured band links to how the site is built", () => {
+    render(<Measured />);
+    expect(screen.getByRole("link", { name: "How it’s built" }).getAttribute("href")).toBe(
+      "/how-its-built",
+    );
+  });
 });
 
 test("the header leads with Read a label and has the barcode mark", () => {

@@ -170,7 +170,7 @@ Everything below the hero needs `/stats/overview`; if the API is asleep, the tic
 ### Header and footer
 
 - **Header:** on `page`. A small barcode mark (seven bars) beside the wordmark, then Read a label, Additives, Dashboard, Graph, Ask and About, and "My basket (n)" once the basket has something in it. Below `md` (768 px) it is two lines that never wrap further: the wordmark with the basket count at the right, then Read a label, Additives, Dashboard and Ask; Graph and About are in the footer, which always has every link.
-- **Footer:** an ink band. The wordmark large (Display), the links again, and the Open Food Facts attribution (rule 6) in `paper-muted`, its links in `paper`.
+- **Footer:** an ink band. The wordmark large (Display), every header link plus "How it's built", a credit line in `paper` ("Built by" with the author's name, linked, and a link to the code), and the Open Food Facts attribution (rule 6) in `paper-muted`, its links in `paper`.
 
 ### Product page
 
@@ -387,6 +387,20 @@ A single column: the question box, then each agent step as a row in a label-styl
 - What was read is labelled as read by AI from the photo, every time. A product match is "Looks like", never "This is". A value the label does not print reads "Not listed".
 - A flagged additive says "Flagged by Open Food Facts" in text, as on the MCP card, here and on the product page.
 - A sample result says "Recorded example" above it.
+
+### How it's built
+
+For someone who wants to know how the site works, not what is in a food. Page width, on `page`.
+
+- **Top:** the title over the heavy rule, a short first-person paragraph that names the author, and a row of links (LinkedIn, GitHub, the code, decision notes) in Data value.
+- **Four facts** in Display with a Small caption under each, two across on a phone and four from `lg`.
+- **The architecture** is the one full-width part: five stages top to bottom (source, pipeline, storage, API, apps). Each stage has its name and a one-line note on the left (above, on a phone) and its parts as `panel` boxes on the right, side by side from `sm`. A "↓" in Heading sits between stages. No colour and no connecting lines: order and the arrow carry the flow, and it is a list, so it reads without the picture.
+- **Everything else** sits on the measure: the pipeline as a numbered list, the stack as a two-column table (label row style), the evals as the same list the About page shows, then problems and fixes, cost, and how the work was done.
+- The home page's "How it's measured" band links here, to the right of its title, and so do About's opening and the footer.
+
+### Link preview
+
+`web/public/og.png`, 1200 × 630, drawn from `docs/design/og/og.html` in these tokens: `page` background, the barcode mark and wordmark, "What's in it?" in the Poster style over the heavy rule, one line under it, and a real label as a `paper` sticker tilted two degrees with its grade chip. The grade chip is the only colour. The command to rebuild it is in that file.
 
 ### MCP card (inside Claude)
 

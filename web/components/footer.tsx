@@ -1,13 +1,15 @@
 import Link from "next/link";
 
+import { AUTHOR, BUILT_HREF, BUILT_LABEL, REPO_URL } from "@/lib/copy";
+
 import { BarcodeMark, NAV_LINKS } from "./header";
 
 export const OFF_URL = "https://world.openfoodfacts.org";
 export const ODBL_URL = "https://opendatacommons.org/licenses/odbl/1-0/";
 
 /**
- * An ink band with the wordmark large and the Open Food Facts ODbL attribution, which every
- * page keeps (CLAUDE.md rule 6; DESIGN.md, "Header and footer").
+ * An ink band with the wordmark large, every link, who built it, and the Open Food Facts ODbL
+ * attribution, which every page keeps (CLAUDE.md rule 6; DESIGN.md, "Header and footer").
  */
 export function Footer() {
   return (
@@ -22,7 +24,7 @@ export function Footer() {
           </p>
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
-              {NAV_LINKS.map((link) => (
+              {[...NAV_LINKS, { href: BUILT_HREF, label: BUILT_LABEL }].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="type-small">
                     {link.label}
@@ -32,7 +34,11 @@ export function Footer() {
             </ul>
           </nav>
         </div>
-        <p className="type-small pt-8 text-paper-muted">
+        <p className="type-small pt-8">
+          Built by <a href={AUTHOR.linkedin}>{AUTHOR.name}</a>. The code is on{" "}
+          <a href={REPO_URL}>GitHub</a>.
+        </p>
+        <p className="type-small pt-2 text-paper-muted">
           Contains data from <a href={OFF_URL}>Open Food Facts</a>, available under the{" "}
           <a href={ODBL_URL}>Open Database License</a>.
         </p>

@@ -143,14 +143,6 @@ export const SHELF = {
   report: "Read the report",
 } as const;
 
-/** The four numbers on the home page, each from an eval report in evals/results/. */
-export const MEASURED = [
-  { value: "0.98", label: "Fact score for the ask agent, against 0.26 for search alone", file: "evals/results/ask_agent.md" },
-  { value: "98%", label: "Of nutrient values read right from real label photos", file: "evals/results/label_reading_claude-haiku-5-5.md" },
-  { value: "29/30", label: "Requests where Claude picks the right LabelLens tool", file: "evals/results/mcp_tools.md" },
-  { value: "184 ms", label: "Search, 95th percentile, on the live site", file: "evals/results/search_latency_public.md" },
-] as const;
-
 /** The /label page: reading a food label from a photo. */
 export const LABEL = {
   intro:
@@ -243,6 +235,15 @@ export const ASK_PRIVACY_NOTE =
   "Questions go to Anthropic and Voyage AI to answer them and are kept in our trace log (Langfuse), which does not delete them on its free plan. Don’t include personal details.";
 
 export const REPO_URL = "https://github.com/adikan2k/labellens";
+
+/** Who built it: the footer credit and the "How it's built" page. */
+export const AUTHOR = {
+  name: "Aditya Kanbargi",
+  linkedin: "https://www.linkedin.com/in/adikan2k/",
+  github: "https://github.com/adikan2k",
+} as const;
+export const BUILT_HREF = "/how-its-built";
+export const BUILT_LABEL = "How it’s built";
 export const MCP_URL = "https://labellens-api-1036759996795.us-east4.run.app/mcp";
 
 /** The ask agent's public limits, from api/app/config.py. */
@@ -252,61 +253,92 @@ export const ASK_LIMITS = {
   timeoutSeconds: 45,
 };
 
-export type EvalResult = {
-  name: string;
-  /** The number that matters, in a sentence a shopper can read. */
-  headline: string;
-  /** Path from the repository root; the About page links it on GitHub. */
-  file: string;
-};
+/** The "How it's built" page: for someone who wants to know how the site works. */
+export const BUILT = {
+  description:
+    "How LabelLens is built: the data pipeline, the knowledge graph, the AI agent and its evals, the stack and what it costs.",
+  facts: [
+    { value: "1M", label: "US products through the pipeline" },
+    { value: "94", label: "data tests on every build" },
+    { value: "8", label: "evals, each with a published report" },
+    { value: "~$6", label: "model spend for the whole project" },
+  ],
+  steps: [
+    {
+      name: "Data",
+      text: "The US subset of the Open Food Facts export goes through staging, intermediate and mart models in dbt, with tests on every key, range and relationship. Duplicate barcodes and impossible nutrient values are handled there, once.",
+    },
+    {
+      name: "Enrichment",
+      text: "Claude fills in a category for the products that Open Food Facts’ tags leave unplaced, and writes an explainer for each additive and common ingredient. It runs through the Batch API and its outputs are committed, so a rerun costs nothing.",
+    },
+    {
+      name: "Serving",
+      text: "Postgres holds the serving tables, swapped in atomically on each load, with full-text search and pgvector for explainer search. Neo4j holds a subset of the products as a graph, capped to fit the free tier.",
+    },
+    {
+      name: "Apps",
+      text: "One FastAPI service serves the website, the ask agent and the MCP server. The API’s schema is checked against a written OpenAPI contract, and the web’s types are generated from the same file.",
+    },
+    {
+      name: "Operations",
+      text: "GitHub Actions runs every check on each pull request, deploys the API on merge without stored keys, smoke-tests production every 6 hours, and reruns the connector eval when its tools change.",
+    },
+  ],
+  stack: [
+    { layer: "Data", tools: "DuckDB, dbt, Dagster, Python (uv, Ruff, Pyright, pytest)" },
+    {
+      layer: "AI",
+      tools:
+        "Claude Haiku for the agent, enrichment and label reading; Claude Sonnet as eval judge; Voyage AI embeddings; Langfuse tracing",
+    },
+    { layer: "Storage", tools: "Neon Postgres with pgvector, Neo4j AuraDB" },
+    { layer: "API", tools: "FastAPI on Google Cloud Run, with the MCP server mounted at /mcp" },
+    { layer: "Web", tools: "Next.js 16, React, Tailwind CSS v4, Vitest, on Vercel" },
+  ],
+  caveats: [
+    "The category labels came from a larger AI model, not from a person, so that result compares two models.",
+    "I wrote both the ask eval’s questions and the agent’s prompt.",
+    "The samples are small, so each report gives a range. Read it before comparing two numbers.",
+  ],
+  notes: [
+    {
+      title: "The agent’s SQL is safe because of the database, not a parser",
+      text: "The agent writes its own SQL, but runs it as a role that can read five tables and nothing else, in a read-only transaction with a 3-second timeout and a 50-row cap. Only rows a tool actually returned can be cited, so an invented source is dropped.",
+    },
+    {
+      title: "The eval caught a regression the demo hid",
+      text: "Telling the agent to list each product once also made it de-duplicate counts: 1,178 cereals instead of 1,323, and the fact score fell to 0.88. The fix was scoped to lists, and the score went back to 0.98.",
+    },
+    {
+      title: "Only 1 of 11 production runs reached the trace log",
+      text: "Cloud Run samples a few requests for its own tracing, and OpenTelemetry’s default sampler followed that decision, so the rest were silently dropped. Each run now starts a trace of its own.",
+    },
+    {
+      title: "“Healthier swaps” offered restaurant menus",
+      text: "Open Food Facts lists menu items under 16- to 24-digit codes, and 34,200 of them qualified as swaps. A barcode check-digit test now keeps swaps to real packaged products.",
+    },
+    {
+      title: "Prompt caching was measured before it was trusted",
+      text: "Caching the fixed prompt and tools made a run 64% cheaper across 10 questions, with the same answers.",
+    },
+  ],
+  cost: [
+    "Model calls: about $6 for the whole project. $5.18 of that was the one-off category fill, 604,507 inputs through the Batch API.",
+    "Evals are cached, so rerunning one costs $0. A paid run prints an estimate first and only sends when confirmed.",
+    "Hosting runs on free tiers: Neon, AuraDB, Cloud Run, Vercel, Langfuse and Voyage AI.",
+    "The public ask agent is limited to 10 questions an hour per visitor and $0.50 a day overall. Past that it shows recorded runs.",
+  ],
+  rules: [
+    "Every feature ships with a test or an eval.",
+    "No paid model call runs without a limit and a printed cost estimate.",
+    "The interface uses only the tokens in the design system.",
+    "Every interface change is checked with screenshots at phone, laptop and wide-screen widths.",
+  ],
+} as const;
 
-/** Every eval in evals/results/, newest numbers as committed. Tests check each file exists. */
-export const EVAL_RESULTS: EvalResult[] = [
-  {
-    name: "Ask agent",
-    headline:
-      "Fact score 0.98 on 43 answerable questions, against 0.26 for an explainer-only baseline. All 5 requests for advice refused.",
-    file: "evals/results/ask_agent.md",
-  },
-  {
-    name: "Category suggestions",
-    headline:
-      "90.0% of 200 products put in the right category (target 90%). The labels were written by an AI model, not a person.",
-    file: "evals/results/category_accuracy_claude-haiku-5-5-full-silver.md",
-  },
-  {
-    name: "Claude connector tool choice",
-    headline: "Claude picked the right tool with the right arguments for 29 of 30 requests (target 90%).",
-    file: "evals/results/mcp_tools.md",
-  },
-  {
-    name: "Search speed",
-    headline: "95% of searches answered within 193 ms on the public API (target 300 ms).",
-    file: "evals/results/search_latency_public.md",
-  },
-  {
-    name: "Graph and swaps speed",
-    headline:
-      "95% of graph neighbourhoods within 406 ms and swap lists within 233 ms on the public API (target 1 s).",
-    file: "evals/results/graph_latency_public.md",
-  },
-  {
-    name: "Page speed",
-    headline: "Lighthouse performance 100 on home, 98 on a product page and 100 on the dashboard (target 90).",
-    file: "evals/results/lighthouse.md",
-  },
-  {
-    name: "Reading labels",
-    headline:
-      "98% of nutrient values read correctly from 30 real label photos (95–99%), checked against the photos; every value right on 85% of labels.",
-    file: "evals/results/label_reading_claude-haiku-5-5.md",
-  },
-  {
-    name: "Waking up",
-    headline: "After an hour with no visitors, the first search took 22.6 s; the next ones about 0.1 s.",
-    file: "evals/results/cold_start.md",
-  },
-];
+/** The measured numbers live in measured.ts, written once and checked against their reports. */
+export { EVAL_RESULTS, MEASURED, type EvalResult } from "./measured";
 
 /** A link to a file in the repository on GitHub. */
 export function repoFileUrl(path: string): string {

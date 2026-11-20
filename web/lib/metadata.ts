@@ -11,6 +11,34 @@ export const SITE_NAME = "LabelLens";
 export const SITE_DESCRIPTION =
   "Search US packaged foods and see their labels explained, from Open Food Facts data.";
 
+/** The public address: link previews need absolute image URLs. */
+export const SITE_URL = "https://labellens-beige.vercel.app";
+export const SITE_TAGLINE = "What’s in it? A million US food labels, explained.";
+export const PREVIEW_ALT =
+  "LabelLens: What’s in it? Beside the headline, the Nutrition Facts label of Old Fashioned Oats, graded Nutri-Score A.";
+
+/** The preview image: public/og.png, drawn from docs/design/og/og.html. */
+export const PREVIEW_IMAGE = { url: "/og.png", width: 1200, height: 630, alt: PREVIEW_ALT };
+
+/**
+ * What a pasted link shows (LinkedIn, WhatsApp, Slack): a title, a line and the large image.
+ * A page that sets these replaces the root layout's whole, so each call carries the site name
+ * and the image again.
+ */
+export function social(title: string, description: string): Pick<Metadata, "openGraph" | "twitter"> {
+  return {
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      locale: "en_US",
+      title,
+      description,
+      images: [PREVIEW_IMAGE],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [PREVIEW_IMAGE] },
+  };
+}
+
 export const ROOT_TITLE: NonNullable<Metadata["title"]> = {
   default: SITE_NAME,
   template: `%s · ${SITE_NAME}`,

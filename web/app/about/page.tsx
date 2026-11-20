@@ -4,7 +4,17 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import { Rule } from "@/components/label/primitives";
-import { ASK_LIMITS, EVAL_RESULTS, MCP_URL, REPO_URL as REPO, repoFileUrl } from "@/lib/copy";
+import {
+  ASK_LIMITS,
+  AUTHOR,
+  BUILT_HREF,
+  BUILT_LABEL,
+  EVAL_RESULTS,
+  MCP_URL,
+  REPO_URL as REPO,
+  repoFileUrl,
+} from "@/lib/copy";
+import { M } from "@/lib/measured";
 
 export const metadata: Metadata = { title: "About" };
 
@@ -19,6 +29,10 @@ export default function AboutPage() {
         <Link href="/compare">compare two products</Link> side by side, look up any additive in the{" "}
         <Link href="/additives">additive guide</Link>, or look across all of them on the dashboard.
         Set <Link href="/preferences">your own rules</Link>, and every product says which it meets.
+      </p>
+      <p className="pt-3">
+        LabelLens was built by <a href={AUTHOR.linkedin}>{AUTHOR.name}</a>. The pipeline, the
+        architecture, the evals and the cost are on <Link href={BUILT_HREF}>{BUILT_LABEL}</Link>.
       </p>
 
       <Section title="Where the data comes from">
@@ -82,9 +96,9 @@ export default function AboutPage() {
           that takes longer than {ASK_LIMITS.timeoutSeconds} seconds stops with a message.
         </p>
         <p className="pt-3">
-          On 50 test questions with known answers, the agent scored 0.98 for facts against 0.26 for
-          a version that could only search the explainers. The{" "}
-          <a href={repoFileUrl("evals/results/ask_agent.md")}>full results</a> list every question.
+          On 50 test questions with known answers, the agent scored {M.askFact.value} for facts
+          against {M.askBaseline.value} for a version that could only search the explainers. The{" "}
+          <a href={repoFileUrl(M.askFact.file)}>full results</a> list every question.
         </p>
       </Section>
 
@@ -130,9 +144,9 @@ export default function AboutPage() {
         </p>
         <p className="pt-3">
           On 30 real label photos from Open Food Facts, checked against the photos themselves, it
-          read 98% of nutrient values correctly (95&ndash;99%) and got every value right on 85% of
-          labels (68&ndash;94%). The{" "}
-          <a href={repoFileUrl("evals/results/label_reading_claude-haiku-5-5.md")}>full results</a>{" "}
+          read {M.labelValues.value} of nutrient values correctly (95&ndash;99%) and got every
+          value right on {M.labelWhole.value} of labels (68&ndash;94%). The{" "}
+          <a href={repoFileUrl(M.labelValues.file)}>full results</a>{" "}
           list every miss. It can still misread a blurry or curved label, so check what it shows
           against the pack. {ASK_LIMITS.perHour} labels an hour from each visitor, within the same
           daily budget as questions.
