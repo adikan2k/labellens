@@ -29,6 +29,7 @@ import {
   PRODUCT_UNAVAILABLE_TITLE,
   productDescription,
   productTitle,
+  social,
 } from "@/lib/metadata";
 
 /** "Lucky Charms (Lucky Charms) · LabelLens". Shares the cached product read with the page. */
@@ -39,10 +40,9 @@ export async function generateMetadata({
   try {
     const result = await cachedProduct(code);
     if (!result) return { title: PRODUCT_NOT_FOUND_TITLE };
-    return {
-      title: productTitle(result.product),
-      description: productDescription(result.product),
-    };
+    const title = productTitle(result.product);
+    const description = productDescription(result.product);
+    return { title, description, ...social(title, description) };
   } catch {
     return { title: PRODUCT_UNAVAILABLE_TITLE };
   }

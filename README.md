@@ -103,7 +103,7 @@ Add `https://labellens-api-1036759996795.us-east4.run.app/mcp` as a custom conne
 ```mermaid
 flowchart LR
     OFF[("Open Food Facts<br/>food.parquet, 8 GB")] --> ING["Ingest<br/>snapshot"]
-    ING --> DBT["dbt on DuckDB<br/>85 data tests"]
+    ING --> DBT["dbt on DuckDB<br/>94 data tests"]
     DBT <--> ENR["Enrichment<br/>Claude Batch API, cached"]
     DBT --> LOAD["Loaders"]
     LOAD --> PG[("Neon Postgres<br/>+ pgvector")]
@@ -136,7 +136,7 @@ Every AI feature is measured against a baseline before it ships, and the misses 
 
 | Eval | What it measures | Target | Measured |
 | --- | --- | --- | --- |
-| Data tests | dbt tests on keys, relationships, accepted values, ranges, completeness, row counts | 30 or more, all passing | **85 data tests and 1 unit test, all passing** |
+| Data tests | dbt tests on keys, relationships, accepted values, ranges, completeness, row counts | 30 or more, all passing | **94 data tests and 1 unit test, all passing** |
 | [Ask agent](evals/results/ask_agent.md) | 50 questions with facts computed from the data, graded by Claude Sonnet, against a baseline with explainer search only | Beat the baseline | Fact score **0.98 (0.93–1.00)** against **0.26 (0.14–0.40)**; 42/43 fully correct; 5/5 advice requests refused |
 | [Label reading](evals/results/label_reading_claude-haiku-5-5.md) | 30 real label photos from Open Food Facts, read by `POST /label` and checked against the photos | Measured | **98% (95–99%) of nutrient values right**; every value right on 85% (68–94%) of labels; additives 93% precision, 98% recall |
 | [MCP tool selection](evals/results/mcp_tools.md) | 30 natural requests: right tool and right arguments, from the tool definitions alone | 90% | **29/30, 97% (83–99%)**, three fresh runs in a row; runs in CI |

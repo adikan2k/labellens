@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { CHIP_CLASSES } from "@/components/label/primitives";
 import type { NutriscoreGrade, StatsOverview } from "@/lib/api";
-import { HOME_WAYS_IN, MEASURED, repoFileUrl, SHELF } from "@/lib/copy";
+import { BUILT_HREF, BUILT_LABEL, HOME_WAYS_IN, MEASURED, repoFileUrl, SHELF } from "@/lib/copy";
 import { additiveFinding, largestFinding, novaFinding, nutriscoreFinding } from "@/lib/findings";
 import { formatCount } from "@/lib/format";
 
@@ -152,9 +152,14 @@ export function Measured() {
     <section aria-labelledby="measured-title" className="band-ink mt-16 -mb-16 py-16">
       {/* Runs straight into the footer band: one black block, with the footer's hairline. */}
       <div className="mx-auto w-full max-w-page px-4">
-        <h2 id="measured-title" className="type-title">
-          {SHELF.measuredTitle}
-        </h2>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+          <h2 id="measured-title" className="type-title">
+            {SHELF.measuredTitle}
+          </h2>
+          <Link href={BUILT_HREF} className="type-data-value">
+            {BUILT_LABEL}
+          </Link>
+        </div>
         <p className="type-body max-w-measure pt-3 text-paper-muted">{SHELF.measuredCaption}</p>
         <ul className="grid grid-cols-1 gap-x-8 gap-y-12 pt-12 sm:grid-cols-2 lg:grid-cols-4">
           {MEASURED.map((m) => (
