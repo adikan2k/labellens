@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 
+import { PackPhoto } from "@/components/label/pack-photo";
 import { GradeChip, Rule } from "@/components/label/primitives";
 import type { Additive, Product } from "@/lib/api";
 import {
@@ -101,6 +102,9 @@ function RuleRow({ weight }: { weight: "heavy" | "medium" | "thin" }) {
 function ProductHead({ product }: { product: Product }) {
   return (
     <th scope="col" className="px-2 py-3 text-right align-bottom last:pr-[0px]">
+      <span className="flex justify-end pb-2">
+        <PackPhoto src={product.image_url} name={product.name} size="head" />
+      </span>
       {product.code === PHOTO_CODE ? (
         <span className="type-data-value block break-words">{product.name}</span>
       ) : (
