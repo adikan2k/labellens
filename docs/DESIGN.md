@@ -172,6 +172,15 @@ Everything below the hero needs `/stats/overview`; if the API is asleep, the tic
 - **Header:** on `page`. A small barcode mark (seven bars) beside the wordmark, then Read a label, Additives, Dashboard, Graph, Ask and About, and "My basket (n)" once the basket has something in it. Below `md` (768 px) it is two lines that never wrap further: the wordmark with the basket count at the right, then Read a label, Additives, Dashboard and Ask; Graph and About are in the footer, which always has every link.
 - **Footer:** an ink band. The wordmark large (Display), every header link plus "How it's built", a credit line in `paper` ("Built by" with the author's name, linked, and a link to the code), and the Open Food Facts attribution (rule 6) in `paper-muted`, its links in `paper`.
 
+### Pack photos
+
+The product itself, as the best food sites show it: the pack photo from Open Food Facts, linked, never copied (About, "Where the data comes from"). Photos are the only pictures on the site that are not drawn from tokens, so they sit in a frame that is: a `paper` sticker with a 1 px `rule-light` edge, the photo contained (`object-contain`), never cropped or tinted.
+
+- **Product page:** at the top of the right column, the full column width at 4:3, above the Nutrition Facts panel, so the column reads as the front and the back of the pack. A Small `ink-muted` credit under it ("Photo: Open Food Facts contributors, CC BY-SA.") links to the product on Open Food Facts. Left out when there is no photo.
+- **Rows** (search results, swaps, the basket): a 48 px square (`h-12`) at the left of the row. It is decoration beside the name (empty alt). A product without a photo keeps the empty frame, so the rows line up.
+- **Compare:** a 96 px square (`h-24`) above each product's name in its column.
+- Row photos load lazily; the product page's loads first (`fetchpriority="high"`), since it is near the top of the page.
+
 ### Product page
 
 ```

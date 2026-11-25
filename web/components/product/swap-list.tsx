@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
 
+import { PackPhoto } from "@/components/label/pack-photo";
 import { GradeChip } from "@/components/label/primitives";
 import type { Swap } from "@/lib/api";
 import { compareHref } from "@/lib/compare";
@@ -19,7 +20,9 @@ export function SwapList({ swaps, from }: { swaps: Swap[]; from?: string }) {
             href={`/product/${product.code}`}
             className="flex items-center justify-between gap-4 no-underline"
           >
-            <span className="min-w-0">
+            <span className="flex min-w-0 items-start gap-3">
+              <PackPhoto src={product.image_url} name={product.name} size="row" />
+              <span className="min-w-0">
               <ViewTransition name={`name-${product.code}`} share="morph" default="none">
                 <span className="type-data-value block break-words">{product.name}</span>
               </ViewTransition>
@@ -27,6 +30,7 @@ export function SwapList({ swaps, from }: { swaps: Swap[]; from?: string }) {
                 {product.brand ?? "Brand not listed"}
               </span>
               <span className="type-small block pt-1">{reason}</span>
+              </span>
             </span>
             <ViewTransition name={`grade-${product.code}`} share="morph" default="none">
               <span className="shrink-0">

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, useSyncExternalStore, ViewTransition } from "react";
 
+import { PackPhoto } from "@/components/label/pack-photo";
 import { GradeChip } from "@/components/label/primitives";
 import { ApiError, searchProducts, type SearchResult } from "@/lib/api";
 import { NO_MATCH, SCAN, SEARCH_SLOW, SEARCH_SLOW_AFTER_MS, WAKING_UP } from "@/lib/copy";
@@ -190,12 +191,15 @@ function ResultRow({ product }: { product: SearchResult }) {
       href={`/product/${product.code}`}
       className="flex items-center justify-between gap-4 border-b border-rule-light py-3 no-underline"
     >
-      <span className="min-w-0">
-        <ViewTransition name={`name-${product.code}`} share="morph" default="none">
-          <span className="type-data-value block break-words">{product.name}</span>
-        </ViewTransition>
-        <span className="type-small block break-words text-ink-muted">
-          {product.brand ?? "Brand not listed"}
+      <span className="flex min-w-0 items-center gap-3">
+        <PackPhoto src={product.image_url} name={product.name} size="row" />
+        <span className="min-w-0">
+          <ViewTransition name={`name-${product.code}`} share="morph" default="none">
+            <span className="type-data-value block break-words">{product.name}</span>
+          </ViewTransition>
+          <span className="type-small block break-words text-ink-muted">
+            {product.brand ?? "Brand not listed"}
+          </span>
         </span>
       </span>
       <ViewTransition name={`grade-${product.code}`} share="morph" default="none">

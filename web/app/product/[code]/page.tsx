@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense, ViewTransition } from "react";
 
+import { PackPhoto } from "@/components/label/pack-photo";
 import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
 import { IngredientList } from "@/components/product/ingredient-list";
@@ -109,6 +110,7 @@ function ProductLayout({ product, swaps }: { product: Product; swaps: Swap[] | n
 
       <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div className="lg:sticky lg:top-8">
+          <PackPhoto src={product.image_url} name={product.name} size="hero" offUrl={product.off_url} />
           <NutritionPanel nutrition={product.nutrition} />
           <NutrientFlags nutrition={product.nutrition} categoryId={product.category_main} />
           <YourRules subject={product} />

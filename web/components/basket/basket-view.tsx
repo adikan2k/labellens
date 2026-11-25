@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import { PackPhoto } from "@/components/label/pack-photo";
 import { CHIP_CLASSES, GradeChip, Rule } from "@/components/label/primitives";
 import { additiveHref } from "@/lib/additives";
 import { getProduct, getSwaps, type NutriscoreGrade, type Product, type Swap } from "@/lib/api";
@@ -186,6 +187,8 @@ function Item({
   return (
     <li className="border-b border-rule-light py-4">
       <div className="flex items-start justify-between gap-4">
+        <span className="flex min-w-0 items-start gap-3">
+        <PackPhoto src={product.image_url} name={product.name} size="row" />
         <span className="min-w-0">
           <Link href={`/product/${product.code}`} className="type-data-value block break-words">
             {product.name}
@@ -203,6 +206,7 @@ function Item({
               {PREFERENCES.basketMisses(missed.map((c) => c.short))}
             </span>
           )}
+        </span>
         </span>
         <span className="flex shrink-0 flex-col items-end gap-2">
           <GradeChip grade={product.nutriscore_grade} />
