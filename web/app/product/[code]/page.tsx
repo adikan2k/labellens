@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense, ViewTransition } from "react";
+import { preconnect } from "react-dom";
 
-import { PackPhoto } from "@/components/label/pack-photo";
+import { PackPhoto, PHOTO_ORIGIN } from "@/components/label/pack-photo";
 import { Rule } from "@/components/label/primitives";
 import { AdditiveList } from "@/components/product/additive-list";
 import { IngredientList } from "@/components/product/ingredient-list";
@@ -51,6 +52,9 @@ export async function generateMetadata({
 
 /** Not async: params are awaited inside the Suspense boundary, so the shell prerenders. */
 export default function ProductPage({ params }: PageProps<"/product/[code]">) {
+  // The pack photo is the largest thing on the page and comes from Open Food Facts' image
+  // server: connect to it while the product loads, so the photo is not waiting on a handshake.
+  preconnect(PHOTO_ORIGIN);
   return (
     <Suspense fallback={<ProductSkeleton />}>
       {params.then(({ code }) => (

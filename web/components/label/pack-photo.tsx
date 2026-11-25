@@ -1,3 +1,6 @@
+/** Where Open Food Facts serves pack photos from. */
+export const PHOTO_ORIGIN = "https://images.openfoodfacts.org";
+
 /**
  * A product's pack photo, linked from Open Food Facts (never copied or re-hosted: About, "Where
  * the data comes from"). DESIGN.md, "Pack photos": a white `paper` sticker with a `rule-light`
