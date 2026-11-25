@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { GradeStrip, Measured, tickerFacts, WaysIn } from "@/components/home/bands";
+import { GradeStrip, Intro, Measured, StartHere, tickerFacts, WaysIn } from "@/components/home/bands";
 import { Specimen } from "@/components/home/specimen";
 import { Ticker } from "@/components/home/ticker";
 import { Rule } from "@/components/label/primitives";
@@ -27,9 +27,13 @@ export default function Home() {
         <Rule weight="heavy" className="mt-4 mb-8 sm:mt-6 sm:mb-12" />
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16">
           <div className="min-w-0">
+            <Intro />
             <Suspense fallback={<LiveSearch productCount={null} />}>
               <SearchWithCount />
             </Suspense>
+            <div className={HIDE_WHILE_TYPING}>
+              <StartHere />
+            </div>
           </div>
           <div className={HIDE_WHILE_TYPING}>
             <Suspense fallback={null}>

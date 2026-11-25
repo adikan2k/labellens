@@ -7,10 +7,10 @@ import { afterEach, describe, expect, test } from "vitest";
 import { BarcodeMark, Header, NAV_LINKS } from "@/components/header";
 import type { Product, StatsOverview } from "@/lib/api";
 import { ean13CheckDigit, ean13Modules } from "@/lib/barcode";
-import { HOME_WAYS_IN, MEASURED, SHELF, SPECIMEN } from "@/lib/copy";
+import { HOME_INTRO, HOME_WAYS_IN, MEASURED, SHELF, SPECIMEN } from "@/lib/copy";
 
 import { Barcode } from "./barcode";
-import { GradeStrip, gradeShares, Measured, tickerFacts, WaysIn } from "./bands";
+import { GradeStrip, gradeShares, Intro, Measured, StartHere, tickerFacts, WaysIn } from "./bands";
 import { Specimen } from "./specimen";
 import { Ticker } from "./ticker";
 
@@ -167,10 +167,22 @@ describe("the bands", () => {
     expect(screen.getByRole("link", { name: SHELF.link }).getAttribute("href")).toBe("/dashboard#nutriscore");
   });
 
-  test("tiles for the first three ways in, links for the rest", () => {
+  test("the hero says what LabelLens is, and that it gives facts, not advice", () => {
+    render(<Intro />);
+    expect(screen.getByText(HOME_INTRO.title)).toBeTruthy();
+    expect(screen.getByText(/never tells you what to eat/)).toBeTruthy();
+  });
+
+  test("the first three ways in sit beside the label; the rest are links further down", () => {
+    render(<StartHere />);
+    const start = screen.getByRole("navigation", { name: HOME_INTRO.start });
+    const rows = within(start).getAllByRole("link").map((a) => a.getAttribute("href"));
+    expect(rows).toEqual(HOME_WAYS_IN.slice(0, 3).map((w) => w.href));
+    cleanup();
+
     render(<WaysIn />);
-    const tiles = screen.getAllByRole("listitem").map((li) => li.querySelector("a")?.getAttribute("href"));
-    expect(tiles).toEqual(HOME_WAYS_IN.slice(0, 3).map((w) => w.href));
+    const links = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
+    expect(links).toEqual(HOME_WAYS_IN.slice(3).map((w) => w.href));
     expect(screen.getByRole("link", { name: "The dashboard" }).getAttribute("href")).toBe("/dashboard");
   });
 

@@ -134,12 +134,15 @@ A poster for the label. The page is warm `page`; the specimen and every panel ar
 │ What's in it?                       (poster, full page width) │
 │ ████████████████████████████████████████████ rule-heavy      │
 │                                                              │
-│ [ Search 985,260 US products ]          ┌ specimen ─────┐    │
-│ Name, brand or barcode. Try: …          │ Nutrition     │ 2° │
-│ Scan a barcode or photograph the label  │ Facts  [C]    │    │
-│                                         │ ▌▌▌▌▌▌▌▌▌▌▌▌  │    │
-│ (results appear here)                   └───────────────┘    │
-│                                          Next label           │
+│ A million US food labels, explained.    ┌ specimen ─────┐    │
+│ Search any packaged food to see …       │ Nutrition     │ 2° │
+│ [ Search 985,260 US products ]          │ Facts  [A]    │    │
+│ Name, brand or barcode. Try: …          │               │    │
+│ Or start here                           │               │    │
+│ ┌ Read a label ─────────────── → ┐     │               │    │
+│ │ Ask a question ───────────── → │     │ ▌▌▌▌▌▌▌▌▌▌▌▌  │    │
+│ └ Compare two products ─────── → ┘     └───────────────┘    │
+│ (results appear under the search)        Next label           │
 │▓ 985,260 products · 74% score C or worse · 70% ultra-proc… ▓▓│ ticker (ink)
 │ The shelf, graded                                            │
 │ ┌─A─┬──B──┬─────C─────┬──────D──────┬─────E─────┐             │
@@ -153,14 +156,16 @@ A poster for the label. The page is warm `page`; the specimen and every panel ar
 
 **The hero.**
 - **Poster headline:** "What's in it?" in Poster, filling the page width (it sizes to its container), over `rule-heavy`.
-- **Search on the left, specimen on the right** (stacked on phones, search first). The search is unchanged: count in the placeholder from `/stats/overview`, the "Try:" examples, "Scan a barcode or photograph the label".
+- **The words beside the label say what LabelLens is**, so a visitor never has to guess from the placeholder: "A million US food labels, explained." in Title, then one Body paragraph in `ink-muted` on the measure, ending with the facts-not-advice line.
+- **Search on the left, specimen on the right** (stacked on phones: words, search, ways in, then the specimen). The search is unchanged: count in the placeholder from `/stats/overview`, the "Try:" examples, "Scan a barcode or photograph the label".
+- **Or start here:** under the search, the three main ways in (read a label, ask a question, compare two products) as one label panel, `rule-heavy` at the top and a row each: the title in Heading, one line in Small `ink-muted`, and an arrow that moves on hover. It fills the column beside the label with things to do, instead of empty page.
 - **The specimen** is a real product's Nutrition Facts panel, the same component as the product page, printing in on load. Above it: the product's name, brand and grade chip. Under it: the product's real EAN-13 barcode, drawn from its digits, which the site's own scanner can read off the screen. The panel is tilted 2 degrees (a transform, so it is not motion). "Next label" shows the next of three products (A, C and E), and the new one prints in.
-- **Typing in the search hides the specimen and everything below the hero,** so results sit right under the box.
+- **Typing in the search hides "Or start here", the specimen and everything below the hero,** so results sit right under the box.
 
 **The bands, in order.**
 - **Ticker (ink band):** the dashboard's findings as one line of `type-data-value` in `paper`, separated by " · ", scrolling slowly (40 s per loop, transform only). It pauses on hover and focus and stands still under reduced motion. The copy that scrolls in from the right is `aria-hidden`; screen readers get the list once.
 - **The shelf, graded:** a full-width strip of the five grade colours, each block as wide as its share of graded US products, with the letter large, the percentage and the count, in the chip's text colour for that grade. On phones it becomes five rows: letter, a bar as long as the share, the percentage. It links to the dashboard. This is where the page's colour comes from, and it is all data.
-- **Ways in:** three label panels: read a label from a photo, ask a question, compare two products. Each has a title, one line, and an arrow. The dashboard and the graph follow as text links.
+- **More ways in:** the rest of the ways in (the basket, the additive guide, your preferences, the dashboard, the graph) as text links. The three main ones are beside the label.
 - **How it's measured (ink band):** four numbers in Display, each with a one-line label and a link to its eval report: the agent's fact score, label values read right, MCP tool choice, search p95.
 - **Footer (ink band):** see "Footer".
 

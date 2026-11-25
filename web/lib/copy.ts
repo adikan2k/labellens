@@ -24,6 +24,14 @@ export function missingValues(names: string[]): string | null {
 export const SWAP_RULE =
   "Same category, a better Nutri-Score, and no additive that Open Food Facts flags for high overexposure risk.";
 /** Ways into the site from home: the first three are tiles, the rest links. */
+/** The hero's words beside the label: what LabelLens is, and where to start. */
+export const HOME_INTRO = {
+  title: "A million US food labels, explained.",
+  body: "Search any packaged food to see its nutrition, every additive looked up and a better-graded swap. It runs on Open Food Facts' data, states facts and published thresholds, and never tells you what to eat.",
+  start: "Or start here",
+} as const;
+
+/** The first three sit beside the label (StartHere); the rest are links further down. */
 export const HOME_WAYS_IN = [
   { href: "/label", title: "Read a label", note: "Photograph any pack, even one LabelLens has never seen, and see it explained." },
   { href: "/ask", title: "Ask a question", note: "An AI agent looks it up in the data, step by step, and cites what it used." },
