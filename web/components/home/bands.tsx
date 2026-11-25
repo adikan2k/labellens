@@ -2,7 +2,8 @@ import Link from "next/link";
 
 import { CHIP_CLASSES } from "@/components/label/primitives";
 import type { NutriscoreGrade, StatsOverview } from "@/lib/api";
-import { BUILT_HREF, BUILT_LABEL, HOME_WAYS_IN, MEASURED, repoFileUrl, SHELF } from "@/lib/copy";
+import { Rule } from "@/components/label/primitives";
+import { BUILT_HREF, BUILT_LABEL, HOME_INTRO, HOME_WAYS_IN, MEASURED, repoFileUrl, SHELF } from "@/lib/copy";
 import { additiveFinding, largestFinding, novaFinding, nutriscoreFinding } from "@/lib/findings";
 import { formatCount } from "@/lib/format";
 
@@ -112,34 +113,61 @@ export function GradeStrip({ stats }: { stats: StatsOverview }) {
   );
 }
 
-/** The first three ways in as label panels; the rest as links. */
+/** What LabelLens is, above the search: the hero says it before a visitor has to guess. */
+export function Intro() {
+  return (
+    <div className="pb-8">
+      <p className="type-title">{HOME_INTRO.title}</p>
+      <p className="type-body max-w-measure pt-3 text-ink-muted">{HOME_INTRO.body}</p>
+    </div>
+  );
+}
+
+/** The first three ways in, beside the label: one label panel, a row each. */
+export function StartHere() {
+  return (
+    <nav aria-labelledby="start-title" className="pt-6">
+      <h2 id="start-title" className="type-data-label pb-2">
+        {HOME_INTRO.start}
+      </h2>
+      <div className="panel px-4 pt-3 pb-1">
+        <Rule weight="heavy" />
+        <ul>
+          {HOME_WAYS_IN.slice(0, 3).map((way) => (
+            <li key={way.href} className="border-b border-rule-light last:border-b-0">
+              <Link
+                href={way.href}
+                className="group/row flex items-center justify-between gap-6 py-4 no-underline"
+              >
+                <span>
+                  <span className="type-heading block">{way.title}</span>
+                  <span className="type-small block pt-1 text-ink-muted">{way.note}</span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="type-heading transition-transform group-hover/row:translate-x-2"
+                >
+                  →
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
+  );
+}
+
+/** The rest of the ways in, as links; the first three are beside the label (StartHere). */
 export function WaysIn() {
-  const [tiles, rest] = [HOME_WAYS_IN.slice(0, 3), HOME_WAYS_IN.slice(3)];
+  const rest = HOME_WAYS_IN.slice(3);
   return (
     <section aria-labelledby="ways-title" className="mx-auto w-full max-w-page px-4 pt-16">
-      <h2 id="ways-title" className="type-title pb-6">
+      <h2 id="ways-title" className="type-title pb-2">
         {SHELF.waysTitle}
       </h2>
-      <ul className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {tiles.map((way) => (
-          <li key={way.href}>
-            <Link
-              href={way.href}
-              className="panel group/tile flex h-full flex-col justify-between gap-8 p-6 no-underline"
-            >
-              <span>
-                <span className="type-title block">{way.title}</span>
-                <span className="type-body block pt-3 text-ink-muted">{way.note}</span>
-              </span>
-              <span aria-hidden="true" className="type-title transition-transform group-hover/tile:translate-x-2">
-                →
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
       {rest.length > 0 && (
-        <p className="type-body flex flex-wrap gap-x-6 gap-y-2 pt-6">
+        <p className="type-body flex flex-wrap gap-x-6 gap-y-2 pt-4">
           {rest.map((way) => (
             <Link key={way.href} href={way.href} className="type-data-value">
               {way.title}
