@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/readme/hero.jpg" alt="The LabelLens home page: a poster headline asking What's in it?, a product search box, and a live Nutrition Facts label printed beside it like a sticker" width="100%">
+<img src="docs/readme/hero.jpg" alt="The LabelLens home page: a poster headline asking What's in it?, one line saying what LabelLens is, a product search box with the three main ways in under it, and a live Nutrition Facts label printed beside it like a sticker" width="100%">
 
 # LabelLens
 
@@ -44,17 +44,17 @@ LabelLens puts it in one place. It states facts and published thresholds, and it
 <table>
 <tr>
 <td width="50%" valign="top">
-<img src="docs/readme/product.jpg" alt="Product page for Cheerios: Nutri-Score C, NOVA 4, additives, a better swap and a Nutrition Facts panel" width="100%">
+<img src="docs/readme/product.jpg" alt="Product page for Oreo: its pack photo, Nutri-Score E, NOVA 4, five additives, three better swaps with their photos, a Nutrition Facts panel and high-in flags" width="100%">
 <b>Look up any product.</b> Search by name, brand or barcode, or scan one with your phone's camera. Each page shows the Nutri-Score, the NOVA processing group, nutrients per 100 g with plain "high in" and "low in" flags, and every additive explained.
 </td>
 <td width="50%" valign="top">
-<img src="docs/readme/label-read.jpg" alt="Read a label: two photos of a coconut water carton and the Nutrition Facts read from them" width="100%">
+<img src="docs/readme/label-read.jpg" alt="Read a label: three sample labels as photo cards, then two photos of a coconut water carton and the start of what was read from them" width="100%">
 <b>Read a label from a photo.</b> Photograph any pack, even one that isn't in the data. Claude reads what's printed, the code converts it to per 100 g, explains the additives, finds the product it most likely is, and suggests better-graded ones.
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
-<img src="docs/readme/ask.jpg" alt="The ask page answering: breakfast cereals under 5 g sugar without artificial colours, with ten numbered sources" width="100%">
+<img src="docs/readme/ask.jpg" alt="The ask page: three example questions as cards, then the agent's steps for breakfast cereals under 5 g sugar without artificial colours, and the start of its answer" width="100%">
 <b>Ask a question.</b> A tool-using agent answers from the data with read-only SQL, graph queries and explainer search. It streams its steps, and it can only cite rows its tools actually returned. It refuses medical advice.
 </td>
 <td width="50%" valign="top">
@@ -64,7 +64,7 @@ LabelLens puts it in one place. It states facts and published thresholds, and it
 </tr>
 <tr>
 <td width="50%" valign="top">
-<img src="docs/readme/basket.jpg" alt="My basket: four products, their Nutri-Score mix, high-in counts, and a one-tap swap under each" width="100%">
+<img src="docs/readme/basket.jpg" alt="My basket: four products with their pack photos, their Nutri-Score mix, high-in counts, and a one-tap swap under each" width="100%">
 <b>Plan a shop.</b> Put products in a basket to see them together: the grade mix, what's ultra-processed, every additive across them, and a one-tap better swap for each. Set your own rules (sugar, salt and saturated-fat limits, a minimum grade, additives to avoid), and every page says which ones a product meets.
 </td>
 <td width="50%" valign="top">
@@ -74,7 +74,7 @@ LabelLens puts it in one place. It states facts and published thresholds, and it
 </tr>
 <tr>
 <td width="50%" valign="top">
-<img src="docs/readme/dashboard.jpg" alt="Dashboard: the US label landscape, with grades and processing by category" width="100%">
+<img src="docs/readme/dashboard.jpg" alt="Dashboard: the US label landscape, with grades, processing, the largest categories and the most common additives" width="100%">
 <b>See the whole shelf.</b> A dashboard of the US packaged-food landscape: grades, processing and additives by category.
 </td>
 <td width="50%" valign="top">
