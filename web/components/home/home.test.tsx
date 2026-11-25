@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BarcodeMark, Header, NAV_LINKS } from "@/components/header";
 import type { Product, StatsOverview } from "@/lib/api";
@@ -14,7 +14,17 @@ import { GradeStrip, gradeShares, Intro, Measured, StartHere, tickerFacts, WaysI
 import { Specimen } from "./specimen";
 import { Ticker } from "./ticker";
 
-afterEach(cleanup);
+// motion reads prefers-reduced-motion once at load, so the hook is mocked to switch it per test.
+const preference = vi.hoisted(() => ({ reduced: false }));
+vi.mock("motion/react", async (original) => ({
+  ...(await original<typeof import("motion/react")>()),
+  useReducedMotion: () => preference.reduced,
+}));
+
+afterEach(() => {
+  cleanup();
+  preference.reduced = false;
+});
 
 const stats = {
   product_count: 1000,
@@ -165,6 +175,24 @@ describe("the bands", () => {
     expect(blocks[0].className).toContain("bg-grade-a");
     expect(within(wide).getByText("9%")).toBeTruthy();
     expect(screen.getByRole("link", { name: SHELF.link }).getAttribute("href")).toBe("/dashboard#nutriscore");
+  });
+
+  test("the strip wipes in and the phone bars grow once in view, still under reduced motion", () => {
+    const { container, unmount } = render(<GradeStrip stats={stats} />);
+    expect(container.querySelectorAll('[data-reveal="wipe"]')).toHaveLength(1);
+    const bars = container.querySelectorAll<HTMLElement>('[data-reveal="grow"]');
+    expect(bars).toHaveLength(5);
+    // Transform only: the bar keeps its final width, so nothing around it moves.
+    expect(bars[3].style.width).toBe("100%");
+    expect(bars[3].style.transformOrigin).toBe("left");
+    unmount();
+
+    preference.reduced = true;
+    const still = render(<GradeStrip stats={stats} />).container;
+    expect(still.querySelectorAll('[data-reveal="wipe"], [data-reveal="grow"]')).toHaveLength(0);
+    expect(still.querySelectorAll('[data-reveal="still"]')).toHaveLength(6);
+    // The numbers are in the page from the start, whatever moves.
+    expect(within(still).getAllByText("27%")).toHaveLength(2);
   });
 
   test("the hero says what LabelLens is, and that it gives facts, not advice", () => {
