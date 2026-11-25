@@ -21,13 +21,25 @@ The ask agent's one retrieval step, `search_explainers`, was only tested end to 
 
 ## What it found
 
-- **E-numbers are almost never found: 1 of 30, by every method.** The text that was embedded is "Name: explainer", and only 14 of 1,019 contain an E-number. Neither kind of search can match a code that is not there. A question like "What is E412?" depends on the agent choosing SQL instead.
+- **E-numbers were almost never found: 1 of 30, by every method.** The text that was embedded is "Name: explainer", and only 14 of 1,019 contain an E-number. Neither kind of search can match a code that is not there, so a question like "What is E412?" depended on the agent choosing SQL instead. Fixed the same day (below).
 - **Otherwise the vector search is strong.** Names 100%, misspellings 97%, descriptions without the name 92%. Keyword search drops to 57% on misspellings, as expected.
 - **Hybrid does not help here.** It sits between the two (68% against 74%), because keyword search is weaker on everything except exact names.
 - **No clean cut-off for off-topic questions.** The best off-topic match scores up to 0.289; some answerable queries score as low as 0.211.
 - **Some explainers have poor names.** 11 additives are named only by their code ("E411 food additive"), and one has a Catalan name.
 
+## Fixed: E-numbers are looked up exactly (2026-11-25)
+
+**Chosen:** before the vector search, the tool reads any E-number out of the question ("E412", "e330", "E339(iii)") and returns that additive's explainer first, or the closest narrower one when only that is written (E322 asked, E322i written). The vector results fill the rest of the five. The eval imports the same two functions, so it measures what the tool does.
+
+**Result:** the agent's search finds the right explainer in its top 5 for 98% (93–99%) of the 125 questions, up from 74%; all 30 E-number questions, up from 1. Names, misspellings and descriptions are unchanged.
+
+**Rejected:**
+- **Putting the E-number into the embedded text and re-embedding:** it would help keyword search more than vector search, which matches codes poorly, and it needs a reload of the live database. An exact lookup is certain and costs nothing.
+- **Reading "E 400" with a space as an E-number:** "vitamin E 400 IU" would become alginic acid.
+
+**What the 98% does not show:** the E-number questions were built from additives that have an explainer, so the lookup cannot miss them. From now on the eval guards that behaviour rather than measuring something hard. The 3 misses left are one misspelling and two descriptions.
+
 ## Next
 
-- Look up E-numbers exactly before searching (a few lines in the tool), or put the E-number into the embedded text and re-embed (under a cent, then a reload).
-- Then measure faithfulness: whether explainer answers say only what the retrieved text says.
+- Measure faithfulness: whether explainer answers say only what the retrieved text says.
+- The same exact lookup for common names the MCP server already knows ("MSG", "baking soda").

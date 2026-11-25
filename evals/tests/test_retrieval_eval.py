@@ -142,12 +142,17 @@ def test_run_summary_and_report() -> None:
     by_id = {r["id"]: r for r in rows}
     assert by_id["name-01"]["ranked"]["vector"][0] == "en:e407"
     assert by_id["e_number-01"]["ranked"]["vector"][0] == "en:salt"
+    # The agent looks the E-number up exactly before the vector results.
+    assert by_id["e_number-01"]["ranked"]["agent"][0] == "en:e500ii"
+    assert by_id["name-01"]["ranked"]["agent"] == by_id["name-01"]["ranked"]["vector"]
     assert by_id["name-01"]["ranked"]["keyword"][0] == "en:e407"
 
     summary = ev.summarize(rows, collection=len(EXPLAINERS))
     vector = summary["overall"]["vector"]
     assert (vector["n"], vector["hit1"], vector["hit5"]) == (3, 2, 3)  # 3 results: all in top 5
     assert summary["by_kind"]["e_number"]["vector"]["hit1"] == 0
+    assert summary["by_kind"]["e_number"]["agent"]["hit1"] == 1
+    assert summary["overall"]["agent"]["hit1"] == 3
     assert summary["class"]["queries"][0]["vector"] == pytest.approx(1 / 3, abs=1e-3)
     assert summary["class"]["base_rate"] == pytest.approx(1 / 3, abs=1e-3)
     assert summary["no_answer"]["n"] == 1
@@ -156,7 +161,7 @@ def test_run_summary_and_report() -> None:
     report = ev.render(summary, rows, names, model="m", collection=3, measured="2026-11-25")
     assert "# Explainer search: retrieval eval" in report
     assert "| Right explainer in the top 5 | 100% (44–100%)" in report
-    assert "## Every vector-search miss (0)" in report
+    assert "## Every miss by the agent's search (0)" in report
     assert "Claude Code: 2 queries" in report and "data: 2 queries" in report
 
 
