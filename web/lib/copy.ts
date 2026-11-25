@@ -103,6 +103,11 @@ export const ADDITIVES = {
   flagged: "Flagged by Open Food Facts",
   shown: (shown: number, total: number) =>
     shown === total ? `${total} additives` : `${shown} of ${total} additives`,
+  topShown: (shown: number, total: number) =>
+    `The ${shown} most common of ${total} additives`,
+  showAll: (total: number) => `Show all ${total}`,
+  whatTheyDo: "What they do",
+  allFunctions: "All",
   none: "No additive matches. Try its E number, such as E330.",
   products: "US products list it",
   share: "of named US products",
