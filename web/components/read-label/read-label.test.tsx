@@ -253,6 +253,19 @@ describe("ReadLabelPanel", () => {
     await waitFor(() => expect(screen.getByRole("alert").textContent).toBe(LABEL.unavailable));
   });
 
+  test("the samples are photo cards, each named by its title", () => {
+    render(<ReadLabelPanel />);
+    const samples = within(screen.getByRole("region", { name: LABEL.sampleIntro }));
+    const cards = samples.getAllByRole("button");
+    expect(cards.map((b) => b.getAttribute("aria-label"))).toEqual(LABEL_SAMPLES.map((s) => s.title));
+    for (const [i, card] of cards.entries()) {
+      const img = card.querySelector("img")!;
+      expect(img.getAttribute("src")).toBe(LABEL_SAMPLES[i].photos[0]);
+      expect(img.getAttribute("alt")).toBe(""); // the title names the card
+      expect(card.textContent).toContain(LABEL.sampleAction);
+    }
+  });
+
   test("a sample shows its recorded read without calling the API", async () => {
     const fetched = vi.fn(async () => new Response(JSON.stringify(response()), { status: 200 }));
     vi.stubGlobal("fetch", fetched);

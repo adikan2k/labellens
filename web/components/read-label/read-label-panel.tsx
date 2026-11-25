@@ -191,22 +191,40 @@ export function ReadLabelPanel() {
       <p id={privacyId} className="type-small max-w-measure pt-3 text-ink-muted">
         {LABEL.privacy}
       </p>
-      <p className="type-small max-w-measure pt-3">
-        {LABEL.sampleIntro}{" "}
-        {LABEL_SAMPLES.map((sample, i) => (
-          <span key={sample.slug}>
-            <button
-              type="button"
-              className="cursor-pointer underline underline-offset-2"
-              onClick={() => showSample(sample)}
-              disabled={reading}
-            >
-              {sample.title}
-            </button>
-            {i < LABEL_SAMPLES.length - 1 ? ", " : ""}
-          </span>
-        ))}
-      </p>
+      <section aria-labelledby="samples-title" className="max-w-measure pt-8">
+        <h2 id="samples-title" className="type-data-label pb-2">
+          {LABEL.sampleIntro}
+        </h2>
+        <ul className="grid grid-cols-3 gap-3">
+          {LABEL_SAMPLES.map((sample) => (
+            <li key={sample.slug}>
+              <button
+                type="button"
+                aria-label={sample.title}
+                className="panel group/sample flex h-full w-full cursor-pointer flex-col p-2 text-left disabled:cursor-default disabled:opacity-60"
+                onClick={() => showSample(sample)}
+                disabled={reading}
+              >
+                {/* A sample photo from public/, credited when the sample is shown. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={sample.photos[0]}
+                  alt=""
+                  loading="lazy"
+                  className="aspect-square w-full bg-paper object-contain"
+                />
+                <span className="type-data-value block pt-2">{sample.title}</span>
+                <span className="type-small block text-ink-muted">
+                  {LABEL.sampleAction}{" "}
+                  <span aria-hidden="true" className="inline-block transition-transform group-hover/sample:translate-x-1">
+                    →
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <div role="status" aria-live="polite" className="type-body pt-8">
         {reading && <p>{LABEL.reading}</p>}

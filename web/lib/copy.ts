@@ -191,7 +191,8 @@ export const LABEL = {
   categoryNote:
     "Products in the same category with Nutri-Score A or B and no additive Open Food Facts flags. The photo matched no product, so these are not swaps for it.",
   barcodeMissing: (code: string) => `The barcode ${code} isn't in the US data.`,
-  sampleIntro: "Or try a sample label:",
+  sampleIntro: "Or try a sample label",
+  sampleAction: "See it read",
   sampleNote: "Recorded example: this sample was read once and saved, so it costs nothing to show.",
   sampleCredit: "Sample photos: Open Food Facts contributors, CC BY-SA.",
   unavailable: "The label reader is not available right now. Try again later.",
@@ -239,6 +240,16 @@ export const ASK_EXAMPLES = [
   "Healthier swaps for Nacho Cheese Doritos",
   "What is carrageenan and why is it in yogurt?",
 ];
+/** What the agent does for each example, shown under it (DESIGN.md, Ask). */
+export const ASK_EXAMPLE_NOTES: Record<(typeof ASK_EXAMPLES)[number], string> = {
+  "Breakfast cereals under 5 g sugar without artificial colours":
+    "Writes its own SQL over the product tables and cites every row it used.",
+  "Healthier swaps for Nacho Cheese Doritos":
+    "Finds better-graded products in the same category, with the reason for each.",
+  "What is carrageenan and why is it in yogurt?":
+    "Searches the additive explainers, then counts the yogurts that list it.",
+};
+export const ASK_EXAMPLES_TITLE = "Or try one of these";
 export const ASK_AI_NOTE =
   "Answers are written by AI from Open Food Facts data. Check them against the sources.";
 export const ASK_REFUSED_NOTE =

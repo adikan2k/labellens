@@ -2,7 +2,16 @@ import { act, cleanup, fireEvent, render, screen, within } from "@testing-librar
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { AskAnswer, AskStep } from "@/lib/ask";
-import { ASK_AI_NOTE, ASK_PRIVACY_NOTE, ASK_REFUSED_NOTE, ASK_REPLAY_NOTE, ASK_SLOW } from "@/lib/copy";
+import {
+  ASK_AI_NOTE,
+  ASK_EXAMPLE_NOTES,
+  ASK_EXAMPLES,
+  ASK_EXAMPLES_TITLE,
+  ASK_PRIVACY_NOTE,
+  ASK_REFUSED_NOTE,
+  ASK_REPLAY_NOTE,
+  ASK_SLOW,
+} from "@/lib/copy";
 
 const askQuestion = vi.fn();
 vi.mock("@/lib/ask", async (original) => ({
@@ -154,6 +163,16 @@ describe("AskPanel", () => {
     await ask("cereals");
     expect(screen.getByRole("alert")).toBeTruthy();
     expect(screen.queryByRole("region", { name: "Steps" })).toBeNull();
+  });
+
+  test("the example questions are cards that say what the agent will do", () => {
+    render(<AskPanel />);
+    const examples = within(screen.getByRole("region", { name: ASK_EXAMPLES_TITLE }));
+    const cards = examples.getAllByRole("button");
+    expect(cards.map((b) => b.getAttribute("aria-label"))).toEqual([...ASK_EXAMPLES]);
+    for (const [i, card] of cards.entries()) {
+      expect(card.textContent).toContain(ASK_EXAMPLE_NOTES[ASK_EXAMPLES[i]]);
+    }
   });
 
   test("an example question asks straight away", async () => {
