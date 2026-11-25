@@ -287,6 +287,8 @@ Under the graph, a `details` list holds every node by kind, including the produc
 
 A single column: the question box, then each agent step as a row in a label-style panel (tool name, what it looked up, row count), then the answer with numbered citations that link to the rows.
 
+Under the box, "Or try one of these" (Data label) and the three example questions as `panel` cards, full width, one under another: the question in Data value, one Small `ink-muted` line on what the agent will do for it, and an arrow that moves on hover. A card asks at once.
+
 The steps stay open after the answer arrives, because they are the evidence for it; "Hide steps" closes them and "Show steps (n)" opens them again. Each new question opens them. When no step has arrived 5 seconds after asking, a Small line under "Reading the question…" says the agent is starting up and how long the first question can take. It goes with the first step.
 
 ### My basket
@@ -419,6 +421,8 @@ The steps stay open after the answer arrives, because they are the evidence for 
 - A flagged additive says "Flagged by Open Food Facts" in text, as on the MCP card, here and on the product page.
 - A sample result says "Recorded example" above it.
 
+
+**Samples.** Under the privacy line, "Or try a sample label" (Data label) and the three sample labels as `panel` cards in three columns: the first photo square and contained, the title in Data value, "See it read →" in Small. Showing one costs nothing (a recorded read). The photos are credited when a sample is shown.
 ### How it's built
 
 For someone who wants to know how the site works, not what is in a food. Page width, on `page`.

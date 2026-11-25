@@ -18,7 +18,9 @@ import {
 } from "@/lib/ask";
 import {
   ASK_AI_NOTE,
+  ASK_EXAMPLE_NOTES,
   ASK_EXAMPLES,
+  ASK_EXAMPLES_TITLE,
   ASK_PRIVACY_NOTE,
   ASK_REFUSED_NOTE,
   ASK_REPLAY_NOTE,
@@ -145,26 +147,40 @@ export function AskPanel() {
           {ASK_PRIVACY_NOTE} <Link href="/about#your-questions">What happens to your questions</Link>
         </p>
       </form>
-      <div className="pt-6">
-        <p className="type-small text-ink-muted">Or try one of these:</p>
-        <ul>
+      <section aria-labelledby="examples-title" className="pt-8">
+        <h2 id="examples-title" className="type-data-label pb-2">
+          {ASK_EXAMPLES_TITLE}
+        </h2>
+        <ul className="grid gap-3">
           {ASK_EXAMPLES.map((example) => (
-            <li key={example} className="border-b border-rule-light py-2">
+            <li key={example}>
               <button
                 type="button"
                 disabled={running}
-                className="type-small cursor-pointer text-left underline underline-offset-2 disabled:cursor-default disabled:text-ink-muted"
+                aria-label={example}
+                className="panel group/example flex w-full cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left disabled:cursor-default disabled:opacity-60"
                 onClick={() => {
                   setQuestion(example);
                   void ask(example);
                 }}
               >
-                {example}
+                <span>
+                  <span className="type-data-value block">{example}</span>
+                  <span className="type-small block pt-1 text-ink-muted">
+                    {ASK_EXAMPLE_NOTES[example]}
+                  </span>
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="type-heading transition-transform group-hover/example:translate-x-2"
+                >
+                  →
+                </span>
               </button>
             </li>
           ))}
         </ul>
-      </div>
+      </section>
 
       <div role="status" aria-live="polite" className="sr-only">
         {running &&
