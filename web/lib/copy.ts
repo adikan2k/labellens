@@ -288,7 +288,7 @@ export const BUILT = {
   facts: [
     { value: "1M", label: "US products through the pipeline" },
     { value: "94", label: "data tests on every build" },
-    { value: "8", label: "evals, each with a published report" },
+    { value: "9", label: "evals, each with a published report" },
     { value: "~$6", label: "model spend for the whole project" },
   ],
   steps: [
