@@ -133,7 +133,7 @@ export const GRAPH = {
   noPeers: "No other product here shares it.",
   inCommon: "in common",
   caption:
-    "Lines join things that are linked. The number beside a product is how many of the middle column it shares. A product listed under several barcodes is shown once.",
+    "Lines join things that are linked. Products are ranked by what they share, with rarer things counting for more, so sharing salt counts for little. The number beside a product is how many things it shares. A product listed under several barcodes is shown once.",
   sharedWith: (name: string) => `In common with ${name}`,
   hubLinks: (others: number) =>
     others === 0

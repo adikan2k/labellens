@@ -641,7 +641,7 @@ components:
 
     GraphNode:
       type: object
-      required: [id, kind, name, nutriscore_grade, detail]
+      required: [id, kind, name, nutriscore_grade, detail, degree]
       properties:
         id:
           type: string
@@ -654,6 +654,14 @@ components:
           description: >
             For additives and ingredients, their explainer (written by AI from Open Food
             Facts data); otherwise null.
+        degree:
+          type: [integer, "null"]
+          minimum: 0
+          description: >
+            For a brand, category, additive or ingredient the product links to, at depth 2:
+            how many links point to it in the whole graph, nearly all from products (a
+            category also counts its narrower categories). Null for products, for the wider
+            category, and at depth 1.
 
     GraphEdge:
       type: object

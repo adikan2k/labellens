@@ -7,7 +7,7 @@ import { Ticker } from "@/components/home/ticker";
 import { Rule } from "@/components/label/primitives";
 import { LiveSearch } from "@/components/search/live-search";
 import type { Product, StatsOverview } from "@/lib/api";
-import { cachedProduct, cachedStats } from "@/lib/cached";
+import { cachedAdditives, cachedProduct, cachedStats } from "@/lib/cached";
 import { HOME_TITLE } from "@/lib/metadata";
 
 export const metadata: Metadata = { title: { absolute: HOME_TITLE } };
@@ -71,12 +71,21 @@ async function SpecimenLoader() {
   return <Specimen products={products} />;
 }
 
+/** How many additives the guide lists, or null when the API cannot say. */
+async function guideCount(): Promise<number | null> {
+  try {
+    return (await cachedAdditives()).additives.length;
+  } catch {
+    return null;
+  }
+}
+
 async function StatsBands() {
-  const overview = await stats();
+  const [overview, additives] = await Promise.all([stats(), guideCount()]);
   if (!overview) return null;
   return (
     <>
-      <Ticker facts={tickerFacts(overview)} />
+      <Ticker facts={tickerFacts(overview, additives)} />
       <GradeStrip stats={overview} />
     </>
   );

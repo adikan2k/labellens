@@ -256,7 +256,7 @@ Full width below the header. The title, intro and search sit on the page width, 
 
 1. **This product**, level with the middle of the graph.
 2. **What it is linked to**, grouped by kind under a Data label heading with its count: brands, categories, additives, ingredients. A wider category the product is in only through a narrower one is listed in `ink-muted` with no line.
-3. **The products that share those things**, under "Most in common": the 16 that share the most, each with how many it shares at the right of its row. A product listed under several barcodes is shown once, and other listings of the centre product are left out.
+3. **The products that share those things**, under "Most in common": the 16 that share the most, with rarer things counting for more (so sharing salt counts for little), each with how many things it shares at the right of its row. A product listed under several barcodes is shown once, and other listings of the centre product are left out.
 
 The three columns sit in one `panel`. Every row is 2rem tall, one line, truncated with the full name as its tooltip, so the lines between columns need no measuring.
 

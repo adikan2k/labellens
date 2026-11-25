@@ -6,6 +6,10 @@ nodes, the best-ranked few per node, so a hub such as sugar (thousands of produc
 handful, not thousands. The whole neighbourhood is capped at MAX_NODES; `truncated` says
 whether anything was left out.
 
+Each brand, category, additive and ingredient linked to the product also carries its
+`degree`: how many links point to it in the whole graph, nearly all from products. The
+explorer uses it to count a shared rare thing for more than shared salt.
+
 Node ids carry their kind ("Product:0016000275287", "Brand:general mills") so ids from
 different kinds never collide. The graph is optional: without NEO4J_* settings, or while
 AuraDB Free is paused or reloading, requests get a 503.
@@ -93,6 +97,7 @@ def _product_node(nid: str, product: dict[str, Any]) -> dict[str, Any]:
         "name": product["name"],
         "nutriscore_grade": product.get("grade"),
         "detail": None,
+        "degree": None,
     }
 
 
@@ -117,6 +122,7 @@ def assemble(
             "name": f"{link['e_number']} {link['name']}" if link.get("e_number") else link["name"],
             "nutriscore_grade": None,
             "detail": link.get("explainer"),
+            "degree": None,
         })  # fmt: skip
         edges.append({"from": center_id, "to": nid, "type": link["type"]})
     parent = center.get("parent")
@@ -124,7 +130,8 @@ def assemble(
     if parent and category:
         pid = node_id("Category", parent["id"])
         nodes.setdefault(pid, {"id": pid, "kind": "Category", "name": parent["name"],
-                               "nutriscore_grade": None, "detail": None})  # fmt: skip
+                               "nutriscore_grade": None, "detail": None,
+                               "degree": None})  # fmt: skip
         edges.append({"from": node_id("Category", category["key"]), "to": pid, "type": "CHILD_OF"})
 
     truncated = False
@@ -134,6 +141,8 @@ def assemble(
         )
         for hub in hubs:
             hub_id = node_id(hub["label"], hub["key"])
+            if hub_id in nodes:
+                nodes[hub_id]["degree"] = hub["degree"]
             if hub["degree"] - 1 > len(hub["others"]):
                 truncated = True
             for other in hub["others"]:

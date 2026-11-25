@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 
 import type { GraphEdge, GraphNeighborhood, GraphNode } from "@/lib/api";
 import { GRAPH } from "@/lib/copy";
-import { columns, groupByKind, KIND_SHAPE, PEER_LIMIT, productCode } from "@/lib/graph-view";
+import { columns, groupByKind, hubWeight, KIND_SHAPE, PEER_LIMIT, productCode } from "@/lib/graph-view";
 
 const node = (id: string, kind: GraphNode["kind"], name: string, extra: Partial<GraphNode> = {}): GraphNode => ({
   id,
@@ -11,6 +11,7 @@ const node = (id: string, kind: GraphNode["kind"], name: string, extra: Partial<
   name,
   nutriscore_grade: null,
   detail: null,
+  degree: null,
   ...extra,
 });
 const link = (from: string, to: string, type: GraphEdge["type"] = "HAS_INGREDIENT"): GraphEdge => ({
@@ -95,6 +96,46 @@ describe("graph view", () => {
     ]);
     // "Cheerios" again is the centre under another barcode; "wheaties!" is Wheaties sharing less.
     expect(model.peersTotal).toBe(2);
+  });
+
+  test("sharing rare things outranks sharing common ones, such as salt and sugar", () => {
+    // Cheerios' real case: Premium Soy Sauce shares salt and sugar; Fiber One shares one vitamin.
+    const RARE = "Ingredient:en:folic-acid";
+    const SALT = "Ingredient:en:salt";
+    const SUGAR_ = "Ingredient:en:sugar";
+    const data: GraphNeighborhood = {
+      center: "Product:1",
+      nodes: [
+        node("Product:1", "Product", "Cheerios"),
+        node(RARE, "Ingredient", "Folic acid", { degree: 1168 }),
+        node(SALT, "Ingredient", "Salt", { degree: 10788 }),
+        node(SUGAR_, "Ingredient", "Sugar", { degree: 7802 }),
+        node("Product:soy", "Product", "Premium Soy Sauce"),
+        node("Product:fibre", "Product", "Fiber One Cereal"),
+      ],
+      edges: [
+        link("Product:1", RARE),
+        link("Product:1", SALT),
+        link("Product:1", SUGAR_),
+        link("Product:soy", SALT),
+        link("Product:soy", SUGAR_),
+        link("Product:fibre", RARE),
+      ],
+      truncated: false,
+      source,
+    };
+    const peers = columns(data, data.center)!.peers;
+    expect(peers.map((p) => [p.node.name, p.shares.length])).toEqual([
+      ["Fiber One Cereal", 1],
+      ["Premium Soy Sauce", 2],
+    ]);
+    expect(peers[0].score).toBeGreaterThan(peers[1].score);
+
+    // Rarer is worth more; a hub the API gave no count for is worth 1, never nothing.
+    expect(hubWeight(80)).toBeGreaterThan(hubWeight(1168));
+    expect(hubWeight(1168)).toBeGreaterThan(hubWeight(10788));
+    expect(hubWeight(10788)).toBeGreaterThan(0);
+    expect(hubWeight(null)).toBe(1);
   });
 
   test("selecting a hub narrows the right column to the products linked to it", () => {

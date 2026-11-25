@@ -480,6 +480,8 @@ export interface components {
             nutriscore_grade: components["schemas"]["NutriscoreGrade"];
             /** @description For additives and ingredients, their explainer (written by AI from Open Food Facts data); otherwise null. */
             detail: string | null;
+            /** @description For a brand, category, additive or ingredient the product links to, at depth 2: how many links point to it in the whole graph, nearly all from products (a category also counts its narrower categories). Null for products, for the wider category, and at depth 1. */
+            degree: number | null;
         };
         GraphEdge: {
             /** @description Node id. */

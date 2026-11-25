@@ -4,7 +4,7 @@ LabelLens turns the Open Food Facts database into a product people can search, q
 
 This is the plan LabelLens was built against, phase by phase, with Claude Code as the pair programmer. Each phase has a scope and a "done when" line. A phase is not done until its "done when" is true and you have seen the evidence.
 
-Sprint dates: phase 0 on Tue Nov 17, phases 1 and 2 on Wed Nov 18, phases 3 and 4 on Thu Nov 19, phases 5 and 6 on Fri Nov 20, design polish on Mon Nov 23, launch checks on Tue Nov 24.
+Planned sprint dates: phase 0 on Tue Nov 17, phases 1 and 2 on Wed Nov 18, phases 3 and 4 on Thu Nov 19, phases 5 and 6 on Fri Nov 20, design polish on Mon Nov 23, launch checks on Tue Nov 24. In practice phases 0 to 7 were merged by Nov 18, and the features and fixes added after the spec by Nov 20.
 
 ---
 
@@ -22,6 +22,8 @@ Sprint dates: phase 0 on Tue Nov 17, phases 1 and 2 on Wed Nov 18, phases 3 and 
 6. Use LabelLens from inside Claude through its MCP App.
 
 **Out of scope.** Accounts, saved lists, user contributions back to Open Food Facts, image recognition, and any medical or dietary advice.
+
+**Added after this spec.** Two of those were later brought in, each with its own decision note: a basket kept in the browser, with no account ([0015](decisions/0015-my-basket.md)), and reading a label from a photo ([0010](decisions/0010-label-reading.md)). Medical and dietary advice stayed out.
 
 ---
 
