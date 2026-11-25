@@ -1,4 +1,13 @@
 /**
+ * Open Food Facts serves each photo at 100, 200 and 400 px wide (`front_en.8.400.jpg`). A 48 or
+ * 96 px frame needs the 100 px one (sharp at twice the pixel density), a sixth of the bytes,
+ * so thumbnails do not compete with the page's main photo.
+ */
+export function thumbnail(src: string): string {
+  return src.replace(/\.400\.jpg$/, ".100.jpg");
+}
+
+/**
  * A product's pack photo, linked from Open Food Facts (never copied or re-hosted: About, "Where
  * the data comes from"). DESIGN.md, "Pack photos": a white `paper` sticker with a `rule-light`
  * edge, the photo contained, never cropped.
@@ -50,7 +59,7 @@ export function PackPhoto({
     >
       {src && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" loading="lazy" className="h-full w-full object-contain" />
+        <img src={thumbnail(src)} alt="" loading="lazy" className="h-full w-full object-contain" />
       )}
     </span>
   );

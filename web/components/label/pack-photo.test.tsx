@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, test } from "vitest";
 
-import { PackPhoto } from "./pack-photo";
+import { PackPhoto, thumbnail } from "./pack-photo";
 
 afterEach(cleanup);
 
@@ -28,6 +28,17 @@ test("a row thumbnail is decoration beside the name, loaded lazily", () => {
   expect(img.getAttribute("alt")).toBe("");
   expect(img.getAttribute("loading")).toBe("lazy");
   expect(container.firstElementChild?.className).toContain("h-12 w-12");
+  // The 100 px photo, not the 400 px one the page's main photo uses.
+  expect(img.getAttribute("src")).toBe(SRC.replace(".400.jpg", ".100.jpg"));
+});
+
+test("only Open Food Facts' 400 px photos are swapped for their 100 px version", () => {
+  expect(thumbnail("https://images.openfoodfacts.org/x/front_en.8.400.jpg")).toBe(
+    "https://images.openfoodfacts.org/x/front_en.8.100.jpg",
+  );
+  expect(thumbnail("https://images.openfoodfacts.org/x/front_en.8.full.jpg")).toBe(
+    "https://images.openfoodfacts.org/x/front_en.8.full.jpg",
+  );
 });
 
 test("a row without a photo keeps an empty frame, so rows line up", () => {
