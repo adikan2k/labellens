@@ -14,7 +14,7 @@ export default function ReadLabelPage() {
   return (
     <div className="mx-auto w-full max-w-page px-4 pt-8 pb-16">
       <div className="max-w-measure">
-        <h1 className="type-title pb-4">Read a label</h1>
+        <h1 className="type-page pb-6">Read a label</h1>
         <Rule weight="heavy" />
         <p className="type-body pt-4 pb-6">{LABEL.intro}</p>
       </div>

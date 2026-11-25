@@ -77,6 +77,22 @@
   font-weight: 900;
   font-stretch: 75%;
 }
+/* Page titles (DESIGN.md, Type): the poster's narrow width, stepping up at md and lg. */
+@utility type-page {
+  font-size: 3.25rem;
+  line-height: 3.25rem;
+  font-weight: 900;
+  font-stretch: 62%;
+  overflow-wrap: break-word;
+  @variant md {
+    font-size: 4.5rem;
+    line-height: 4.25rem;
+  }
+  @variant lg {
+    font-size: 5.5rem;
+    line-height: 5rem;
+  }
+}
 @utility type-title {
   font-size: 2.25rem;
   line-height: 2.5rem;

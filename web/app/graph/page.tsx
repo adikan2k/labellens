@@ -18,7 +18,7 @@ export default function GraphPage({ searchParams }: PageProps<"/graph">) {
     // the full width (DESIGN.md, graph explorer).
     <div className="w-full pt-8 pb-16">
       <div className="mx-auto w-full max-w-page px-4">
-        <h1 className="type-title">The food graph</h1>
+        <h1 className="type-page">The food graph</h1>
         <p className="type-body max-w-measure pt-2 text-ink-muted">
           Products, the brands that make them, their categories, additives and ingredients, and
           the other products they share them with.

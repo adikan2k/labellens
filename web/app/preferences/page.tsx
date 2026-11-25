@@ -17,7 +17,7 @@ export default function PreferencesPage() {
   return (
     <div className="mx-auto w-full max-w-page px-4 pt-8 pb-16">
       <div className="max-w-measure">
-        <h1 className="type-title pb-4">{PREFERENCES.title}</h1>
+        <h1 className="type-page pb-6">{PREFERENCES.title}</h1>
         <Rule weight="heavy" />
         <p className="type-body pt-4">{PREFERENCES.intro}</p>
       </div>

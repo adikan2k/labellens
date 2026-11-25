@@ -21,7 +21,7 @@ export const metadata: Metadata = { title: "About" };
 export default function AboutPage() {
   return (
     <article className="type-body mx-auto w-full max-w-measure px-4 pt-8 pb-16">
-      <h1 className="type-title pb-4">About LabelLens</h1>
+      <h1 className="type-page pb-6">About LabelLens</h1>
       <Rule weight="heavy" />
       <p className="pt-4">
         LabelLens explains the labels of packaged foods sold in the United States. Search for a

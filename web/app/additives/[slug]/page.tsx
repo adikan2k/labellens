@@ -56,7 +56,7 @@ async function GuideView({ slug }: { slug: string }) {
   } catch {
     return (
       <div className="mx-auto w-full max-w-measure px-4 pt-16 pb-16">
-        <h1 className="type-title pb-4">{ADDITIVES.title}</h1>
+        <h1 className="type-page pb-6">{ADDITIVES.title}</h1>
         <p className="type-body">{ADDITIVES.unavailable}</p>
         <p className="type-body pt-4">
           <Link href={`/additives/${slug}`}>Try again</Link> or see{" "}

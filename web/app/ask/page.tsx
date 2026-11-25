@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function AskPage() {
   return (
     <div className="mx-auto w-full max-w-measure px-4 pt-8 pb-16">
-      <h1 className="type-title pb-4">Ask a question</h1>
+      <h1 className="type-page pb-6">Ask a question</h1>
       <Rule weight="heavy" />
       <p className="type-body pt-4 pb-6">
         Ask about the products, nutrients, ingredients and additives in Open Food Facts. An AI
