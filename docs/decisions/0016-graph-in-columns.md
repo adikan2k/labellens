@@ -13,6 +13,7 @@ Every neighbourhood the API returns has the same shape: one product, the things 
 - **It answers a question.** The right column ranks products by how much they share with the centre, with the count. Selecting one lists what is shared; selecting an ingredient or additive lists every product that has it.
 - **Plain page elements, not WebGL.** Rows are buttons in lists and the lines are SVG. It works by keyboard and screen reader without a second view, and three libraries (Sigma, graphology and its layout) are gone from the page.
 - **Fixed row height.** Every row is one line, 2rem tall, so the lines between columns are computed from row numbers and nothing is measured in the browser.
+- **Ranked by what is shared, rare things counting more** (added 2026-11-25). Counting shared things equally put Premium Soy Sauce and Creamy Peanut Butter among the products most like Cheerios, because all three list salt and sugar. Each shared thing is now weighted by how rare it is in the graph (inverse document frequency on its link count, which the API returns as `degree`). On Cheerios that drops both out of the top 16; on Doritos the top of the list is unchanged.
 - **One product, one row.** Other listings of the same name are folded together, and listings of the centre's own name are left out, the same rule search uses (#39).
 
 **Rejected:**

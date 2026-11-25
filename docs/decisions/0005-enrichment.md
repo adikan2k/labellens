@@ -60,7 +60,7 @@ These files are both the cache and what dbt reads.
 ## Labels written by AI, said plainly
 
 **Chosen:** the 200 eval labels were written by Claude Opus 5.5 from the category definitions, without seeing the evaluated model's answers. They live in `evals/datasets/category_silver_opus.csv`, and every report says who made them.
-**Why:** labelling 200 unfamiliar products by hand was not a good use of time. The project owner tried a blind 30-product check and stopped because the products were unfamiliar, which is itself a sign of how hard these labels are.
+**Why:** labelling 200 unfamiliar products by hand was not a good use of time. I tried a blind 30-product check and stopped because I could not place most of the products, which is itself a sign of how hard these labels are.
 **Cost of the choice:** the eval measures agreement with a stronger model, not accuracy against a person. `category_gold.csv` is still reserved for hand labels, and `scripts/audit_labels.py` runs the blind check if anyone does it later.
 
 ## Measured

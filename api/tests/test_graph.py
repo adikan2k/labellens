@@ -73,6 +73,21 @@ def test_depth_two_adds_products_per_hub_and_marks_truncation() -> None:
     assert small["truncated"] is False
 
 
+def test_each_linked_node_says_how_common_it_is() -> None:
+    hubs = [
+        hub("Ingredient", "en:sugar", 5000, "A1"),
+        hub("Brand", "general mills", 3, "B1"),
+    ]
+    by_id = {n["id"]: n for n in graph.assemble(CENTER, hubs)["nodes"]}
+    assert by_id["Ingredient:en:sugar"]["degree"] == 5000
+    assert by_id["Brand:general mills"]["degree"] == 3
+    # Products, and links with no hub row (depth 1, the wider category), say nothing.
+    assert by_id["Product:0016000275287"]["degree"] is None
+    assert by_id["Product:A1"]["degree"] is None
+    assert by_id["Category:grains"]["degree"] is None
+    assert all(n["degree"] is None for n in graph.assemble(CENTER, None)["nodes"])
+
+
 def test_the_node_cap_holds() -> None:
     hubs = [hub("Ingredient", "en:sugar", 41, *[f"P{i}" for i in range(40)])]
     out = graph.assemble(CENTER, hubs, max_nodes=10)
@@ -123,7 +138,7 @@ def test_route_returns_the_contract_shape(client: TestClient) -> None:
     body = response.json()
     assert set(body) == {"center", "nodes", "edges", "truncated", "source"}
     assert set(body["edges"][0]) == {"from", "to", "type"}
-    assert set(body["nodes"][0]) == {"id", "kind", "name", "nutriscore_grade", "detail"}
+    assert set(body["nodes"][0]) == {"id", "kind", "name", "nutriscore_grade", "detail", "degree"}
     assert "Product:B1" in {n["id"] for n in body["nodes"]}
     assert response.headers["cache-control"] == "public, max-age=3600"
 

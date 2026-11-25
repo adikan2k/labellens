@@ -159,6 +159,8 @@ class GraphNode(Model):
     name: str
     nutriscore_grade: NutriscoreGrade | None
     detail: str | None
+    # How many links point to it in the whole graph; null for products, and at depth 1.
+    degree: int | None
 
 
 class GraphEdge(Model):

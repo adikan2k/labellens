@@ -6,15 +6,20 @@ import { BUILT_HREF, BUILT_LABEL, HOME_WAYS_IN, MEASURED, repoFileUrl, SHELF } f
 import { additiveFinding, largestFinding, novaFinding, nutriscoreFinding } from "@/lib/findings";
 import { formatCount } from "@/lib/format";
 
-/** The dashboard's findings as one line: what the ticker scrolls. */
-export function tickerFacts(stats: StatsOverview): string[] {
+/**
+ * The dashboard's findings as one line: what the ticker scrolls. `guideCount` is how many
+ * additives the additive guide lists (those a product lists), so the two pages agree; the
+ * fact is left out when it is unknown. (stats.additive_count is every additive in the
+ * taxonomy, a larger number that no page shows.)
+ */
+export function tickerFacts(stats: StatsOverview, guideCount: number | null = null): string[] {
   return [
     `${formatCount(stats.named_product_count)} US products`,
     nutriscoreFinding(stats.nutriscore),
     novaFinding(stats.nova),
     additiveFinding(stats.top_additives),
     largestFinding(stats.categories, "category"),
-    `${formatCount(stats.additive_count)} additives explained`,
+    ...(guideCount ? [`${formatCount(guideCount)} additives in the additive guide`] : []),
   ];
 }
 

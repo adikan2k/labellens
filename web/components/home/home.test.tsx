@@ -136,8 +136,12 @@ describe("the specimen", () => {
 
 describe("the bands", () => {
   test("the ticker says the dashboard's findings once to screen readers, and can be paused", () => {
-    const facts = tickerFacts(stats);
+    const facts = tickerFacts(stats, 515);
     expect(facts[0]).toBe("985,260 US products");
+    // The additive guide's count, not the taxonomy's (stats.additive_count is 514 here).
+    expect(facts).toContain("515 additives in the additive guide");
+    expect(facts.join(" ")).not.toContain("514");
+    expect(tickerFacts(stats).some((f) => f.includes("additive guide"))).toBe(false);
     expect(facts).toContain("E330 Citric acid is in more products than any other additive: 101,709");
     render(<Ticker facts={facts} />);
     const band = screen.getByRole("region", { name: SHELF.tickerLabel });

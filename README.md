@@ -31,7 +31,7 @@ LabelLens puts it in one place. It states facts and published thresholds, and it
 <table>
 <tr>
 <td align="center"><b>985,260</b><br><sub>named US products</sub></td>
-<td align="center"><b>515</b><br><sub>additives, each explained</sub></td>
+<td align="center"><b>515</b><br><sub>additives in the guide</sub></td>
 <td align="center"><b>0.98</b><br><sub>ask agent fact score<br>(baseline 0.26)</sub></td>
 <td align="center"><b>98%</b><br><sub>label values read right<br>from a photo</sub></td>
 <td align="center"><b>175 ms</b><br><sub>p95 search,<br>live API</sub></td>
@@ -132,7 +132,7 @@ flowchart TB
 ```
 
 1. **Data.** The US subset of the Open Food Facts export (1,002,769 products) goes through staging, intermediate and mart models in dbt, with tests on every key, range and relationship.
-2. **Enrichment.** Claude fills in categories for 674,384 products that Open Food Facts' tags leave unplaced, and writes 1,019 additive and ingredient explainers. It runs through the Batch API and is cached, so reruns cost nothing.
+2. **Enrichment.** Claude fills in categories for 676,320 products that Open Food Facts' tags leave unplaced, and writes 1,019 additive and ingredient explainers. It runs through the Batch API and is cached, so reruns cost nothing.
 3. **Serving.** Postgres holds the serving tables, swapped in atomically on each load, with pgvector for explainer search. Neo4j holds the graph subset, capped to fit AuraDB Free.
 4. **Apps.** One FastAPI service serves the website, the ask agent and the MCP server. The Next.js site caches what it can and renders the rest per request.
 5. **Operations.** GitHub Actions runs CI, deploys the API on merge with keyless auth (Workload Identity Federation), smoke-tests production every 6 hours, reruns the MCP eval when its tools change, and builds the newest export weekly without publishing it.
