@@ -153,6 +153,7 @@ Every AI feature is measured against a baseline before it ships, and the misses 
 | --- | --- | --- | --- |
 | Data tests | dbt tests on keys, relationships, accepted values, ranges, completeness, row counts | 30 or more, all passing | **94 data tests and 1 unit test, all passing** |
 | [Ask agent](evals/results/ask_agent.md) | 50 questions with facts computed from the data, graded by Claude Sonnet, against a baseline with explainer search only | Beat the baseline | Fact score **0.98 (0.93–1.00)** against **0.26 (0.14–0.40)**; 42/43 fully correct; 5/5 advice requests refused |
+| [Explainer search](evals/results/retrieval.md) | 145 queries against the agent's vector search over 1,019 explainers, with keyword (BM25) and hybrid baselines | Measured | **74% (66–81%) in the top 5**, keyword 58%, hybrid 68%. Names 100%, misspellings 97%, descriptions 92%, but **E-numbers 3%**: the searched text leaves them out |
 | [Label reading](evals/results/label_reading_claude-haiku-5-5.md) | 30 real label photos from Open Food Facts, read by `POST /label` and checked against the photos | Measured | **98% (95–99%) of nutrient values right**; every value right on 85% (68–94%) of labels; additives 93% precision, 98% recall |
 | [MCP tool selection](evals/results/mcp_tools.md) | 30 natural requests: right tool and right arguments, from the tool definitions alone | 90% | **29/30, 97% (83–99%)**, three fresh runs in a row; runs in CI |
 | [Category accuracy](evals/results/category_accuracy_claude-haiku-5-5-full-silver.md) | AI category on 200 products, against labels from a larger model (Claude Opus) | 90% | Haiku **90.0% (85.1–93.4%)**, Sonnet 92.0%. Open Food Facts' own tags: 87.5% |
@@ -165,6 +166,7 @@ Every AI feature is measured against a baseline before it ships, and the misses 
 **What these numbers don't show:**
 - The category labels came from Claude Opus, not from a person, so that result compares two models.
 - I wrote both the ask eval's questions and the agent's prompt.
+- In the explainer search eval, 100 of 145 queries take their answers from Open Food Facts' data; the other 45 were written by Claude Code and not checked by a person.
 - The MCP eval runs on Haiku. Claude itself is a larger model, so this is the stricter test.
 
 ## Engineering notes

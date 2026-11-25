@@ -1,0 +1,5564 @@
+{
+ "measured": "2026-11-25T20:17:09+00:00",
+ "model": "voyage-4-lite",
+ "summary": {
+  "overall": {
+   "vector": {
+    "n": 125,
+    "hit1": 80,
+    "hit1_ci": [
+     0.5528,
+     0.7188
+    ],
+    "hit5": 93,
+    "hit5_ci": [
+     0.661,
+     0.8124
+    ],
+    "mrr": {
+     "mean": 0.6792,
+     "ci": [
+      0.6013,
+      0.7549
+     ]
+    }
+   },
+   "keyword": {
+    "n": 125,
+    "hit1": 53,
+    "hit1_ci": [
+     0.3409,
+     0.5116
+    ],
+    "hit5": 73,
+    "hit5_ci": [
+     0.4963,
+     0.6666
+    ],
+    "mrr": {
+     "mean": 0.4975,
+     "ci": [
+      0.418,
+      0.5765
+     ]
+    }
+   },
+   "hybrid": {
+    "n": 125,
+    "hit1": 65,
+    "hit1_ci": [
+     0.4331,
+     0.6057
+    ],
+    "hit5": 85,
+    "hit5_ci": [
+     0.5939,
+     0.7554
+    ],
+    "mrr": {
+     "mean": 0.5914,
+     "ci": [
+      0.5132,
+      0.6703
+     ]
+    }
+   }
+  },
+  "by_kind": {
+   "name": {
+    "vector": {
+     "n": 40,
+     "hit1": 38,
+     "hit1_ci": [
+      0.835,
+      0.9862
+     ],
+     "hit5": 40,
+     "hit5_ci": [
+      0.9124,
+      1.0
+     ],
+     "mrr": {
+      "mean": 0.9688,
+      "ci": [
+       0.9187,
+       1.0
+      ]
+     }
+    },
+    "keyword": {
+     "n": 40,
+     "hit1": 30,
+     "hit1_ci": [
+      0.5981,
+      0.8581
+     ],
+     "hit5": 38,
+     "hit5_ci": [
+      0.835,
+      0.9862
+     ],
+     "mrr": {
+      "mean": 0.8411,
+      "ci": [
+       0.7464,
+       0.925
+      ]
+     }
+    },
+    "hybrid": {
+     "n": 40,
+     "hit1": 35,
+     "hit1_ci": [
+      0.7389,
+      0.9454
+     ],
+     "hit5": 40,
+     "hit5_ci": [
+      0.9124,
+      1.0
+     ],
+     "mrr": {
+      "mean": 0.9271,
+      "ci": [
+       0.8625,
+       0.9812
+      ]
+     }
+    }
+   },
+   "e_number": {
+    "vector": {
+     "n": 30,
+     "hit1": 1,
+     "hit1_ci": [
+      0.0059,
+      0.1667
+     ],
+     "hit5": 1,
+     "hit5_ci": [
+      0.0059,
+      0.1667
+     ],
+     "mrr": {
+      "mean": 0.0333,
+      "ci": [
+       0.0,
+       0.1
+      ]
+     }
+    },
+    "keyword": {
+     "n": 30,
+     "hit1": 1,
+     "hit1_ci": [
+      0.0059,
+      0.1667
+     ],
+     "hit5": 1,
+     "hit5_ci": [
+      0.0059,
+      0.1667
+     ],
+     "mrr": {
+      "mean": 0.0333,
+      "ci": [
+       0.0,
+       0.1
+      ]
+     }
+    },
+    "hybrid": {
+     "n": 30,
+     "hit1": 1,
+     "hit1_ci": [
+      0.0059,
+      0.1667
+     ],
+     "hit5": 1,
+     "hit5_ci": [
+      0.0059,
+      0.1667
+     ],
+     "mrr": {
+      "mean": 0.0333,
+      "ci": [
+       0.0,
+       0.1
+      ]
+     }
+    }
+   },
+   "misspelling": {
+    "vector": {
+     "n": 30,
+     "hit1": 26,
+     "hit1_ci": [
+      0.7032,
+      0.9469
+     ],
+     "hit5": 29,
+     "hit5_ci": [
+      0.8333,
+      0.9941
+     ],
+     "mrr": {
+      "mean": 0.9056,
+      "ci": [
+       0.8111,
+       0.9833
+      ]
+     }
+    },
+    "keyword": {
+     "n": 30,
+     "hit1": 12,
+     "hit1_ci": [
+      0.2459,
+      0.5768
+     ],
+     "hit5": 17,
+     "hit5_ci": [
+      0.392,
+      0.7262
+     ],
+     "mrr": {
+      "mean": 0.4743,
+      "ci": [
+       0.3167,
+       0.6354
+      ]
+     }
+    },
+    "hybrid": {
+     "n": 30,
+     "hit1": 15,
+     "hit1_ci": [
+      0.3315,
+      0.6685
+     ],
+     "hit5": 23,
+     "hit5_ci": [
+      0.5907,
+      0.8821
+     ],
+     "mrr": {
+      "mean": 0.627,
+      "ci": [
+       0.4864,
+       0.765
+      ]
+     }
+    }
+   },
+   "descriptive": {
+    "vector": {
+     "n": 25,
+     "hit1": 15,
+     "hit1_ci": [
+      0.4074,
+      0.766
+     ],
+     "hit5": 23,
+     "hit5_ci": [
+      0.7503,
+      0.9778
+     ],
+     "mrr": {
+      "mean": 0.7193,
+      "ci": [
+       0.574,
+       0.8533
+      ]
+     }
+    },
+    "keyword": {
+     "n": 25,
+     "hit1": 10,
+     "hit1_ci": [
+      0.234,
+      0.5926
+     ],
+     "hit5": 17,
+     "hit5_ci": [
+      0.4841,
+      0.828
+     ],
+     "mrr": {
+      "mean": 0.5324,
+      "ci": [
+       0.3733,
+       0.696
+      ]
+     }
+    },
+    "hybrid": {
+     "n": 25,
+     "hit1": 14,
+     "hit1_ci": [
+      0.3707,
+      0.7333
+     ],
+     "hit5": 21,
+     "hit5_ci": [
+      0.6535,
+      0.936
+     ],
+     "mrr": {
+      "mean": 0.6813,
+      "ci": [
+       0.524,
+       0.828
+      ]
+     }
+    }
+   }
+  },
+  "class": {
+   "queries": [
+    {
+     "id": "class-01",
+     "query": "an additive that colours food",
+     "cls": "en:colour",
+     "base_rate": 0.0491,
+     "vector": 0.0,
+     "keyword": 0.2,
+     "hybrid": 0.4
+    },
+    {
+     "id": "class-02",
+     "query": "something that keeps oil and water mixed",
+     "cls": "en:emulsifier",
+     "base_rate": 0.1246,
+     "vector": 1.0,
+     "keyword": 0.6,
+     "hybrid": 0.8
+    },
+    {
+     "id": "class-03",
+     "query": "what thickens sauces and desserts",
+     "cls": "en:thickener",
+     "base_rate": 0.1138,
+     "vector": 0.8,
+     "keyword": 0.0,
+     "hybrid": 0.6
+    },
+    {
+     "id": "class-04",
+     "query": "an additive that keeps a texture stable",
+     "cls": "en:stabiliser",
+     "base_rate": 0.1433,
+     "vector": 0.8,
+     "keyword": 0.6,
+     "hybrid": 0.6
+    },
+    {
+     "id": "class-05",
+     "query": "an additive that stops food going off",
+     "cls": "en:preservative",
+     "base_rate": 0.0451,
+     "vector": 0.2,
+     "keyword": 0.0,
+     "hybrid": 0.0
+    },
+    {
+     "id": "class-06",
+     "query": "what stops fats from going rancid",
+     "cls": "en:antioxidant",
+     "base_rate": 0.0353,
+     "vector": 0.6,
+     "keyword": 0.4,
+     "hybrid": 0.4
+    },
+    {
+     "id": "class-07",
+     "query": "a sugar substitute",
+     "cls": "en:sweetener",
+     "base_rate": 0.0275,
+     "vector": 0.6,
+     "keyword": 0.4,
+     "hybrid": 0.8
+    },
+    {
+     "id": "class-08",
+     "query": "something that keeps food moist",
+     "cls": "en:humectant",
+     "base_rate": 0.0599,
+     "vector": 1.0,
+     "keyword": 0.2,
+     "hybrid": 0.6
+    },
+    {
+     "id": "class-09",
+     "query": "an additive that binds metals in food",
+     "cls": "en:sequestrant",
+     "base_rate": 0.0638,
+     "vector": 0.6,
+     "keyword": 0.4,
+     "hybrid": 0.8
+    },
+    {
+     "id": "class-10",
+     "query": "a substance used to carry flavours or colours",
+     "cls": "en:carrier",
+     "base_rate": 0.0285,
+     "vector": 0.4,
+     "keyword": 0.2,
+     "hybrid": 0.4
+    }
+   ],
+   "mean": {
+    "vector": {
+     "mean": 0.6,
+     "ci": [
+      0.4,
+      0.78
+     ]
+    },
+    "keyword": {
+     "mean": 0.3,
+     "ci": [
+      0.18,
+      0.42
+     ]
+    },
+    "hybrid": {
+     "mean": 0.54,
+     "ci": [
+      0.38,
+      0.68
+     ]
+    }
+   },
+   "base_rate": 0.0691
+  },
+  "no_answer": {
+   "n": 10,
+   "off_topic": {
+    "median": 0.2173,
+    "max": 0.2892
+   },
+   "answerable": {
+    "median": 0.5632,
+    "min": 0.211
+   },
+   "below_every_answerable": 4
+  }
+ },
+ "queries": [
+  {
+   "id": "name-01",
+   "kind": "name",
+   "query": "What is Citric acid?",
+   "relevant": [
+    "en:e330"
+   ],
+   "top_similarity": 0.6661,
+   "vector": [
+    "en:e330",
+    "en:organic-acids",
+    "en:e331ii",
+    "en:e331i",
+    "en:e331iii"
+   ],
+   "keyword": [
+    "en:e472c",
+    "en:e333iii",
+    "en:e332ii",
+    "en:e345",
+    "en:e1505"
+   ],
+   "hybrid": [
+    "en:e331ii",
+    "en:e332ii",
+    "en:e330",
+    "en:e331i",
+    "en:e331iii"
+   ]
+  },
+  {
+   "id": "name-02",
+   "kind": "name",
+   "query": "Gelatine",
+   "relevant": [
+    "en:e428"
+   ],
+   "top_similarity": 0.5948,
+   "vector": [
+    "en:e428",
+    "en:e418",
+    "en:e404",
+    "en:e407",
+    "en:e401"
+   ],
+   "keyword": [
+    "en:e428",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator"
+   ],
+   "hybrid": [
+    "en:e428",
+    "en:e418",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e404",
+    "de:gärungskohlensäure"
+   ]
+  },
+  {
+   "id": "name-03",
+   "kind": "name",
+   "query": "Why is Sodium diacetate in food?",
+   "relevant": [
+    "en:e262",
+    "en:e262ii"
+   ],
+   "top_similarity": 0.6153,
+   "vector": [
+    "en:e262ii",
+    "en:e266",
+    "en:e262",
+    "en:e237",
+    "en:e262i"
+   ],
+   "keyword": [
+    "en:e261ii",
+    "en:e262ii",
+    "en:e237",
+    "en:e550ii",
+    "en:sodium-selenite"
+   ],
+   "hybrid": [
+    "en:e262ii",
+    "en:e237",
+    "en:e261ii",
+    "en:e331ii",
+    "en:e201"
+   ]
+  },
+  {
+   "id": "name-04",
+   "kind": "name",
+   "query": "What does Caramel do?",
+   "relevant": [
+    "en:e150",
+    "en:e150a",
+    "en:e150b",
+    "en:e150c",
+    "en:e150d"
+   ],
+   "top_similarity": 0.5347,
+   "vector": [
+    "en:e150",
+    "en:e150a",
+    "en:e150b",
+    "en:e150c",
+    "en:coconut-sugar"
+   ],
+   "keyword": [
+    "en:e150c",
+    "en:e150d",
+    "en:e493",
+    "en:e150",
+    "en:e150a"
+   ],
+   "hybrid": [
+    "en:e150",
+    "en:e150c",
+    "en:e150a",
+    "en:e150d",
+    "en:e150b"
+   ]
+  },
+  {
+   "id": "name-05",
+   "kind": "name",
+   "query": "What is White and yellow beeswax?",
+   "relevant": [
+    "en:e901"
+   ],
+   "top_similarity": 0.6834,
+   "vector": [
+    "en:e901",
+    "en:e905c",
+    "en:e902",
+    "en:e905ci",
+    "en:e905cii"
+   ],
+   "keyword": [
+    "en:e901",
+    "en:pantothenic-acid",
+    "en:e107",
+    "en:e105",
+    "en:e104"
+   ],
+   "hybrid": [
+    "en:e901",
+    "en:e104",
+    "en:e105",
+    "en:e107",
+    "en:e102"
+   ]
+  },
+  {
+   "id": "name-06",
+   "kind": "name",
+   "query": "Polyglycerol esters of fatty acids",
+   "relevant": [
+    "en:e475"
+   ],
+   "top_similarity": 0.6741,
+   "vector": [
+    "en:e475",
+    "en:e472a",
+    "en:e477",
+    "en:e472e",
+    "en:e476"
+   ],
+   "keyword": [
+    "en:e475",
+    "en:e477",
+    "en:e472",
+    "en:e472b",
+    "en:e473"
+   ],
+   "hybrid": [
+    "en:e475",
+    "en:e477",
+    "en:e472",
+    "en:e472e",
+    "en:e472b"
+   ]
+  },
+  {
+   "id": "name-07",
+   "kind": "name",
+   "query": "Why is Alpha-Amylase in food?",
+   "relevant": [
+    "en:e1100"
+   ],
+   "top_similarity": 0.6336,
+   "vector": [
+    "en:e1100",
+    "en:enzyme",
+    "en:e1105",
+    "en:e1101",
+    "en:e457"
+   ],
+   "keyword": [
+    "en:e1100",
+    "en:e457",
+    "en:e307",
+    "en:e307a",
+    "en:e307c"
+   ],
+   "hybrid": [
+    "en:e1100",
+    "en:e457",
+    "en:e1105",
+    "en:e620",
+    "en:e641"
+   ]
+  },
+  {
+   "id": "name-08",
+   "kind": "name",
+   "query": "What does Lutein do?",
+   "relevant": [
+    "en:e161b"
+   ],
+   "top_similarity": 0.585,
+   "vector": [
+    "en:e161b",
+    "en:e322",
+    "en:e322i",
+    "en:e160aii",
+    "en:e161h"
+   ],
+   "keyword": [
+    "en:e161b",
+    "en:e493",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid"
+   ],
+   "hybrid": [
+    "en:e161b",
+    "en:biotin",
+    "en:e322",
+    "en:e493",
+    "en:e322i"
+   ]
+  },
+  {
+   "id": "name-09",
+   "kind": "name",
+   "query": "What is Sodium dodecyl sulfate?",
+   "relevant": [
+    "en:e487"
+   ],
+   "top_similarity": 0.6371,
+   "vector": [
+    "en:e487",
+    "en:e514",
+    "en:e514i",
+    "en:e312",
+    "en:e514ii"
+   ],
+   "keyword": [
+    "en:e487",
+    "en:e312",
+    "en:e520",
+    "en:ferrous-sulfate",
+    "en:manganese-sulfate"
+   ],
+   "hybrid": [
+    "en:e487",
+    "en:e312",
+    "en:e266",
+    "en:e539",
+    "en:e514ii"
+   ]
+  },
+  {
+   "id": "name-10",
+   "kind": "name",
+   "query": "Anthocyanins",
+   "relevant": [
+    "en:e163"
+   ],
+   "top_similarity": 0.6627,
+   "vector": [
+    "en:e163",
+    "en:e130",
+    "en:e103",
+    "en:e161g",
+    "en:e162"
+   ],
+   "keyword": [
+    "en:e163",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator"
+   ],
+   "hybrid": [
+    "en:e163",
+    "en:blackberry",
+    "en:blueberry",
+    "en:e130",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi"
+   ]
+  },
+  {
+   "id": "name-11",
+   "kind": "name",
+   "query": "Why is Polyglycitol syrup in food?",
+   "relevant": [
+    "en:e964"
+   ],
+   "top_similarity": 0.6625,
+   "vector": [
+    "en:e964",
+    "en:e1200",
+    "en:e420ii",
+    "en:e1520",
+    "en:e965ii"
+   ],
+   "keyword": [
+    "en:e964",
+    "en:corn-syrup",
+    "en:rice-syrup",
+    "en:tapioca-syrup",
+    "en:brown-rice-syrup"
+   ],
+   "hybrid": [
+    "en:e964",
+    "en:corn-syrup",
+    "en:glucose-fructose-syrup",
+    "en:e965ii",
+    "en:tapioca-syrup"
+   ]
+  },
+  {
+   "id": "name-12",
+   "kind": "name",
+   "query": "What does Sodium hydrogen malate do?",
+   "relevant": [
+    "en:e350",
+    "en:e350ii"
+   ],
+   "top_similarity": 0.6213,
+   "vector": [
+    "en:e350ii",
+    "en:e350i",
+    "en:e350",
+    "en:e514ii",
+    "en:e539"
+   ],
+   "keyword": [
+    "en:e350ii",
+    "en:e350i",
+    "en:e514ii",
+    "en:e500ii",
+    "en:e352i"
+   ],
+   "hybrid": [
+    "en:e350ii",
+    "en:e350i",
+    "en:e514ii",
+    "en:e352i",
+    "en:e262ii"
+   ]
+  },
+  {
+   "id": "name-13",
+   "kind": "name",
+   "query": "What is Sodium acetates?",
+   "relevant": [
+    "en:e262",
+    "en:e262i",
+    "en:e262ii"
+   ],
+   "top_similarity": 0.6716,
+   "vector": [
+    "en:e262",
+    "en:e262i",
+    "en:e262ii",
+    "en:e364",
+    "en:e266"
+   ],
+   "keyword": [
+    "en:e262",
+    "en:e500iii",
+    "en:e266",
+    "en:e237",
+    "en:e550ii"
+   ],
+   "hybrid": [
+    "en:e262",
+    "en:e266",
+    "en:e237",
+    "en:e500iii",
+    "en:e281"
+   ]
+  },
+  {
+   "id": "name-14",
+   "kind": "name",
+   "query": "Buffered vinegar",
+   "relevant": [
+    "en:e267"
+   ],
+   "top_similarity": 0.688,
+   "vector": [
+    "en:e267",
+    "en:vinegar",
+    "en:white-vinegar",
+    "en:white-distilled-vinegar",
+    "en:distilled-vinegar"
+   ],
+   "keyword": [
+    "en:e267",
+    "en:balsamic-vinegar",
+    "en:rice-vinegar",
+    "en:red-wine-vinegar",
+    "en:grain-vinegar"
+   ],
+   "hybrid": [
+    "en:e267",
+    "en:balsamic-vinegar",
+    "en:rice-vinegar",
+    "en:red-wine-vinegar",
+    "en:grain-vinegar"
+   ]
+  },
+  {
+   "id": "name-15",
+   "kind": "name",
+   "query": "Why is Acid-treated modified starch in food?",
+   "relevant": [
+    "en:e1401"
+   ],
+   "top_similarity": 0.6702,
+   "vector": [
+    "en:e1401",
+    "en:modified-starch",
+    "en:e14xx",
+    "en:modified-corn-starch",
+    "en:modified-wheat-starch"
+   ],
+   "keyword": [
+    "en:e1401",
+    "en:e1402",
+    "en:modified-corn-starch",
+    "en:e1414",
+    "en:modified-tapioca-starch"
+   ],
+   "hybrid": [
+    "en:e1401",
+    "en:modified-corn-starch",
+    "en:modified-starch",
+    "en:e1402",
+    "en:modified-wheat-starch"
+   ]
+  },
+  {
+   "id": "name-16",
+   "kind": "name",
+   "query": "What does Formic acid do?",
+   "relevant": [
+    "en:e236"
+   ],
+   "top_similarity": 0.555,
+   "vector": [
+    "en:e236",
+    "en:e238",
+    "en:e237",
+    "en:e240",
+    "en:e239"
+   ],
+   "keyword": [
+    "en:e236",
+    "en:e493",
+    "en:e237",
+    "en:e238",
+    "en:e1000"
+   ],
+   "hybrid": [
+    "en:e236",
+    "en:e238",
+    "en:e237",
+    "en:e297",
+    "en:e280"
+   ]
+  },
+  {
+   "id": "name-17",
+   "kind": "name",
+   "query": "What is Annatto norbixin?",
+   "relevant": [
+    "en:e160",
+    "en:e160b",
+    "en:e160bii"
+   ],
+   "top_similarity": 0.4724,
+   "vector": [
+    "en:e160bii",
+    "en:e160bi",
+    "en:e160b",
+    "en:e323",
+    "en:e906"
+   ],
+   "keyword": [
+    "en:e160bii",
+    "en:e160b",
+    "en:e160bi",
+    "en:zinc",
+    "en:e927b"
+   ],
+   "hybrid": [
+    "en:e160bii",
+    "en:e160bi",
+    "en:e160b",
+    "en:inositol",
+    "en:e315"
+   ]
+  },
+  {
+   "id": "name-18",
+   "kind": "name",
+   "query": "Nitrogen",
+   "relevant": [
+    "en:e941"
+   ],
+   "top_similarity": 0.5341,
+   "vector": [
+    "en:e941",
+    "en:e919",
+    "en:e252",
+    "en:e942",
+    "en:e249"
+   ],
+   "keyword": [
+    "en:e941",
+    "en:e919",
+    "en:e927",
+    "en:e927b",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi"
+   ],
+   "hybrid": [
+    "en:e941",
+    "en:e919",
+    "en:e927",
+    "en:e927b",
+    "en:amino-acids"
+   ]
+  },
+  {
+   "id": "name-19",
+   "kind": "name",
+   "query": "Why is Potassium diacetate in food?",
+   "relevant": [
+    "en:e261",
+    "en:e261ii"
+   ],
+   "top_similarity": 0.6546,
+   "vector": [
+    "en:e261ii",
+    "en:e261",
+    "en:e577",
+    "en:e283",
+    "en:e336ii"
+   ],
+   "keyword": [
+    "en:e261ii",
+    "en:potassium-iodide",
+    "en:e261",
+    "en:e515i",
+    "en:e577"
+   ],
+   "hybrid": [
+    "en:e261ii",
+    "en:e261",
+    "en:e577",
+    "en:e202",
+    "en:e262ii"
+   ]
+  },
+  {
+   "id": "name-20",
+   "kind": "name",
+   "query": "What does Sodium/potassium and calcium salts of fatty acids do?",
+   "relevant": [
+    "en:e470",
+    "en:e470a",
+    "en:e470ai",
+    "en:e470aiii"
+   ],
+   "top_similarity": 0.6634,
+   "vector": [
+    "en:e470a",
+    "en:e470aiii",
+    "en:e470ai",
+    "en:e470",
+    "en:e470b"
+   ],
+   "keyword": [
+    "en:e470a",
+    "en:e470",
+    "en:e470aiii",
+    "en:e470ai",
+    "en:e470b"
+   ],
+   "hybrid": [
+    "en:e470a",
+    "en:e470aiii",
+    "en:e470",
+    "en:e470ai",
+    "en:e470b"
+   ]
+  },
+  {
+   "id": "name-21",
+   "kind": "name",
+   "query": "What is Salt?",
+   "relevant": [
+    "en:salt"
+   ],
+   "top_similarity": 0.6113,
+   "vector": [
+    "en:salt",
+    "en:sea-salt",
+    "en:sodium-chloride",
+    "en:sodium",
+    "en:iodised-salt"
+   ],
+   "keyword": [
+    "en:sea-salt",
+    "en:e508",
+    "en:iodised-salt",
+    "en:e515i",
+    "en:salt"
+   ],
+   "hybrid": [
+    "en:sea-salt",
+    "en:salt",
+    "en:e508",
+    "en:iodised-salt",
+    "en:e515i"
+   ]
+  },
+  {
+   "id": "name-22",
+   "kind": "name",
+   "query": "Colour - color",
+   "relevant": [
+    "en:colour"
+   ],
+   "top_similarity": 0.6098,
+   "vector": [
+    "en:colour",
+    "en:natural-colours",
+    "en:e165",
+    "en:vegetable-pigment",
+    "en:e162"
+   ],
+   "keyword": [
+    "en:e165",
+    "en:colour",
+    "en:e130",
+    "en:e105",
+    "en:e128"
+   ],
+   "hybrid": [
+    "en:colour",
+    "en:e165",
+    "en:e130",
+    "en:natural-colours",
+    "en:vegetable-pigment"
+   ]
+  },
+  {
+   "id": "name-23",
+   "kind": "name",
+   "query": "Why is Molasses in food?",
+   "relevant": [
+    "en:molasses"
+   ],
+   "top_similarity": 0.6007,
+   "vector": [
+    "en:molasses",
+    "en:corn-syrup",
+    "en:malt-syrup",
+    "en:e965",
+    "en:brown-sugar"
+   ],
+   "keyword": [
+    "en:brown-sugar",
+    "en:molasses",
+    "en:worcestershire-sauce",
+    "en:torula-yeast",
+    "en:e620"
+   ],
+   "hybrid": [
+    "en:molasses",
+    "en:brown-sugar",
+    "en:e422",
+    "en:corn-syrup",
+    "en:malt-syrup"
+   ]
+  },
+  {
+   "id": "name-24",
+   "kind": "name",
+   "query": "What does Buttermilk do?",
+   "relevant": [
+    "en:buttermilk"
+   ],
+   "top_similarity": 0.6158,
+   "vector": [
+    "en:buttermilk",
+    "en:buttermilk-solids",
+    "en:soured-milk",
+    "en:cultured-pasteurized-milk",
+    "en:whole-milk"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:buttermilk",
+    "en:buttermilk-solids",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure"
+   ],
+   "hybrid": [
+    "en:buttermilk",
+    "en:buttermilk-solids",
+    "en:bifidus",
+    "en:blue-cheese",
+    "en:e493"
+   ]
+  },
+  {
+   "id": "name-25",
+   "kind": "name",
+   "query": "What is Celery?",
+   "relevant": [
+    "en:celery"
+   ],
+   "top_similarity": 0.3852,
+   "vector": [
+    "en:celery-juice",
+    "en:celery-powder",
+    "en:celery-seed",
+    "en:celery",
+    "en:e469"
+   ],
+   "keyword": [
+    "en:celery-seed",
+    "en:celery",
+    "en:celery-juice",
+    "en:celery-powder",
+    "en:zinc"
+   ],
+   "hybrid": [
+    "en:celery-juice",
+    "en:celery-seed",
+    "en:celery-powder",
+    "en:celery",
+    "en:cream"
+   ]
+  },
+  {
+   "id": "name-26",
+   "kind": "name",
+   "query": "Sesame seeds",
+   "relevant": [
+    "en:sesame-seeds"
+   ],
+   "top_similarity": 0.5719,
+   "vector": [
+    "en:sesame-seeds",
+    "en:sesame",
+    "en:poppyseed",
+    "en:mustard-seed",
+    "en:celery-seed"
+   ],
+   "keyword": [
+    "en:sesame-seeds",
+    "en:sesame-oil",
+    "en:tahini",
+    "en:sesame",
+    "en:pumpkin-seed"
+   ],
+   "hybrid": [
+    "en:sesame-seeds",
+    "en:sesame",
+    "en:sesame-oil",
+    "en:poppyseed",
+    "en:sunflower-seed"
+   ]
+  },
+  {
+   "id": "name-27",
+   "kind": "name",
+   "query": "Why is Fruit in food?",
+   "relevant": [
+    "en:fruit"
+   ],
+   "top_similarity": 0.6314,
+   "vector": [
+    "en:fruit",
+    "en:apple",
+    "en:pear",
+    "en:fruit-pectin",
+    "en:papaya"
+   ],
+   "keyword": [
+    "en:mango",
+    "en:fructose",
+    "en:fruit",
+    "en:olive-oil",
+    "en:coconut"
+   ],
+   "hybrid": [
+    "en:fruit",
+    "en:apple",
+    "en:mango",
+    "en:pineapple",
+    "en:fruit-juice"
+   ]
+  },
+  {
+   "id": "name-28",
+   "kind": "name",
+   "query": "What does Natural smoke flavor do?",
+   "relevant": [
+    "en:natural-smoke-flavouring"
+   ],
+   "top_similarity": 0.6863,
+   "vector": [
+    "en:natural-smoke-flavouring",
+    "en:smoke-flavouring",
+    "en:natural-flavouring",
+    "en:natural-and-artificial-flavouring",
+    "en:butter-natural-flavouring"
+   ],
+   "keyword": [
+    "en:natural-smoke-flavouring",
+    "en:smoke-flavouring",
+    "en:natural-flavouring",
+    "en:butter-natural-flavouring",
+    "en:e493"
+   ],
+   "hybrid": [
+    "en:natural-smoke-flavouring",
+    "en:smoke-flavouring",
+    "en:natural-flavouring",
+    "en:butter-natural-flavouring",
+    "en:natural-vanilla-flavouring"
+   ]
+  },
+  {
+   "id": "name-29",
+   "kind": "name",
+   "query": "What is Sesame oil?",
+   "relevant": [
+    "en:sesame-oil"
+   ],
+   "top_similarity": 0.7002,
+   "vector": [
+    "en:sesame-oil",
+    "en:sesame",
+    "en:safflower-oil",
+    "en:cottonseed-oil",
+    "en:rapeseed-oil"
+   ],
+   "keyword": [
+    "en:sesame-oil",
+    "en:sesame",
+    "en:sesame-seeds",
+    "en:tahini",
+    "en:safflower-oil"
+   ],
+   "hybrid": [
+    "en:sesame-oil",
+    "en:sesame",
+    "en:safflower-oil",
+    "en:sesame-seeds",
+    "en:sunflower-oil"
+   ]
+  },
+  {
+   "id": "name-30",
+   "kind": "name",
+   "query": "Raspberries",
+   "relevant": [
+    "en:raspberry"
+   ],
+   "top_similarity": 0.6293,
+   "vector": [
+    "en:raspberry",
+    "en:raspberry-puree",
+    "en:cranberry",
+    "en:strawberry",
+    "en:blackberry"
+   ],
+   "keyword": [
+    "en:raspberry",
+    "en:raspberry-puree",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid"
+   ],
+   "hybrid": [
+    "en:raspberry",
+    "en:raspberry-puree",
+    "en:apple",
+    "en:apricot",
+    "en:blackberry"
+   ]
+  },
+  {
+   "id": "name-31",
+   "kind": "name",
+   "query": "Why is Soluble corn fiber in food?",
+   "relevant": [
+    "en:soluble-corn-fiber"
+   ],
+   "top_similarity": 0.703,
+   "vector": [
+    "en:soluble-corn-fiber",
+    "en:inulin",
+    "en:oat-fibre",
+    "en:chicory-fibre",
+    "en:e425ii"
+   ],
+   "keyword": [
+    "en:soluble-corn-fiber",
+    "en:inulin",
+    "en:e425ii",
+    "en:hydrolysed-corn-protein",
+    "en:corn-syrup"
+   ],
+   "hybrid": [
+    "en:soluble-corn-fiber",
+    "en:inulin",
+    "en:e425ii",
+    "en:chicory-fibre",
+    "en:corn-syrup"
+   ]
+  },
+  {
+   "id": "name-32",
+   "kind": "name",
+   "query": "What does Icing sugar do?",
+   "relevant": [
+    "en:icing-sugar"
+   ],
+   "top_similarity": 0.6671,
+   "vector": [
+    "en:icing-sugar",
+    "en:invert-sugar",
+    "en:invert-sugar-syrup",
+    "en:sugar",
+    "en:e953"
+   ],
+   "keyword": [
+    "en:icing-sugar",
+    "en:e493",
+    "en:sugar",
+    "en:sucrose",
+    "en:liquid-sugar"
+   ],
+   "hybrid": [
+    "en:icing-sugar",
+    "en:sugar",
+    "en:invert-sugar-syrup",
+    "en:e953",
+    "en:liquid-sugar"
+   ]
+  },
+  {
+   "id": "name-33",
+   "kind": "name",
+   "query": "What is Whey protein isolate?",
+   "relevant": [
+    "en:whey-protein-isolate"
+   ],
+   "top_similarity": 0.721,
+   "vector": [
+    "en:whey-protein-isolate",
+    "en:whey-protein",
+    "en:milk-protein-isolate",
+    "en:soy-protein-isolate",
+    "en:whey-powder"
+   ],
+   "keyword": [
+    "en:whey-protein-isolate",
+    "en:whey-protein",
+    "en:soy-protein-isolate",
+    "en:whey-powder",
+    "en:milk-protein-isolate"
+   ],
+   "hybrid": [
+    "en:whey-protein-isolate",
+    "en:whey-protein",
+    "en:soy-protein-isolate",
+    "en:milk-protein-isolate",
+    "en:whey-powder"
+   ]
+  },
+  {
+   "id": "name-34",
+   "kind": "name",
+   "query": "White vinegar",
+   "relevant": [
+    "en:white-vinegar"
+   ],
+   "top_similarity": 0.7057,
+   "vector": [
+    "en:white-vinegar",
+    "en:white-distilled-vinegar",
+    "en:distilled-vinegar",
+    "en:red-wine-vinegar",
+    "en:vinegar"
+   ],
+   "keyword": [
+    "en:white-vinegar",
+    "en:white-distilled-vinegar",
+    "en:dijon-mustard",
+    "en:balsamic-vinegar",
+    "en:rice-vinegar"
+   ],
+   "hybrid": [
+    "en:white-vinegar",
+    "en:white-distilled-vinegar",
+    "en:red-wine-vinegar",
+    "en:distilled-vinegar",
+    "en:grain-vinegar"
+   ]
+  },
+  {
+   "id": "name-35",
+   "kind": "name",
+   "query": "Why is Malted barley in food?",
+   "relevant": [
+    "en:malted-barley"
+   ],
+   "top_similarity": 0.6561,
+   "vector": [
+    "en:barley-malt-flour",
+    "en:malted-barley",
+    "en:malt",
+    "en:barley",
+    "en:malt-syrup"
+   ],
+   "keyword": [
+    "en:barley-malt-flour",
+    "en:malted-barley",
+    "en:barley",
+    "en:barley-malt-extract",
+    "en:malt-syrup"
+   ],
+   "hybrid": [
+    "en:barley-malt-flour",
+    "en:malted-barley",
+    "en:barley",
+    "en:malt",
+    "en:barley-malt-extract"
+   ]
+  },
+  {
+   "id": "name-36",
+   "kind": "name",
+   "query": "What does Habanero peppers do?",
+   "relevant": [
+    "en:habanero-chili"
+   ],
+   "top_similarity": 0.6713,
+   "vector": [
+    "en:habanero-chili",
+    "en:jalapeno-pepper",
+    "en:red-chili-pepper",
+    "en:chipotle",
+    "en:cayenne-pepper"
+   ],
+   "keyword": [
+    "en:habanero-chili",
+    "en:red-and-green-bell-peppers",
+    "en:e493",
+    "en:bell-pepper",
+    "en:green-pepper"
+   ],
+   "hybrid": [
+    "en:habanero-chili",
+    "en:jalapeno-pepper",
+    "en:bell-pepper",
+    "en:green-chili-pepper",
+    "en:red-and-green-bell-peppers"
+   ]
+  },
+  {
+   "id": "name-37",
+   "kind": "name",
+   "query": "What is Rye flour?",
+   "relevant": [
+    "en:rye-flour"
+   ],
+   "top_similarity": 0.6972,
+   "vector": [
+    "en:rye-flour",
+    "en:brown-rice-flour",
+    "en:rice-flour",
+    "en:barley-malt-flour",
+    "en:wholemeal-oat-flour"
+   ],
+   "keyword": [
+    "en:rye-flour",
+    "en:flour-treatment-agent",
+    "en:graham-flour",
+    "en:oat-flour",
+    "en:wholemeal-oat-flour"
+   ],
+   "hybrid": [
+    "en:rye-flour",
+    "en:brown-rice-flour",
+    "en:oat-flour",
+    "en:wholemeal-oat-flour",
+    "en:graham-flour"
+   ]
+  },
+  {
+   "id": "name-38",
+   "kind": "name",
+   "query": "Tamari soy sauce",
+   "relevant": [
+    "en:tamari"
+   ],
+   "top_similarity": 0.7164,
+   "vector": [
+    "en:tamari",
+    "en:soy-sauce",
+    "en:worcestershire-sauce",
+    "en:rice-vinegar",
+    "en:tahini"
+   ],
+   "keyword": [
+    "en:tamari",
+    "en:soy-sauce",
+    "en:tomato-sauce",
+    "en:soy-protein",
+    "en:soya-lecithin"
+   ],
+   "hybrid": [
+    "en:tamari",
+    "en:soy-sauce",
+    "en:tomato-sauce",
+    "en:worcestershire-sauce",
+    "en:soya"
+   ]
+  },
+  {
+   "id": "name-39",
+   "kind": "name",
+   "query": "Why is Malt syrup in food?",
+   "relevant": [
+    "en:malt-syrup"
+   ],
+   "top_similarity": 0.6512,
+   "vector": [
+    "en:malt-syrup",
+    "en:malt-extract",
+    "en:e965ii",
+    "en:barley-malt-extract",
+    "en:corn-syrup"
+   ],
+   "keyword": [
+    "en:malt-syrup",
+    "en:malt-extract",
+    "en:corn-syrup",
+    "en:barley-malt-extract",
+    "en:malt"
+   ],
+   "hybrid": [
+    "en:malt-syrup",
+    "en:malt-extract",
+    "en:corn-syrup",
+    "en:barley-malt-extract",
+    "en:e636"
+   ]
+  },
+  {
+   "id": "name-40",
+   "kind": "name",
+   "query": "What does Juice do?",
+   "relevant": [
+    "en:juice"
+   ],
+   "top_similarity": 0.5559,
+   "vector": [
+    "en:juice",
+    "en:fruit-juice",
+    "en:vegetable-juice",
+    "en:tomato-juice",
+    "en:orange-juice"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:lime-juice-concentrate",
+    "en:concentrated-lemon-juice",
+    "en:evaporated-cane-juice",
+    "en:diced-tomatoes-in-tomato-juice"
+   ],
+   "hybrid": [
+    "en:orange-juice",
+    "en:juice",
+    "en:lime-juice",
+    "en:fruit-juice",
+    "en:lime-juice-concentrate"
+   ]
+  },
+  {
+   "id": "e_number-01",
+   "kind": "e_number",
+   "query": "What is E412?",
+   "relevant": [
+    "en:e412"
+   ],
+   "top_similarity": 0.4911,
+   "vector": [
+    "en:e411",
+    "en:e440a",
+    "en:e1402",
+    "en:e470iii",
+    "en:e431"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e490",
+    "en:e142",
+    "en:e261i",
+    "en:e523",
+    "en:e411"
+   ]
+  },
+  {
+   "id": "e_number-02",
+   "kind": "e_number",
+   "query": "E160b",
+   "relevant": [
+    "en:e160",
+    "en:e160b",
+    "en:e160bi",
+    "en:e160bii"
+   ],
+   "top_similarity": 0.253,
+   "vector": [
+    "en:e15x",
+    "en:e386",
+    "en:e101a",
+    "en:e411",
+    "en:e100i"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e15x",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e386",
+    "de:gärungskohlensäure",
+    "en:e101a"
+   ]
+  },
+  {
+   "id": "e_number-03",
+   "kind": "e_number",
+   "query": "What does E160c do in food?",
+   "relevant": [
+    "en:e160",
+    "en:e160c"
+   ],
+   "top_similarity": 0.4763,
+   "vector": [
+    "en:e100i",
+    "en:e440a",
+    "en:e160f",
+    "en:e1402",
+    "xx:e364"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e15x",
+    "en:e100i",
+    "en:e493",
+    "en:e440a"
+   ]
+  },
+  {
+   "id": "e_number-04",
+   "kind": "e_number",
+   "query": "What is E960?",
+   "relevant": [
+    "en:e960",
+    "en:e960a",
+    "en:e960c",
+    "en:e960d"
+   ],
+   "top_similarity": 0.3903,
+   "vector": [
+    "en:e490",
+    "en:e160f",
+    "xx:e364",
+    "en:e386",
+    "en:e440a"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e490",
+    "en:e315",
+    "en:e142",
+    "en:zinc",
+    "en:e160f"
+   ]
+  },
+  {
+   "id": "e_number-05",
+   "kind": "e_number",
+   "query": "E341",
+   "relevant": [
+    "en:e341",
+    "en:e341i",
+    "en:e341ii",
+    "en:e341iii"
+   ],
+   "top_similarity": 0.3641,
+   "vector": [
+    "en:e411",
+    "en:e386",
+    "xx:e364",
+    "en:e15x",
+    "xx:e386"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e411",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e386",
+    "de:gärungskohlensäure",
+    "xx:e364"
+   ]
+  },
+  {
+   "id": "e_number-06",
+   "kind": "e_number",
+   "query": "What does E320 do in food?",
+   "relevant": [
+    "en:e320"
+   ],
+   "top_similarity": 0.5016,
+   "vector": [
+    "en:e440a",
+    "en:e386",
+    "en:e160f",
+    "en:e470iii",
+    "en:e1402"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e15x",
+    "en:e440a",
+    "en:e493",
+    "en:e386"
+   ]
+  },
+  {
+   "id": "e_number-07",
+   "kind": "e_number",
+   "query": "What is E920?",
+   "relevant": [
+    "en:e920"
+   ],
+   "top_similarity": 0.4148,
+   "vector": [
+    "en:e490",
+    "en:e440a",
+    "en:e386",
+    "en:e1402",
+    "en:e15x"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e490",
+    "en:e315",
+    "en:e142",
+    "en:zinc",
+    "en:e440a"
+   ]
+  },
+  {
+   "id": "e_number-08",
+   "kind": "e_number",
+   "query": "E575",
+   "relevant": [
+    "en:e575"
+   ],
+   "top_similarity": 0.3012,
+   "vector": [
+    "en:e15x",
+    "en:e386",
+    "en:e490",
+    "xx:e386",
+    "en:e152"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e15x",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e386",
+    "de:gärungskohlensäure",
+    "en:e490"
+   ]
+  },
+  {
+   "id": "e_number-09",
+   "kind": "e_number",
+   "query": "What does E443 do in food?",
+   "relevant": [
+    "en:e443"
+   ],
+   "top_similarity": 0.5194,
+   "vector": [
+    "en:e440a",
+    "en:e411",
+    "en:e470iii",
+    "en:e1402",
+    "xx:e364"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e440a",
+    "en:e493",
+    "en:e470iii",
+    "en:e240"
+   ]
+  },
+  {
+   "id": "e_number-10",
+   "kind": "e_number",
+   "query": "What is E444?",
+   "relevant": [
+    "en:e444"
+   ],
+   "top_similarity": 0.4022,
+   "vector": [
+    "en:e440a",
+    "xx:e364",
+    "en:e411",
+    "en:e490",
+    "en:e1402"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e490",
+    "en:e315",
+    "en:e142",
+    "en:e261i",
+    "en:e1421"
+   ]
+  },
+  {
+   "id": "e_number-11",
+   "kind": "e_number",
+   "query": "E953",
+   "relevant": [
+    "en:e953"
+   ],
+   "top_similarity": 0.3053,
+   "vector": [
+    "en:e490",
+    "en:e15x",
+    "en:e386",
+    "en:e411",
+    "en:e152"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e490",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e15x",
+    "de:gärungskohlensäure",
+    "en:e386"
+   ]
+  },
+  {
+   "id": "e_number-12",
+   "kind": "e_number",
+   "query": "What does E1519 do in food?",
+   "relevant": [
+    "en:e1519"
+   ],
+   "top_similarity": 0.4962,
+   "vector": [
+    "en:e15x",
+    "en:e101a",
+    "en:e411",
+    "en:e440a",
+    "en:e1402"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e15x",
+    "en:e493",
+    "en:e370",
+    "en:e530"
+   ]
+  },
+  {
+   "id": "e_number-13",
+   "kind": "e_number",
+   "query": "What is E1521?",
+   "relevant": [
+    "en:e1521"
+   ],
+   "top_similarity": 0.3365,
+   "vector": [
+    "en:e15x",
+    "en:e121",
+    "en:e411",
+    "en:e1402",
+    "en:e261i"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e315",
+    "en:e261i",
+    "en:e490",
+    "en:e142",
+    "en:e504ii"
+   ]
+  },
+  {
+   "id": "e_number-14",
+   "kind": "e_number",
+   "query": "E635",
+   "relevant": [
+    "en:e635"
+   ],
+   "top_similarity": 0.3662,
+   "vector": [
+    "en:e386",
+    "en:e15x",
+    "xx:e364",
+    "xx:e386",
+    "en:e411"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:apple-juice-from-concentrate",
+    "en:e386",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e15x",
+    "de:gärungskohlensäure"
+   ]
+  },
+  {
+   "id": "e_number-15",
+   "kind": "e_number",
+   "query": "What does E942 do in food?",
+   "relevant": [
+    "en:e942"
+   ],
+   "top_similarity": 0.5534,
+   "vector": [
+    "en:e1402",
+    "en:e440a",
+    "en:e490",
+    "en:e407a",
+    "en:e470iii"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e15x",
+    "en:e1402",
+    "en:e493",
+    "en:e440a"
+   ]
+  },
+  {
+   "id": "e_number-16",
+   "kind": "e_number",
+   "query": "What is E404?",
+   "relevant": [
+    "en:e404"
+   ],
+   "top_similarity": 0.4033,
+   "vector": [
+    "en:e440a",
+    "xx:e364",
+    "en:e411",
+    "en:e1402",
+    "en:e386"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e490",
+    "en:e315",
+    "en:e142",
+    "en:e261i",
+    "en:e1421"
+   ]
+  },
+  {
+   "id": "e_number-17",
+   "kind": "e_number",
+   "query": "E928",
+   "relevant": [
+    "en:e928"
+   ],
+   "top_similarity": 0.3283,
+   "vector": [
+    "en:e386",
+    "en:e490",
+    "en:e152",
+    "en:e15x",
+    "en:e128"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e386",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e490",
+    "de:gärungskohlensäure",
+    "en:e152"
+   ]
+  },
+  {
+   "id": "e_number-18",
+   "kind": "e_number",
+   "query": "What does E550 do in food?",
+   "relevant": [
+    "en:e550",
+    "en:e550ii"
+   ],
+   "top_similarity": 0.4909,
+   "vector": [
+    "en:e490",
+    "en:e440a",
+    "en:e386",
+    "en:e1520",
+    "xx:e386"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e15x",
+    "en:e490",
+    "en:e493",
+    "en:e440a"
+   ]
+  },
+  {
+   "id": "e_number-19",
+   "kind": "e_number",
+   "query": "What is E246?",
+   "relevant": [
+    "en:e246"
+   ],
+   "top_similarity": 0.4232,
+   "vector": [
+    "en:e386",
+    "xx:e386",
+    "xx:e364",
+    "en:e440a",
+    "en:e490"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e490",
+    "en:e315",
+    "en:e261i",
+    "en:e523",
+    "en:e386"
+   ]
+  },
+  {
+   "id": "e_number-20",
+   "kind": "e_number",
+   "query": "E409",
+   "relevant": [
+    "en:e409"
+   ],
+   "top_similarity": 0.3256,
+   "vector": [
+    "en:e411",
+    "en:e490",
+    "en:e386",
+    "en:e440a",
+    "xx:e364"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e411",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e490",
+    "de:gärungskohlensäure",
+    "en:e386"
+   ]
+  },
+  {
+   "id": "e_number-21",
+   "kind": "e_number",
+   "query": "What does E440ii do in food?",
+   "relevant": [
+    "en:e440",
+    "en:e440ii"
+   ],
+   "top_similarity": 0.5487,
+   "vector": [
+    "en:e440a",
+    "en:e411",
+    "en:e470iii",
+    "en:e1402",
+    "en:e490"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e15x",
+    "en:e440a",
+    "en:e493",
+    "en:e470iii"
+   ]
+  },
+  {
+   "id": "e_number-22",
+   "kind": "e_number",
+   "query": "What is E175?",
+   "relevant": [
+    "en:e175"
+   ],
+   "top_similarity": 0.4258,
+   "vector": [
+    "en:e15x",
+    "en:e490",
+    "en:e386",
+    "xx:e364",
+    "xx:e386"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e490",
+    "en:e315",
+    "en:e142",
+    "en:e261i",
+    "en:e370"
+   ]
+  },
+  {
+   "id": "e_number-23",
+   "kind": "e_number",
+   "query": "E166",
+   "relevant": [
+    "en:e166"
+   ],
+   "top_similarity": 0.3472,
+   "vector": [
+    "en:e386",
+    "en:e15x",
+    "en:e411",
+    "xx:e386",
+    "xx:e364"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e386",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e15x",
+    "de:gärungskohlensäure",
+    "en:e411"
+   ]
+  },
+  {
+   "id": "e_number-24",
+   "kind": "e_number",
+   "query": "What does E536 do in food?",
+   "relevant": [
+    "en:e536"
+   ],
+   "top_similarity": 0.5467,
+   "vector": [
+    "en:e386",
+    "xx:e386",
+    "xx:e364",
+    "en:e440a",
+    "en:e1402"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e15x",
+    "en:e386",
+    "en:e493",
+    "xx:e386"
+   ]
+  },
+  {
+   "id": "e_number-25",
+   "kind": "e_number",
+   "query": "What is E225?",
+   "relevant": [
+    "en:e225"
+   ],
+   "top_similarity": 0.3983,
+   "vector": [
+    "xx:e386",
+    "en:e1402",
+    "en:e15x",
+    "en:e128",
+    "xx:e364"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e315",
+    "en:e490",
+    "en:e261i",
+    "en:e142",
+    "xx:e386"
+   ]
+  },
+  {
+   "id": "e_number-26",
+   "kind": "e_number",
+   "query": "E921",
+   "relevant": [
+    "en:e921"
+   ],
+   "top_similarity": 0.3078,
+   "vector": [
+    "en:e411",
+    "en:e490",
+    "en:e386",
+    "en:e15x",
+    "en:e261i"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e411",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e490",
+    "de:gärungskohlensäure",
+    "en:e386"
+   ]
+  },
+  {
+   "id": "e_number-27",
+   "kind": "e_number",
+   "query": "What does E15x do in food?",
+   "relevant": [
+    "en:e15x"
+   ],
+   "top_similarity": 0.6098,
+   "vector": [
+    "en:e15x",
+    "en:e1402",
+    "en:e470b",
+    "en:e440a",
+    "en:e470iii"
+   ],
+   "keyword": [
+    "en:e15x",
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925"
+   ],
+   "hybrid": [
+    "en:e15x",
+    "en:e411",
+    "en:e530",
+    "en:e370",
+    "en:e1402"
+   ]
+  },
+  {
+   "id": "e_number-28",
+   "kind": "e_number",
+   "query": "What is E312?",
+   "relevant": [
+    "en:e312"
+   ],
+   "top_similarity": 0.3654,
+   "vector": [
+    "xx:e364",
+    "en:e386",
+    "en:e121",
+    "en:e128",
+    "en:e1402"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:e315",
+    "en:corn-maltodextrin",
+    "en:e490"
+   ],
+   "hybrid": [
+    "en:e315",
+    "en:e261i",
+    "en:e142",
+    "en:inositol",
+    "xx:e364"
+   ]
+  },
+  {
+   "id": "e_number-29",
+   "kind": "e_number",
+   "query": "E441",
+   "relevant": [
+    "en:e441"
+   ],
+   "top_similarity": 0.4015,
+   "vector": [
+    "en:e411",
+    "en:e386",
+    "en:e440a",
+    "en:e490",
+    "en:e15x"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e411",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e386",
+    "de:gärungskohlensäure",
+    "en:e440a"
+   ]
+  },
+  {
+   "id": "e_number-30",
+   "kind": "e_number",
+   "query": "What does E550ii do in food?",
+   "relevant": [
+    "en:e550",
+    "en:e550ii"
+   ],
+   "top_similarity": 0.4735,
+   "vector": [
+    "en:e470iii",
+    "en:e411",
+    "en:e1402",
+    "en:e100i",
+    "en:e490"
+   ],
+   "keyword": [
+    "en:e493",
+    "en:e411",
+    "en:e240",
+    "en:e925",
+    "en:emulsifier"
+   ],
+   "hybrid": [
+    "en:e411",
+    "en:e15x",
+    "en:e470iii",
+    "en:e493",
+    "en:e1402"
+   ]
+  },
+  {
+   "id": "misspelling-01",
+   "kind": "misspelling",
+   "query": "nicotinci acid",
+   "relevant": [
+    "en:e375"
+   ],
+   "top_similarity": 0.5565,
+   "vector": [
+    "en:e375",
+    "en:e635",
+    "en:e355",
+    "en:e952",
+    "en:e363"
+   ],
+   "keyword": [
+    "en:e1000",
+    "en:e296",
+    "en:e297",
+    "en:e513",
+    "en:e334"
+   ],
+   "hybrid": [
+    "en:e334",
+    "en:e355",
+    "en:e363",
+    "en:e297",
+    "en:e296"
+   ]
+  },
+  {
+   "id": "misspelling-02",
+   "kind": "misspelling",
+   "query": "sodium ertyhorbate",
+   "relevant": [
+    "en:e316"
+   ],
+   "top_similarity": 0.5293,
+   "vector": [
+    "en:e316",
+    "en:sodium-selenite",
+    "en:e285",
+    "en:e500iii",
+    "en:e201"
+   ],
+   "keyword": [
+    "en:e500iii",
+    "en:e223",
+    "en:e452i",
+    "en:e452vi",
+    "en:e539"
+   ],
+   "hybrid": [
+    "en:e500iii",
+    "en:sodium-selenite",
+    "en:e266",
+    "en:e550ii",
+    "en:e350i"
+   ]
+  },
+  {
+   "id": "misspelling-03",
+   "kind": "misspelling",
+   "query": "sodium acsorbate",
+   "relevant": [
+    "en:e301"
+   ],
+   "top_similarity": 0.5267,
+   "vector": [
+    "en:e301",
+    "en:e364",
+    "en:e262i",
+    "en:e262",
+    "en:e237"
+   ],
+   "keyword": [
+    "en:e500iii",
+    "en:e223",
+    "en:e452i",
+    "en:e452vi",
+    "en:e539"
+   ],
+   "hybrid": [
+    "en:e500iii",
+    "en:e266",
+    "en:e237",
+    "en:e350i",
+    "en:e364"
+   ]
+  },
+  {
+   "id": "misspelling-04",
+   "kind": "misspelling",
+   "query": "trisodium hposphate",
+   "relevant": [
+    "en:e339",
+    "en:e339iii"
+   ],
+   "top_similarity": 0.5632,
+   "vector": [
+    "en:e339iii",
+    "en:e450ii",
+    "en:e339",
+    "en:e452vi",
+    "en:di-and-triphosphates"
+   ],
+   "keyword": [
+    "en:e331iii",
+    "en:e450ii",
+    "en:e339iii",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure"
+   ],
+   "hybrid": [
+    "en:e339iii",
+    "en:e450ii",
+    "en:e331iii",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e339"
+   ]
+  },
+  {
+   "id": "misspelling-05",
+   "kind": "misspelling",
+   "query": "sodium intrate",
+   "relevant": [
+    "en:e251"
+   ],
+   "top_similarity": 0.4981,
+   "vector": [
+    "en:sodium-selenite",
+    "en:sodium",
+    "en:e550ii",
+    "en:e514",
+    "en:e500iii"
+   ],
+   "keyword": [
+    "en:e500iii",
+    "en:e223",
+    "en:e452i",
+    "en:e452vi",
+    "en:e539"
+   ],
+   "hybrid": [
+    "en:e500iii",
+    "en:e514",
+    "en:e550ii",
+    "en:sodium-selenite",
+    "en:e350i"
+   ]
+  },
+  {
+   "id": "misspelling-06",
+   "kind": "misspelling",
+   "query": "diphoshpates",
+   "relevant": [
+    "en:e450",
+    "en:e450i",
+    "en:e450ii",
+    "en:e450iii",
+    "en:e450v",
+    "en:e450vi",
+    "en:e450vii"
+   ],
+   "top_similarity": 0.3585,
+   "vector": [
+    "en:e450",
+    "en:di-and-triphosphates",
+    "en:e450vi",
+    "en:diphosphates-and-sodium-carbonates",
+    "en:e450vii"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e450",
+    "en:di-and-triphosphates",
+    "de:gärungskohlensäure",
+    "en:e450vi"
+   ]
+  },
+  {
+   "id": "misspelling-07",
+   "kind": "misspelling",
+   "query": "calcium stearoly-2-lactylate",
+   "relevant": [
+    "en:e482",
+    "en:e482i"
+   ],
+   "top_similarity": 0.7001,
+   "vector": [
+    "en:e482",
+    "en:e482i",
+    "en:e486",
+    "en:e481",
+    "en:e327"
+   ],
+   "keyword": [
+    "en:e482",
+    "en:e482i",
+    "en:e481",
+    "en:e121",
+    "en:e477"
+   ],
+   "hybrid": [
+    "en:e482",
+    "en:e482i",
+    "en:e481",
+    "en:e486",
+    "en:e470aiii"
+   ]
+  },
+  {
+   "id": "misspelling-08",
+   "kind": "misspelling",
+   "query": "pentasodium rtiphosphate",
+   "relevant": [
+    "en:e451",
+    "en:e451i"
+   ],
+   "top_similarity": 0.481,
+   "vector": [
+    "en:e451i",
+    "en:e451ii",
+    "en:e450iii",
+    "en:e450ii",
+    "en:e452vi"
+   ],
+   "keyword": [
+    "en:e451i",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator"
+   ],
+   "hybrid": [
+    "en:e451i",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e451ii",
+    "en:e450iii",
+    "de:gärungskohlensäure"
+   ]
+  },
+  {
+   "id": "misspelling-09",
+   "kind": "misspelling",
+   "query": "proapne",
+   "relevant": [
+    "en:e944"
+   ],
+   "top_similarity": 0.2973,
+   "vector": [
+    "en:e944",
+    "en:e281",
+    "en:e310",
+    "en:provolone",
+    "en:e405"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:apple-puree",
+    "en:apple-juice-from-concentrate",
+    "en:apricot",
+    "en:apple"
+   ]
+  },
+  {
+   "id": "misspelling-10",
+   "kind": "misspelling",
+   "query": "calcium stearyol lactylate",
+   "relevant": [
+    "en:e482",
+    "en:e482i"
+   ],
+   "top_similarity": 0.6832,
+   "vector": [
+    "en:e482",
+    "en:e482i",
+    "en:e486",
+    "en:e481",
+    "en:e327"
+   ],
+   "keyword": [
+    "en:e482i",
+    "en:e482",
+    "en:e481",
+    "en:e352i",
+    "en:e916"
+   ],
+   "hybrid": [
+    "en:e482",
+    "en:e482i",
+    "en:e481",
+    "en:e486",
+    "en:e470aiii"
+   ]
+  },
+  {
+   "id": "misspelling-11",
+   "kind": "misspelling",
+   "query": "citric acid esters of mono- adn diglycerides of fatty acids",
+   "relevant": [
+    "en:e472",
+    "en:e472c"
+   ],
+   "top_similarity": 0.6094,
+   "vector": [
+    "en:e472c",
+    "en:e484",
+    "en:e472d",
+    "en:e472",
+    "en:e472a"
+   ],
+   "keyword": [
+    "en:e472c",
+    "en:e472",
+    "en:e472b",
+    "en:e472d",
+    "en:e472e"
+   ],
+   "hybrid": [
+    "en:e472c",
+    "en:e472",
+    "en:e472d",
+    "en:e472b",
+    "en:e472e"
+   ]
+  },
+  {
+   "id": "misspelling-12",
+   "kind": "misspelling",
+   "query": "sodium osrbate",
+   "relevant": [
+    "en:e201"
+   ],
+   "top_similarity": 0.3571,
+   "vector": [
+    "en:e201",
+    "en:e316",
+    "en:e281",
+    "en:e550",
+    "en:e539"
+   ],
+   "keyword": [
+    "en:e500iii",
+    "en:e223",
+    "en:e452i",
+    "en:e452vi",
+    "en:e539"
+   ],
+   "hybrid": [
+    "en:e500iii",
+    "en:e281",
+    "en:e539",
+    "en:e223",
+    "en:e201"
+   ]
+  },
+  {
+   "id": "misspelling-13",
+   "kind": "misspelling",
+   "query": "calcium ofrmiate",
+   "relevant": [
+    "en:e238"
+   ],
+   "top_similarity": 0.5169,
+   "vector": [
+    "en:e238",
+    "en:e333",
+    "en:e916",
+    "en:e529",
+    "en:e282"
+   ],
+   "keyword": [
+    "en:e352i",
+    "en:e916",
+    "en:e367",
+    "en:e383",
+    "en:e238"
+   ],
+   "hybrid": [
+    "en:e916",
+    "en:e238",
+    "en:e352i",
+    "en:e367",
+    "en:e383"
+   ]
+  },
+  {
+   "id": "misspelling-14",
+   "kind": "misspelling",
+   "query": "plant craotenes",
+   "relevant": [
+    "en:e160",
+    "en:e160a",
+    "en:e160aii"
+   ],
+   "top_similarity": 0.3611,
+   "vector": [
+    "en:e160aii",
+    "en:cottonseed",
+    "en:canola",
+    "en:poppyseed",
+    "en:cranberry"
+   ],
+   "keyword": [
+    "en:e425",
+    "en:e460",
+    "en:green-tea-extract",
+    "en:e163",
+    "en:e440a"
+   ],
+   "hybrid": [
+    "en:e160aii",
+    "en:e425",
+    "en:poppyseed",
+    "en:e416",
+    "en:sunflower-seed"
+   ]
+  },
+  {
+   "id": "misspelling-15",
+   "kind": "misspelling",
+   "query": "alpha-cycoldextrine",
+   "relevant": [
+    "en:e457"
+   ],
+   "top_similarity": 0.5561,
+   "vector": [
+    "en:e457",
+    "en:e952",
+    "en:inositol",
+    "en:e405",
+    "en:e400"
+   ],
+   "keyword": [
+    "en:e307a",
+    "en:e457",
+    "en:e307",
+    "en:d-alpha-tocopheryl-acetate",
+    "en:dl-alpha-tocopheryl-acetate"
+   ],
+   "hybrid": [
+    "en:e457",
+    "en:e1100",
+    "en:d-alpha-tocopheryl-acetate",
+    "en:dl-alpha-tocopheryl-acetate",
+    "en:e307c"
+   ]
+  },
+  {
+   "id": "misspelling-16",
+   "kind": "misspelling",
+   "query": "corn ysrup",
+   "relevant": [
+    "en:corn-syrup"
+   ],
+   "top_similarity": 0.4731,
+   "vector": [
+    "en:corn",
+    "en:corn-syrup-solids",
+    "en:corn-syrup",
+    "en:yellow-corn-flour",
+    "en:cornmeal"
+   ],
+   "keyword": [
+    "en:corn-syrup-solids",
+    "en:corn-flour",
+    "en:cornmeal",
+    "en:corn-maltodextrin",
+    "en:soluble-corn-fiber"
+   ],
+   "hybrid": [
+    "en:corn-syrup-solids",
+    "en:corn-flour",
+    "en:cornmeal",
+    "en:corn-syrup",
+    "en:corn"
+   ]
+  },
+  {
+   "id": "misspelling-17",
+   "kind": "misspelling",
+   "query": "enriched wehat flour",
+   "relevant": [
+    "en:fortified-wheat-flour"
+   ],
+   "top_similarity": 0.6443,
+   "vector": [
+    "en:fortified-wheat-flour",
+    "en:whole-wheat-flour",
+    "en:wheat-flour",
+    "en:barley-malt-flour",
+    "en:wholemeal-oat-flour"
+   ],
+   "keyword": [
+    "en:fortified-wheat-flour",
+    "en:flour-treatment-agent",
+    "en:graham-flour",
+    "en:oat-flour",
+    "en:wholemeal-oat-flour"
+   ],
+   "hybrid": [
+    "en:fortified-wheat-flour",
+    "en:flour-treatment-agent",
+    "en:graham-flour",
+    "en:wholemeal-oat-flour",
+    "en:barley-malt-flour"
+   ]
+  },
+  {
+   "id": "misspelling-18",
+   "kind": "misspelling",
+   "query": "jalapeno epppers",
+   "relevant": [
+    "en:jalapeno-pepper"
+   ],
+   "top_similarity": 0.5965,
+   "vector": [
+    "en:jalapeno-pepper",
+    "en:chipotle",
+    "en:habanero-chili",
+    "en:green-chili-pepper",
+    "en:red-chili-pepper"
+   ],
+   "keyword": [
+    "en:jalapeno-pepper",
+    "en:chipotle",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid"
+   ],
+   "hybrid": [
+    "en:jalapeno-pepper",
+    "en:chipotle",
+    "en:allspice",
+    "en:bell-pepper",
+    "en:avocado"
+   ]
+  },
+  {
+   "id": "misspelling-19",
+   "kind": "misspelling",
+   "query": "cranbreries",
+   "relevant": [
+    "en:cranberry"
+   ],
+   "top_similarity": 0.4053,
+   "vector": [
+    "en:cranberry",
+    "en:blackberry",
+    "en:breadcrumbs",
+    "en:wheat-bran",
+    "en:raspberry"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:blackberry",
+    "en:breadcrumbs",
+    "en:blueberry",
+    "en:broccoli",
+    "en:barley"
+   ]
+  },
+  {
+   "id": "misspelling-20",
+   "kind": "misspelling",
+   "query": "vitamni b6",
+   "relevant": [
+    "en:vitamin-b6"
+   ],
+   "top_similarity": 0.6157,
+   "vector": [
+    "en:vitamin-b6",
+    "en:pyridoxine-hydrochloride",
+    "en:vitamin-b12",
+    "en:thiamin",
+    "en:biotin"
+   ],
+   "keyword": [
+    "en:pyridoxine-hydrochloride",
+    "en:vitamin-b6",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid"
+   ],
+   "hybrid": [
+    "en:vitamin-b6",
+    "en:pyridoxine-hydrochloride",
+    "en:biotin",
+    "en:vitamin-b12",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi"
+   ]
+  },
+  {
+   "id": "misspelling-21",
+   "kind": "misspelling",
+   "query": "sour rceam",
+   "relevant": [
+    "en:sour-cream"
+   ],
+   "top_similarity": 0.2449,
+   "vector": [
+    "en:sour-cream",
+    "en:rennet",
+    "en:e203",
+    "en:tamarind",
+    "en:rice-vinegar"
+   ],
+   "keyword": [
+    "en:sour-cream",
+    "en:lime",
+    "en:e270",
+    "en:tamarind",
+    "en:white-vinegar"
+   ],
+   "hybrid": [
+    "en:sour-cream",
+    "en:tamarind",
+    "en:e236",
+    "en:e262",
+    "en:red-wine-vinegar"
+   ]
+  },
+  {
+   "id": "misspelling-22",
+   "kind": "misspelling",
+   "query": "cayenne eppper",
+   "relevant": [
+    "en:cayenne-pepper"
+   ],
+   "top_similarity": 0.3441,
+   "vector": [
+    "en:cayenne-pepper",
+    "en:e160f",
+    "en:e902",
+    "en:celery-powder",
+    "en:e150b"
+   ],
+   "keyword": [
+    "en:cayenne-pepper",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator"
+   ],
+   "hybrid": [
+    "en:cayenne-pepper",
+    "en:e160f",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e902",
+    "de:gärungskohlensäure"
+   ]
+  },
+  {
+   "id": "misspelling-23",
+   "kind": "misspelling",
+   "query": "mushoroms",
+   "relevant": [
+    "en:mushroom"
+   ],
+   "top_similarity": 0.211,
+   "vector": [
+    "en:mushroom",
+    "en:barley-malt-flour",
+    "en:mustard-seed",
+    "en:mustard",
+    "en:muesli"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:barley-malt-flour",
+    "en:anchovy",
+    "en:barley",
+    "en:mushroom",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi"
+   ]
+  },
+  {
+   "id": "misspelling-24",
+   "kind": "misspelling",
+   "query": "modified taipoca starch",
+   "relevant": [
+    "en:modified-tapioca-starch"
+   ],
+   "top_similarity": 0.6238,
+   "vector": [
+    "en:modified-tapioca-starch",
+    "en:modified-potato-starch",
+    "en:e14xx",
+    "en:modified-wheat-starch",
+    "en:tapioca"
+   ],
+   "keyword": [
+    "en:e1402",
+    "en:modified-potato-starch",
+    "en:e1401",
+    "en:modified-wheat-starch",
+    "en:e1450"
+   ],
+   "hybrid": [
+    "en:modified-potato-starch",
+    "en:modified-tapioca-starch",
+    "en:modified-wheat-starch",
+    "en:e1401",
+    "en:e14xx"
+   ]
+  },
+  {
+   "id": "misspelling-25",
+   "kind": "misspelling",
+   "query": "turkey rbeast",
+   "relevant": [
+    "en:turkey-breast"
+   ],
+   "top_similarity": 0.4966,
+   "vector": [
+    "en:turkey",
+    "en:turkey-breast",
+    "en:chicken",
+    "en:chicken-breast",
+    "en:chicken-meat"
+   ],
+   "keyword": [
+    "en:turkey-breast",
+    "en:turkey",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid"
+   ],
+   "hybrid": [
+    "en:turkey",
+    "en:turkey-breast",
+    "en:beef",
+    "en:bacon",
+    "en:beef-broth"
+   ]
+  },
+  {
+   "id": "misspelling-26",
+   "kind": "misspelling",
+   "query": "white ebans",
+   "relevant": [
+    "en:white-beans"
+   ],
+   "top_similarity": 0.3388,
+   "vector": [
+    "en:white-wine",
+    "en:e901",
+    "en:white-beans",
+    "en:egg-white",
+    "en:white-chocolate"
+   ],
+   "keyword": [
+    "en:e171",
+    "en:e170i",
+    "en:white-wine",
+    "en:white-beans",
+    "en:white-pepper"
+   ],
+   "hybrid": [
+    "en:white-wine",
+    "en:white-beans",
+    "en:e171",
+    "en:e170i",
+    "en:white-pepper"
+   ]
+  },
+  {
+   "id": "misspelling-27",
+   "kind": "misspelling",
+   "query": "ricotta hceese",
+   "relevant": [
+    "en:ricotta"
+   ],
+   "top_similarity": 0.6336,
+   "vector": [
+    "en:ricotta",
+    "en:asiago",
+    "en:romano-cheese",
+    "en:provolone",
+    "en:cream-cheese"
+   ],
+   "keyword": [
+    "en:ricotta",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator"
+   ],
+   "hybrid": [
+    "en:ricotta",
+    "en:asiago",
+    "en:blue-cheese",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:romano-cheese"
+   ]
+  },
+  {
+   "id": "misspelling-28",
+   "kind": "misspelling",
+   "query": "sodium hcloride",
+   "relevant": [
+    "en:sodium-chloride"
+   ],
+   "top_similarity": 0.5718,
+   "vector": [
+    "en:sodium-chloride",
+    "en:sodium",
+    "en:iodised-salt",
+    "en:e550ii",
+    "en:salt"
+   ],
+   "keyword": [
+    "en:e500iii",
+    "en:e223",
+    "en:e452i",
+    "en:e452vi",
+    "en:e539"
+   ],
+   "hybrid": [
+    "en:e500iii",
+    "en:e550ii",
+    "en:e514",
+    "en:e539",
+    "en:e350i"
+   ]
+  },
+  {
+   "id": "misspelling-29",
+   "kind": "misspelling",
+   "query": "dijon umstard",
+   "relevant": [
+    "en:dijon-mustard"
+   ],
+   "top_similarity": 0.2712,
+   "vector": [
+    "en:dijon-mustard",
+    "en:e627",
+    "en:e631",
+    "en:e632",
+    "en:e940"
+   ],
+   "keyword": [
+    "en:dijon-mustard",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator"
+   ],
+   "hybrid": [
+    "en:dijon-mustard",
+    "en:e627",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e631",
+    "de:gärungskohlensäure"
+   ]
+  },
+  {
+   "id": "misspelling-30",
+   "kind": "misspelling",
+   "query": "feta hceese",
+   "relevant": [
+    "en:feta"
+   ],
+   "top_similarity": 0.6214,
+   "vector": [
+    "en:feta",
+    "en:ricotta",
+    "en:cream-cheese",
+    "en:asiago",
+    "en:romano-cheese"
+   ],
+   "keyword": [
+    "en:feta",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator"
+   ],
+   "hybrid": [
+    "en:feta",
+    "en:asiago",
+    "en:blue-cheese",
+    "en:ricotta",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi"
+   ]
+  },
+  {
+   "id": "class-01",
+   "kind": "class",
+   "query": "an additive that colours food",
+   "relevant": [
+    "en:e100",
+    "en:e101",
+    "en:e101a",
+    "en:e101i",
+    "en:e102",
+    "en:e104",
+    "en:e110",
+    "en:e120",
+    "en:e122",
+    "en:e123",
+    "en:e124",
+    "en:e127",
+    "en:e128",
+    "en:e129",
+    "en:e132",
+    "en:e133",
+    "en:e140",
+    "en:e140i",
+    "en:e140ii",
+    "en:e141",
+    "en:e141i",
+    "en:e141ii",
+    "en:e143",
+    "en:e150a",
+    "en:e150b",
+    "en:e150c",
+    "en:e150d",
+    "en:e155",
+    "en:e160a",
+    "en:e160ai",
+    "en:e160aii",
+    "en:e160b",
+    "en:e160bi",
+    "en:e160bii",
+    "en:e160c",
+    "en:e160d",
+    "en:e160e",
+    "en:e160f",
+    "en:e161b",
+    "en:e161g",
+    "en:e161h",
+    "en:e162",
+    "en:e163",
+    "en:e170i",
+    "en:e171",
+    "en:e172",
+    "en:e172i",
+    "en:e172ii",
+    "en:e172iii",
+    "en:e181"
+   ],
+   "top_similarity": 0.6896,
+   "vector": [
+    "en:colour",
+    "en:e105",
+    "en:e125",
+    "en:e180",
+    "en:e111"
+   ],
+   "keyword": [
+    "en:e15x",
+    "en:e386",
+    "en:vitamin-e",
+    "en:e411",
+    "en:e101a"
+   ],
+   "hybrid": [
+    "en:e101a",
+    "en:e111",
+    "en:e101i",
+    "en:colour",
+    "en:e15x"
+   ]
+  },
+  {
+   "id": "class-02",
+   "kind": "class",
+   "query": "something that keeps oil and water mixed",
+   "relevant": [
+    "en:e1201",
+    "en:e1400",
+    "en:e1401",
+    "en:e1402",
+    "en:e1412",
+    "en:e1413",
+    "en:e1414",
+    "en:e1420",
+    "en:e1421",
+    "en:e1422",
+    "en:e1440",
+    "en:e1442",
+    "en:e1450",
+    "en:e14xx",
+    "en:e1503",
+    "en:e1505",
+    "en:e1518",
+    "en:e1520",
+    "en:e181",
+    "en:e322",
+    "en:e322i",
+    "en:e322ii",
+    "en:e325",
+    "en:e326",
+    "en:e331",
+    "en:e331i",
+    "en:e331ii",
+    "en:e339",
+    "en:e339i",
+    "en:e339ii",
+    "en:e339iii",
+    "en:e340",
+    "en:e340i",
+    "en:e340ii",
+    "en:e340iii",
+    "en:e341",
+    "en:e341i",
+    "en:e341ii",
+    "en:e341iii",
+    "en:e400",
+    "en:e401",
+    "en:e402",
+    "en:e403",
+    "en:e405",
+    "en:e406",
+    "en:e407",
+    "en:e407a",
+    "en:e410",
+    "en:e412",
+    "en:e413",
+    "en:e414",
+    "en:e415",
+    "en:e416",
+    "en:e425",
+    "en:e425i",
+    "en:e425ii",
+    "en:e427",
+    "en:e431",
+    "en:e432",
+    "en:e433",
+    "en:e434",
+    "en:e435",
+    "en:e436",
+    "en:e440",
+    "en:e440a",
+    "en:e440i",
+    "en:e440ii",
+    "en:e442",
+    "en:e444",
+    "en:e445",
+    "en:e450",
+    "en:e450i",
+    "en:e450ii",
+    "en:e450iii",
+    "en:e450v",
+    "en:e450vi",
+    "en:e450vii",
+    "en:e451",
+    "en:e451i",
+    "en:e451ii",
+    "en:e452",
+    "en:e452i",
+    "en:e452ii",
+    "en:e452iv",
+    "en:e452vi",
+    "en:e460",
+    "en:e460i",
+    "en:e460ii",
+    "en:e461",
+    "en:e463",
+    "en:e464",
+    "en:e466",
+    "en:e470",
+    "en:e470a",
+    "en:e470ai",
+    "en:e470aiii",
+    "en:e470b",
+    "en:e471",
+    "en:e472a",
+    "en:e472b",
+    "en:e472c",
+    "en:e472e",
+    "en:e473",
+    "en:e474",
+    "en:e475",
+    "en:e476",
+    "en:e477",
+    "en:e479b",
+    "en:e481",
+    "en:e482",
+    "en:e484",
+    "en:e491",
+    "en:e492",
+    "en:e493",
+    "en:e494",
+    "en:e541",
+    "en:e541i",
+    "en:e542",
+    "en:e900a",
+    "en:e901",
+    "en:e902",
+    "en:e965",
+    "en:e965i",
+    "en:e965ii",
+    "en:e966",
+    "en:e967",
+    "en:e999"
+   ],
+   "top_similarity": 0.524,
+   "vector": [
+    "en:e479b",
+    "en:e436",
+    "en:e492",
+    "en:e435",
+    "en:e472b"
+   ],
+   "keyword": [
+    "en:emulsifier",
+    "en:e331",
+    "en:e436",
+    "en:e441",
+    "en:e476"
+   ],
+   "hybrid": [
+    "en:e436",
+    "en:e441",
+    "en:e435",
+    "en:e476",
+    "en:e999"
+   ]
+  },
+  {
+   "id": "class-03",
+   "kind": "class",
+   "query": "what thickens sauces and desserts",
+   "relevant": [
+    "en:e1200",
+    "en:e1201",
+    "en:e1203",
+    "en:e1204",
+    "en:e1400",
+    "en:e1401",
+    "en:e1402",
+    "en:e1412",
+    "en:e1413",
+    "en:e1414",
+    "en:e1420",
+    "en:e1421",
+    "en:e1422",
+    "en:e1440",
+    "en:e1442",
+    "en:e1450",
+    "en:e14xx",
+    "en:e181",
+    "en:e325",
+    "en:e327",
+    "en:e339",
+    "en:e339i",
+    "en:e339ii",
+    "en:e339iii",
+    "en:e340",
+    "en:e340i",
+    "en:e340ii",
+    "en:e340iii",
+    "en:e341",
+    "en:e341i",
+    "en:e341ii",
+    "en:e341iii",
+    "en:e342",
+    "en:e343",
+    "en:e343i",
+    "en:e343ii",
+    "en:e400",
+    "en:e401",
+    "en:e402",
+    "en:e403",
+    "en:e404",
+    "en:e405",
+    "en:e406",
+    "en:e407",
+    "en:e407a",
+    "en:e410",
+    "en:e412",
+    "en:e413",
+    "en:e414",
+    "en:e415",
+    "en:e416",
+    "en:e417",
+    "en:e418",
+    "en:e420",
+    "en:e420i",
+    "en:e420ii",
+    "en:e421",
+    "en:e422",
+    "en:e425",
+    "en:e425i",
+    "en:e425ii",
+    "en:e427",
+    "en:e440",
+    "en:e440a",
+    "en:e440i",
+    "en:e440ii",
+    "en:e450",
+    "en:e450i",
+    "en:e450ii",
+    "en:e450iii",
+    "en:e450v",
+    "en:e450vi",
+    "en:e450vii",
+    "en:e451",
+    "en:e451i",
+    "en:e451ii",
+    "en:e452",
+    "en:e452i",
+    "en:e452ii",
+    "en:e452iv",
+    "en:e452vi",
+    "en:e457",
+    "en:e460",
+    "en:e460i",
+    "en:e460ii",
+    "en:e461",
+    "en:e462",
+    "en:e463",
+    "en:e464",
+    "en:e466",
+    "en:e468",
+    "en:e469",
+    "en:e470",
+    "en:e470a",
+    "en:e470ai",
+    "en:e470aiii",
+    "en:e470b",
+    "en:e500",
+    "en:e500i",
+    "en:e500ii",
+    "en:e500iii",
+    "en:e508",
+    "en:e509",
+    "en:e541",
+    "en:e541i",
+    "en:e553",
+    "en:e553b",
+    "en:e576",
+    "en:e901",
+    "en:e902",
+    "en:e953",
+    "en:e965",
+    "en:e965i",
+    "en:e965ii",
+    "en:e966",
+    "en:e967"
+   ],
+   "top_similarity": 0.5486,
+   "vector": [
+    "en:e405",
+    "en:modified-starch",
+    "en:e413",
+    "en:e1413",
+    "en:e1420"
+   ],
+   "keyword": [
+    "en:e154",
+    "en:sweetened-condensed-milk",
+    "en:coconut-milk",
+    "en:fresh-cream",
+    "en:modified-corn-starch"
+   ],
+   "hybrid": [
+    "en:modified-corn-starch",
+    "en:sweetened-condensed-milk",
+    "en:e413",
+    "en:e400",
+    "en:e1420"
+   ]
+  },
+  {
+   "id": "class-04",
+   "kind": "class",
+   "query": "an additive that keeps a texture stable",
+   "relevant": [
+    "en:e1101",
+    "en:e1103",
+    "en:e1200",
+    "en:e1201",
+    "en:e1202",
+    "en:e1400",
+    "en:e1401",
+    "en:e1402",
+    "en:e1412",
+    "en:e1413",
+    "en:e1414",
+    "en:e1420",
+    "en:e1421",
+    "en:e1422",
+    "en:e1440",
+    "en:e1442",
+    "en:e1450",
+    "en:e14xx",
+    "en:e1505",
+    "en:e170i",
+    "en:e181",
+    "en:e263",
+    "en:e331",
+    "en:e331i",
+    "en:e331ii",
+    "en:e332",
+    "en:e332ii",
+    "en:e333",
+    "en:e333iii",
+    "en:e335",
+    "en:e337",
+    "en:e339",
+    "en:e339i",
+    "en:e339ii",
+    "en:e339iii",
+    "en:e340",
+    "en:e340i",
+    "en:e340ii",
+    "en:e340iii",
+    "en:e341",
+    "en:e341i",
+    "en:e341ii",
+    "en:e341iii",
+    "en:e342",
+    "en:e343",
+    "en:e343i",
+    "en:e343ii",
+    "en:e400",
+    "en:e401",
+    "en:e402",
+    "en:e403",
+    "en:e404",
+    "en:e405",
+    "en:e406",
+    "en:e407",
+    "en:e407a",
+    "en:e410",
+    "en:e412",
+    "en:e413",
+    "en:e414",
+    "en:e415",
+    "en:e416",
+    "en:e417",
+    "en:e418",
+    "en:e420",
+    "en:e420i",
+    "en:e420ii",
+    "en:e421",
+    "en:e425",
+    "en:e425i",
+    "en:e425ii",
+    "en:e427",
+    "en:e432",
+    "en:e433",
+    "en:e435",
+    "en:e436",
+    "en:e440",
+    "en:e440a",
+    "en:e440i",
+    "en:e440ii",
+    "en:e444",
+    "en:e445",
+    "en:e450",
+    "en:e450i",
+    "en:e450ii",
+    "en:e450iii",
+    "en:e450v",
+    "en:e450vi",
+    "en:e450vii",
+    "en:e451",
+    "en:e451i",
+    "en:e451ii",
+    "en:e452",
+    "en:e452i",
+    "en:e452ii",
+    "en:e452iv",
+    "en:e452vi",
+    "en:e457",
+    "en:e460",
+    "en:e460i",
+    "en:e460ii",
+    "en:e461",
+    "en:e463",
+    "en:e464",
+    "en:e466",
+    "en:e468",
+    "en:e469",
+    "en:e470",
+    "en:e470a",
+    "en:e470ai",
+    "en:e470aiii",
+    "en:e470b",
+    "en:e471",
+    "en:e472a",
+    "en:e472b",
+    "en:e472c",
+    "en:e472e",
+    "en:e473",
+    "en:e475",
+    "en:e481",
+    "en:e482",
+    "en:e492",
+    "en:e493",
+    "en:e494",
+    "en:e500",
+    "en:e500i",
+    "en:e500ii",
+    "en:e500iii",
+    "en:e501",
+    "en:e501i",
+    "en:e501ii",
+    "en:e508",
+    "en:e509",
+    "en:e511",
+    "en:e516",
+    "en:e523",
+    "en:e541",
+    "en:e541i",
+    "en:e576",
+    "en:e901",
+    "en:e953",
+    "en:e965",
+    "en:e965i",
+    "en:e965ii",
+    "en:e967",
+    "xx:e386"
+   ],
+   "top_similarity": 0.3304,
+   "vector": [
+    "en:stabiliser",
+    "en:e407a",
+    "en:e464",
+    "en:e340ii",
+    "en:e341"
+   ],
+   "keyword": [
+    "en:e436",
+    "en:emulsifier",
+    "en:e333iii",
+    "en:e341i",
+    "en:e15x"
+   ],
+   "hybrid": [
+    "en:stabiliser",
+    "en:e340ii",
+    "en:e341i",
+    "en:e436",
+    "en:antioxidant"
+   ]
+  },
+  {
+   "id": "class-05",
+   "kind": "class",
+   "query": "an additive that stops food going off",
+   "relevant": [
+    "en:e1105",
+    "en:e200",
+    "en:e201",
+    "en:e202",
+    "en:e203",
+    "en:e210",
+    "en:e211",
+    "en:e212",
+    "en:e214",
+    "en:e218",
+    "en:e220",
+    "en:e221",
+    "en:e222",
+    "en:e223",
+    "en:e224",
+    "en:e225",
+    "en:e230",
+    "en:e231",
+    "en:e234",
+    "en:e235",
+    "en:e239",
+    "en:e242",
+    "en:e243",
+    "en:e249",
+    "en:e250",
+    "en:e251",
+    "en:e252",
+    "en:e260",
+    "en:e261",
+    "en:e262",
+    "en:e262i",
+    "en:e262ii",
+    "en:e263",
+    "en:e280",
+    "en:e281",
+    "en:e282",
+    "en:e283",
+    "en:e290",
+    "en:e339",
+    "en:e339i",
+    "en:e339ii",
+    "en:e339iii",
+    "en:e385",
+    "en:e508",
+    "en:e928",
+    "xx:e386"
+   ],
+   "top_similarity": 0.5999,
+   "vector": [
+    "en:preservative",
+    "en:antioxidant",
+    "en:e320",
+    "en:e200",
+    "en:e324"
+   ],
+   "keyword": [
+    "en:e15x",
+    "en:e386",
+    "en:vitamin-e",
+    "en:e411",
+    "en:e304i"
+   ],
+   "hybrid": [
+    "en:e386",
+    "en:antioxidant",
+    "en:e310",
+    "en:e411",
+    "en:vitamin-e"
+   ]
+  },
+  {
+   "id": "class-06",
+   "kind": "class",
+   "query": "what stops fats from going rancid",
+   "relevant": [
+    "en:e1102",
+    "en:e220",
+    "en:e221",
+    "en:e222",
+    "en:e223",
+    "en:e224",
+    "en:e225",
+    "en:e300",
+    "en:e301",
+    "en:e304",
+    "en:e304i",
+    "en:e304ii",
+    "en:e307a",
+    "en:e307b",
+    "en:e307c",
+    "en:e310",
+    "en:e315",
+    "en:e316",
+    "en:e319",
+    "en:e320",
+    "en:e322",
+    "en:e322i",
+    "en:e322ii",
+    "en:e325",
+    "en:e326",
+    "en:e330",
+    "en:e334",
+    "en:e338",
+    "en:e385",
+    "en:e388",
+    "en:e472c",
+    "en:e484",
+    "en:e512",
+    "en:e539",
+    "en:e942",
+    "xx:e386"
+   ],
+   "top_similarity": 0.5274,
+   "vector": [
+    "en:e306",
+    "en:e310",
+    "en:e307a",
+    "en:e320",
+    "en:e309"
+   ],
+   "keyword": [
+    "en:e320",
+    "en:dl-alpha-tocopheryl-acetate",
+    "en:e306",
+    "en:e309",
+    "en:e310"
+   ],
+   "hybrid": [
+    "en:e306",
+    "en:e320",
+    "en:e310",
+    "en:dl-alpha-tocopheryl-acetate",
+    "en:e309"
+   ]
+  },
+  {
+   "id": "class-07",
+   "kind": "class",
+   "query": "a sugar substitute",
+   "relevant": [
+    "en:e420",
+    "en:e420i",
+    "en:e420ii",
+    "en:e421",
+    "en:e950",
+    "en:e951",
+    "en:e952",
+    "en:e953",
+    "en:e954",
+    "en:e955",
+    "en:e957",
+    "en:e958",
+    "en:e959",
+    "en:e960",
+    "en:e960a",
+    "en:e960c",
+    "en:e960d",
+    "en:e961",
+    "en:e962",
+    "en:e963",
+    "en:e964",
+    "en:e965",
+    "en:e965i",
+    "en:e965ii",
+    "en:e966",
+    "en:e967",
+    "en:e968",
+    "en:e969"
+   ],
+   "top_similarity": 0.5672,
+   "vector": [
+    "en:e952",
+    "en:e964",
+    "en:e965ii",
+    "en:sugar",
+    "en:cane-sugar"
+   ],
+   "keyword": [
+    "en:e957",
+    "en:e952",
+    "en:monk-fruit-extract",
+    "en:e508",
+    "en:chicory-root"
+   ],
+   "hybrid": [
+    "en:e952",
+    "en:sugar",
+    "en:e957",
+    "en:e964",
+    "en:e953"
+   ]
+  },
+  {
+   "id": "class-08",
+   "kind": "class",
+   "query": "something that keeps food moist",
+   "relevant": [
+    "en:e1200",
+    "en:e1518",
+    "en:e1520",
+    "en:e325",
+    "en:e326",
+    "en:e339",
+    "en:e339i",
+    "en:e339ii",
+    "en:e339iii",
+    "en:e340",
+    "en:e340i",
+    "en:e340ii",
+    "en:e340iii",
+    "en:e341",
+    "en:e341i",
+    "en:e341ii",
+    "en:e341iii",
+    "en:e350",
+    "en:e350i",
+    "en:e350ii",
+    "en:e400",
+    "en:e401",
+    "en:e402",
+    "en:e403",
+    "en:e404",
+    "en:e406",
+    "en:e407",
+    "en:e407a",
+    "en:e420",
+    "en:e420i",
+    "en:e420ii",
+    "en:e421",
+    "en:e422",
+    "en:e425",
+    "en:e425i",
+    "en:e425ii",
+    "en:e450",
+    "en:e450i",
+    "en:e450ii",
+    "en:e450iii",
+    "en:e450v",
+    "en:e450vi",
+    "en:e450vii",
+    "en:e451",
+    "en:e451i",
+    "en:e451ii",
+    "en:e452",
+    "en:e452i",
+    "en:e452ii",
+    "en:e452iv",
+    "en:e452vi",
+    "en:e460",
+    "en:e460i",
+    "en:e460ii",
+    "en:e466",
+    "en:e542",
+    "en:e965",
+    "en:e965i",
+    "en:e965ii",
+    "en:e967",
+    "en:e968"
+   ],
+   "top_similarity": 0.553,
+   "vector": [
+    "en:e350i",
+    "en:e406",
+    "en:e350ii",
+    "en:e1520",
+    "en:e422"
+   ],
+   "keyword": [
+    "en:invert-sugar",
+    "en:emulsifier",
+    "en:e340",
+    "en:brown-sugar",
+    "en:invert-sugar-syrup"
+   ],
+   "hybrid": [
+    "en:e340",
+    "en:e422",
+    "en:stabiliser",
+    "en:e350i",
+    "en:invert-sugar"
+   ]
+  },
+  {
+   "id": "class-09",
+   "kind": "class",
+   "query": "an additive that binds metals in food",
+   "relevant": [
+    "en:e1505",
+    "en:e262",
+    "en:e262i",
+    "en:e262ii",
+    "en:e300",
+    "en:e330",
+    "en:e331",
+    "en:e331i",
+    "en:e331ii",
+    "en:e332",
+    "en:e332ii",
+    "en:e333",
+    "en:e333iii",
+    "en:e334",
+    "en:e335",
+    "en:e337",
+    "en:e338",
+    "en:e339",
+    "en:e339i",
+    "en:e339ii",
+    "en:e339iii",
+    "en:e340",
+    "en:e340i",
+    "en:e340ii",
+    "en:e340iii",
+    "en:e341",
+    "en:e341i",
+    "en:e341ii",
+    "en:e341iii",
+    "en:e385",
+    "en:e400",
+    "en:e401",
+    "en:e402",
+    "en:e403",
+    "en:e404",
+    "en:e420",
+    "en:e420i",
+    "en:e420ii",
+    "en:e450",
+    "en:e450i",
+    "en:e450ii",
+    "en:e450iii",
+    "en:e450v",
+    "en:e450vi",
+    "en:e450vii",
+    "en:e451",
+    "en:e451i",
+    "en:e451ii",
+    "en:e452",
+    "en:e452i",
+    "en:e452ii",
+    "en:e452iv",
+    "en:e452vi",
+    "en:e472a",
+    "en:e472b",
+    "en:e472c",
+    "en:e472e",
+    "en:e484",
+    "en:e516",
+    "en:e539",
+    "en:e575",
+    "en:e576",
+    "en:e577",
+    "en:e578",
+    "xx:e386"
+   ],
+   "top_similarity": 0.5935,
+   "vector": [
+    "en:e385",
+    "en:zinc",
+    "en:e391",
+    "en:e577",
+    "en:e539"
+   ],
+   "keyword": [
+    "en:e15x",
+    "en:e391",
+    "en:e338",
+    "en:e411",
+    "en:e335"
+   ],
+   "hybrid": [
+    "en:e391",
+    "en:e577",
+    "en:e335",
+    "en:e338",
+    "en:e578"
+   ]
+  },
+  {
+   "id": "class-10",
+   "kind": "class",
+   "query": "a substance used to carry flavours or colours",
+   "relevant": [
+    "en:e1400",
+    "en:e1503",
+    "en:e1504",
+    "en:e1505",
+    "en:e1518",
+    "en:e400",
+    "en:e401",
+    "en:e402",
+    "en:e403",
+    "en:e404",
+    "en:e405",
+    "en:e406",
+    "en:e407",
+    "en:e407a",
+    "en:e414",
+    "en:e425",
+    "en:e425i",
+    "en:e425ii",
+    "en:e460",
+    "en:e460i",
+    "en:e460ii",
+    "en:e462",
+    "en:e504",
+    "en:e504i",
+    "en:e504ii",
+    "en:e551",
+    "en:e901",
+    "en:e902",
+    "en:e903"
+   ],
+   "top_similarity": 0.6599,
+   "vector": [
+    "en:e462",
+    "en:colour",
+    "en:e127",
+    "en:e1504",
+    "en:e160bi"
+   ],
+   "keyword": [
+    "en:alcohol",
+    "en:fat",
+    "en:stabiliser",
+    "en:colour",
+    "en:e414"
+   ],
+   "hybrid": [
+    "en:colour",
+    "en:e1504",
+    "en:e160c",
+    "en:e462",
+    "en:alcohol"
+   ]
+  },
+  {
+   "id": "descriptive-01",
+   "kind": "descriptive",
+   "query": "baking soda",
+   "relevant": [
+    "en:e500",
+    "en:e500ii"
+   ],
+   "top_similarity": 0.6148,
+   "vector": [
+    "en:e500ii",
+    "en:e501ii",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e541",
+    "en:diphosphates-and-sodium-carbonates"
+   ],
+   "keyword": [
+    "en:e541",
+    "en:e500ii",
+    "en:e500i",
+    "en:butter",
+    "en:cottonseed-oil"
+   ],
+   "hybrid": [
+    "en:e500ii",
+    "en:e541",
+    "en:e500i",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:baking-powder"
+   ]
+  },
+  {
+   "id": "descriptive-02",
+   "kind": "descriptive",
+   "query": "vitamin C added to drinks",
+   "relevant": [
+    "en:e300",
+    "en:vitamin-c"
+   ],
+   "top_similarity": 0.6117,
+   "vector": [
+    "en:vitamin-c",
+    "en:e301",
+    "en:e300",
+    "en:e303",
+    "en:e316"
+   ],
+   "keyword": [
+    "en:vitamin-c",
+    "en:cholecalciferol",
+    "en:vitamin-b12",
+    "en:e301",
+    "en:e316"
+   ],
+   "hybrid": [
+    "en:vitamin-c",
+    "en:e301",
+    "en:e300",
+    "en:e316",
+    "en:e318"
+   ]
+  },
+  {
+   "id": "descriptive-03",
+   "kind": "descriptive",
+   "query": "MSG",
+   "relevant": [
+    "en:e621"
+   ],
+   "top_similarity": 0.2335,
+   "vector": [
+    "en:e621",
+    "en:e343i",
+    "en:e624",
+    "en:methylsulfonylmethane",
+    "en:e625"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:e621",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e343i",
+    "de:gärungskohlensäure",
+    "en:e624"
+   ]
+  },
+  {
+   "id": "descriptive-04",
+   "kind": "descriptive",
+   "query": "the red dye in candy",
+   "relevant": [
+    "en:e129",
+    "en:e124",
+    "en:e120",
+    "en:e127",
+    "en:e122"
+   ],
+   "top_similarity": 0.6053,
+   "vector": [
+    "en:e127",
+    "en:e123",
+    "en:e125",
+    "en:e124",
+    "en:e120"
+   ],
+   "keyword": [
+    "en:e103",
+    "en:e128",
+    "en:e124",
+    "en:e129",
+    "en:e121"
+   ],
+   "hybrid": [
+    "en:e124",
+    "en:e128",
+    "en:e125",
+    "en:e129",
+    "en:e120"
+   ]
+  },
+  {
+   "id": "descriptive-05",
+   "kind": "descriptive",
+   "query": "yellow food colouring",
+   "relevant": [
+    "en:e102",
+    "en:e110",
+    "en:e104",
+    "en:e100",
+    "en:e100i",
+    "en:e160",
+    "en:e160a",
+    "en:e160ai",
+    "en:e160aii"
+   ],
+   "top_similarity": 0.6275,
+   "vector": [
+    "en:e107",
+    "en:e105",
+    "en:e104",
+    "en:e110",
+    "en:e172iii"
+   ],
+   "keyword": [
+    "en:e100i",
+    "en:e101a",
+    "en:e101",
+    "en:e107",
+    "en:e105"
+   ],
+   "hybrid": [
+    "en:e107",
+    "en:e105",
+    "en:e100i",
+    "en:e104",
+    "en:e101"
+   ]
+  },
+  {
+   "id": "descriptive-06",
+   "kind": "descriptive",
+   "query": "the sweetener in diet soda",
+   "relevant": [
+    "en:e951",
+    "en:e950",
+    "en:e955"
+   ],
+   "top_similarity": 0.6458,
+   "vector": [
+    "en:e951",
+    "en:e954",
+    "en:e962",
+    "en:e952",
+    "en:e969"
+   ],
+   "keyword": [
+    "en:e951",
+    "en:e500i",
+    "en:e541",
+    "en:juice",
+    "en:e958"
+   ],
+   "hybrid": [
+    "en:e951",
+    "en:e955",
+    "en:e960a",
+    "en:e960",
+    "en:e960c"
+   ]
+  },
+  {
+   "id": "descriptive-07",
+   "kind": "descriptive",
+   "query": "the preservative in soft drinks",
+   "relevant": [
+    "en:e211",
+    "en:e202"
+   ],
+   "top_similarity": 0.6029,
+   "vector": [
+    "en:e242",
+    "en:e216",
+    "en:e214",
+    "en:e210",
+    "en:e218"
+   ],
+   "keyword": [
+    "en:raspberry",
+    "en:e210",
+    "en:e220",
+    "en:date",
+    "en:peach"
+   ],
+   "hybrid": [
+    "en:e210",
+    "en:e211",
+    "en:e212",
+    "en:e200",
+    "en:e265"
+   ]
+  },
+  {
+   "id": "descriptive-08",
+   "kind": "descriptive",
+   "query": "a thickener made from seaweed",
+   "relevant": [
+    "en:e407",
+    "en:e407a",
+    "en:e406",
+    "en:e401"
+   ],
+   "top_similarity": 0.6747,
+   "vector": [
+    "en:e407a",
+    "en:e405",
+    "en:seaweed",
+    "en:e401",
+    "en:e400"
+   ],
+   "keyword": [
+    "en:e407a",
+    "en:e405",
+    "en:e404",
+    "en:e406",
+    "en:e401"
+   ],
+   "hybrid": [
+    "en:e407a",
+    "en:e405",
+    "en:e401",
+    "en:e404",
+    "en:e406"
+   ]
+  },
+  {
+   "id": "descriptive-09",
+   "kind": "descriptive",
+   "query": "a salt substitute",
+   "relevant": [
+    "en:e508"
+   ],
+   "top_similarity": 0.4544,
+   "vector": [
+    "en:salt",
+    "en:sea-salt",
+    "en:e508",
+    "en:iodised-salt",
+    "en:sodium-chloride"
+   ],
+   "keyword": [
+    "en:e508",
+    "en:e515i",
+    "en:e957",
+    "en:chicory-root",
+    "en:e952"
+   ],
+   "hybrid": [
+    "en:e508",
+    "en:sea-salt",
+    "en:e515i",
+    "en:iodised-salt",
+    "en:salt"
+   ]
+  },
+  {
+   "id": "descriptive-10",
+   "kind": "descriptive",
+   "query": "the gas that makes drinks fizzy",
+   "relevant": [
+    "en:e290"
+   ],
+   "top_similarity": 0.6033,
+   "vector": [
+    "en:carbonated-water",
+    "en:e290",
+    "en:e942",
+    "de:gärungskohlensäure",
+    "en:e940"
+   ],
+   "keyword": [
+    "en:e290",
+    "en:baking-powder",
+    "en:e220",
+    "en:vitamin-d",
+    "en:carbonated-water"
+   ],
+   "hybrid": [
+    "en:e290",
+    "en:carbonated-water",
+    "en:e220",
+    "en:e942",
+    "en:e949"
+   ]
+  },
+  {
+   "id": "descriptive-11",
+   "kind": "descriptive",
+   "query": "vitamin E used as an antioxidant",
+   "relevant": [
+    "en:e306",
+    "en:e307",
+    "en:e307a",
+    "en:e307b",
+    "en:e307c"
+   ],
+   "top_similarity": 0.6683,
+   "vector": [
+    "en:e307",
+    "en:e307a",
+    "en:e307c",
+    "en:dl-alpha-tocopheryl-acetate",
+    "en:e309"
+   ],
+   "keyword": [
+    "en:d-alpha-tocopheryl-acetate",
+    "en:e307c",
+    "en:dl-alpha-tocopheryl-acetate",
+    "en:e307a",
+    "en:e309"
+   ],
+   "hybrid": [
+    "en:e307c",
+    "en:e307a",
+    "en:e307",
+    "en:dl-alpha-tocopheryl-acetate",
+    "en:d-alpha-tocopheryl-acetate"
+   ]
+  },
+  {
+   "id": "descriptive-12",
+   "kind": "descriptive",
+   "query": "caramel colour in cola",
+   "relevant": [
+    "en:e150",
+    "en:e150d",
+    "en:e150a"
+   ],
+   "top_similarity": 0.6211,
+   "vector": [
+    "en:e150",
+    "en:e150b",
+    "en:e150c",
+    "en:e150a",
+    "en:e150d"
+   ],
+   "keyword": [
+    "en:e150c",
+    "en:e150d",
+    "en:e165",
+    "en:e636",
+    "en:e130"
+   ],
+   "hybrid": [
+    "en:e150c",
+    "en:e150",
+    "en:e150d",
+    "en:e150a",
+    "en:e150b"
+   ]
+  },
+  {
+   "id": "descriptive-13",
+   "kind": "descriptive",
+   "query": "the acid in cola",
+   "relevant": [
+    "en:e338"
+   ],
+   "top_similarity": 0.4853,
+   "vector": [
+    "en:e338",
+    "en:acid",
+    "en:e507",
+    "en:e296",
+    "en:e574"
+   ],
+   "keyword": [
+    "en:e513",
+    "en:e260",
+    "en:e243",
+    "en:e203",
+    "en:acid"
+   ],
+   "hybrid": [
+    "en:acid",
+    "en:e513",
+    "en:e260",
+    "en:e210",
+    "en:e296"
+   ]
+  },
+  {
+   "id": "descriptive-14",
+   "kind": "descriptive",
+   "query": "soy lecithin",
+   "relevant": [
+    "en:e322",
+    "en:e322i",
+    "en:e322ii"
+   ],
+   "top_similarity": 0.6097,
+   "vector": [
+    "en:soya-lecithin",
+    "en:e322i",
+    "en:e322",
+    "en:e322ii",
+    "en:soya"
+   ],
+   "keyword": [
+    "en:soya-lecithin",
+    "en:tamari",
+    "en:e322i",
+    "en:soy-protein",
+    "en:e322ii"
+   ],
+   "hybrid": [
+    "en:soya-lecithin",
+    "en:e322i",
+    "en:e322ii",
+    "en:soya",
+    "en:soy-protein"
+   ]
+  },
+  {
+   "id": "descriptive-15",
+   "kind": "descriptive",
+   "query": "a thickener made from beans",
+   "relevant": [
+    "en:e412",
+    "en:e410"
+   ],
+   "top_similarity": 0.5492,
+   "vector": [
+    "en:e410",
+    "en:white-beans",
+    "en:beans",
+    "en:e412",
+    "en:pinto-beans"
+   ],
+   "keyword": [
+    "en:chocolate",
+    "en:vanillin",
+    "en:cocoa-powder-processed-with-alkali",
+    "en:cocoa-powder",
+    "en:vanilla-flavouring"
+   ],
+   "hybrid": [
+    "en:white-beans",
+    "en:beans",
+    "en:e1421",
+    "en:e427",
+    "en:pinto-beans"
+   ]
+  },
+  {
+   "id": "descriptive-16",
+   "kind": "descriptive",
+   "query": "nitrite in bacon",
+   "relevant": [
+    "en:e250",
+    "en:e249",
+    "en:e252"
+   ],
+   "top_similarity": 0.5831,
+   "vector": [
+    "en:e249",
+    "en:e250",
+    "en:e252",
+    "en:e251",
+    "en:e919"
+   ],
+   "keyword": [
+    "en:e249",
+    "en:bacon",
+    "en:e250",
+    "en:diced-tomatoes-in-tomato-juice",
+    "en:e260"
+   ],
+   "hybrid": [
+    "en:e249",
+    "en:e250",
+    "en:bacon",
+    "en:e925",
+    "en:e239"
+   ]
+  },
+  {
+   "id": "descriptive-17",
+   "kind": "descriptive",
+   "query": "sulfites in wine and dried fruit",
+   "relevant": [
+    "en:e220",
+    "en:e223",
+    "en:e224",
+    "en:e228"
+   ],
+   "top_similarity": 0.5745,
+   "vector": [
+    "en:e226",
+    "en:e225",
+    "en:e221",
+    "en:e222",
+    "en:e228"
+   ],
+   "keyword": [
+    "en:e225",
+    "en:e226",
+    "en:mango",
+    "en:red-wine-vinegar",
+    "en:white-wine"
+   ],
+   "hybrid": [
+    "en:e226",
+    "en:e225",
+    "en:raisin",
+    "en:white-wine",
+    "en:wine"
+   ]
+  },
+  {
+   "id": "descriptive-18",
+   "kind": "descriptive",
+   "query": "lye used to make pretzels",
+   "relevant": [
+    "en:e524"
+   ],
+   "top_similarity": 0.4517,
+   "vector": [
+    "en:e921",
+    "en:e920",
+    "en:e1105",
+    "en:e924a",
+    "en:e283"
+   ],
+   "keyword": [
+    "en:e290",
+    "en:potato-flakes",
+    "en:durum-wheat-semolina",
+    "en:canola",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi"
+   ],
+   "hybrid": [
+    "en:e1519",
+    "en:e921",
+    "en:e290",
+    "en:e920",
+    "en:potato-flakes"
+   ]
+  },
+  {
+   "id": "descriptive-19",
+   "kind": "descriptive",
+   "query": "anti-foaming agent in frying oil",
+   "relevant": [
+    "en:e900",
+    "en:e900a"
+   ],
+   "top_similarity": 0.5605,
+   "vector": [
+    "en:e900",
+    "en:e479b",
+    "en:e435",
+    "en:e487",
+    "en:e433"
+   ],
+   "keyword": [
+    "en:e900",
+    "en:e487",
+    "en:rapeseed-oil",
+    "en:cottonseed-oil",
+    "en:soya-oil"
+   ],
+   "hybrid": [
+    "en:e900",
+    "en:e487",
+    "en:peanut-oil",
+    "en:cottonseed-oil",
+    "en:e905b"
+   ]
+  },
+  {
+   "id": "descriptive-20",
+   "kind": "descriptive",
+   "query": "cellulose made from wood pulp",
+   "relevant": [
+    "en:e460",
+    "en:e460i",
+    "en:e460ii"
+   ],
+   "top_similarity": 0.4936,
+   "vector": [
+    "en:e460ii",
+    "en:e460",
+    "en:e464",
+    "en:e460i",
+    "en:e469"
+   ],
+   "keyword": [
+    "en:e445",
+    "en:e463",
+    "en:e461",
+    "en:smoke-flavouring",
+    "en:e460ii"
+   ],
+   "hybrid": [
+    "en:e460ii",
+    "en:e463",
+    "en:e461",
+    "en:e464",
+    "en:e445"
+   ]
+  },
+  {
+   "id": "descriptive-21",
+   "kind": "descriptive",
+   "query": "a sugar alcohol in sugar-free gum",
+   "relevant": [
+    "en:e420",
+    "en:e420i",
+    "en:e420ii",
+    "en:e967",
+    "en:e965",
+    "en:e965i",
+    "en:e965ii",
+    "en:e953"
+   ],
+   "top_similarity": 0.5843,
+   "vector": [
+    "en:e953",
+    "en:e964",
+    "en:e420",
+    "en:e965ii",
+    "en:e421"
+   ],
+   "keyword": [
+    "en:e953",
+    "en:e415",
+    "en:e421",
+    "en:e420",
+    "en:e968"
+   ],
+   "hybrid": [
+    "en:e953",
+    "en:e420",
+    "en:e421",
+    "en:e968",
+    "en:e965ii"
+   ]
+  },
+  {
+   "id": "descriptive-22",
+   "kind": "descriptive",
+   "query": "high fructose corn syrup",
+   "relevant": [
+    "en:glucose-fructose-syrup",
+    "en:corn-syrup"
+   ],
+   "top_similarity": 0.6805,
+   "vector": [
+    "en:high-fructose-corn-syrup",
+    "en:glucose-fructose-syrup",
+    "en:fructose",
+    "en:corn-syrup",
+    "en:corn-syrup-solids"
+   ],
+   "keyword": [
+    "en:high-fructose-corn-syrup",
+    "en:glucose-fructose-syrup",
+    "en:corn-syrup",
+    "en:corn-syrup-solids",
+    "en:invert-sugar-syrup"
+   ],
+   "hybrid": [
+    "en:high-fructose-corn-syrup",
+    "en:glucose-fructose-syrup",
+    "en:corn-syrup",
+    "en:corn-syrup-solids",
+    "en:fructose"
+   ]
+  },
+  {
+   "id": "descriptive-23",
+   "kind": "descriptive",
+   "query": "the stimulant in coffee and energy drinks",
+   "relevant": [
+    "en:caffeine"
+   ],
+   "top_similarity": 0.6595,
+   "vector": [
+    "en:caffeine",
+    "en:coffee",
+    "en:taurine",
+    "en:e960a",
+    "en:e960c"
+   ],
+   "keyword": [
+    "en:caffeine",
+    "en:coffee",
+    "en:taurine",
+    "en:chicory-root",
+    "en:thiamin"
+   ],
+   "hybrid": [
+    "en:caffeine",
+    "en:coffee",
+    "en:taurine",
+    "en:chicory-root",
+    "en:e960c"
+   ]
+  },
+  {
+   "id": "descriptive-24",
+   "kind": "descriptive",
+   "query": "protein from milk used in shakes",
+   "relevant": [
+    "en:whey-protein",
+    "en:whey-protein-isolate",
+    "en:whey"
+   ],
+   "top_similarity": 0.6757,
+   "vector": [
+    "en:milk-proteins",
+    "en:milk-protein-isolate",
+    "en:milk-protein-concentrate",
+    "en:calcium-caseinate",
+    "en:whey-protein"
+   ],
+   "keyword": [
+    "en:milk-proteins",
+    "en:milk-protein-isolate",
+    "en:milk-protein-concentrate",
+    "en:calcium-caseinate",
+    "en:skimmed-milk"
+   ],
+   "hybrid": [
+    "en:milk-proteins",
+    "en:milk-protein-isolate",
+    "en:milk-protein-concentrate",
+    "en:calcium-caseinate",
+    "en:whey-protein"
+   ]
+  },
+  {
+   "id": "descriptive-25",
+   "kind": "descriptive",
+   "query": "white colouring in sweets and icing",
+   "relevant": [
+    "en:e171",
+    "en:e170",
+    "en:e170i",
+    "en:e170ii"
+   ],
+   "top_similarity": 0.5219,
+   "vector": [
+    "en:e901",
+    "en:white-chocolate",
+    "en:icing-sugar",
+    "en:e170i",
+    "en:e171"
+   ],
+   "keyword": [
+    "en:e100i",
+    "en:icing-sugar",
+    "en:e101a",
+    "en:white-pepper",
+    "en:white-wine"
+   ],
+   "hybrid": [
+    "en:icing-sugar",
+    "en:e170i",
+    "en:e171",
+    "en:e901",
+    "en:white-chocolate"
+   ]
+  },
+  {
+   "id": "no_answer-01",
+   "kind": "no_answer",
+   "query": "What is the capital of France?",
+   "relevant": [],
+   "top_similarity": 0.2167,
+   "vector": [
+    "en:dijon-mustard",
+    "en:e938",
+    "en:e939",
+    "en:e940",
+    "en:e941"
+   ],
+   "keyword": [
+    "en:oat-bran",
+    "en:e202",
+    "en:e958",
+    "en:cottonseed",
+    "en:cashew-nuts"
+   ],
+   "hybrid": [
+    "en:coffee",
+    "en:dijon-mustard",
+    "en:oat-bran",
+    "en:e938",
+    "en:e202"
+   ]
+  },
+  {
+   "id": "no_answer-02",
+   "kind": "no_answer",
+   "query": "How do I fix a flat bicycle tyre?",
+   "relevant": [],
+   "top_similarity": 0.2008,
+   "vector": [
+    "en:crust",
+    "en:e927",
+    "en:potato-flour",
+    "en:e410",
+    "en:filling"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e493",
+    "en:pumpkin-seed",
+    "en:acidity-regulator",
+    "en:modified-potato-starch"
+   ],
+   "hybrid": [
+    "en:modified-potato-starch",
+    "en:cucumber",
+    "en:e905c",
+    "en:crust",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi"
+   ]
+  },
+  {
+   "id": "no_answer-03",
+   "kind": "no_answer",
+   "query": "What is a blockchain?",
+   "relevant": [],
+   "top_similarity": 0.2892,
+   "vector": [
+    "en:e460",
+    "en:amino-acids",
+    "en:beef",
+    "en:tapioca",
+    "en:coconut-oil"
+   ],
+   "keyword": [
+    "en:zinc",
+    "en:e927b",
+    "en:corn-maltodextrin",
+    "en:inositol",
+    "en:e106"
+   ],
+   "hybrid": [
+    "en:kale",
+    "en:glucose",
+    "en:e460",
+    "en:zinc",
+    "en:amino-acids"
+   ]
+  },
+  {
+   "id": "no_answer-04",
+   "kind": "no_answer",
+   "query": "Who wrote Hamlet?",
+   "relevant": [],
+   "top_similarity": 0.2561,
+   "vector": [
+    "en:ham",
+    "en:e239",
+    "en:alcohol",
+    "en:e939",
+    "en:e231"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "de:gärungskohlensäure",
+    "en:acid",
+    "en:acidity-regulator",
+    "en:agave-syrup"
+   ],
+   "hybrid": [
+    "en:alcohol",
+    "en:beef-broth",
+    "en:ham",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e239"
+   ]
+  },
+  {
+   "id": "no_answer-05",
+   "kind": "no_answer",
+   "query": "How tall is Mount Everest?",
+   "relevant": [],
+   "top_similarity": 0.238,
+   "vector": [
+    "en:himalayan-pink-salt",
+    "en:fresh-cream",
+    "en:monk-fruit-extract",
+    "en:whole-milk",
+    "en:pepper"
+   ],
+   "keyword": [
+    "en:acidity-regulator",
+    "en:lemongrass",
+    "en:modified-potato-starch",
+    "en:modified-corn-starch",
+    "en:zinc"
+   ],
+   "hybrid": [
+    "en:cream",
+    "en:himalayan-pink-salt",
+    "en:acidity-regulator",
+    "en:fresh-cream",
+    "en:lemongrass"
+   ]
+  },
+  {
+   "id": "no_answer-06",
+   "kind": "no_answer",
+   "query": "What is the best laptop for students?",
+   "relevant": [],
+   "top_similarity": 0.193,
+   "vector": [
+    "en:romaine-lettuce",
+    "en:pineapple",
+    "en:apple",
+    "en:peach",
+    "en:e133"
+   ],
+   "keyword": [
+    "en:oil",
+    "en:flax-seed",
+    "en:olive",
+    "en:chili-pepper",
+    "en:almond"
+   ],
+   "hybrid": [
+    "en:avocado",
+    "en:pecan-nut",
+    "en:romaine-lettuce",
+    "en:oil",
+    "en:pineapple"
+   ]
+  },
+  {
+   "id": "no_answer-07",
+   "kind": "no_answer",
+   "query": "How do I reset my email password?",
+   "relevant": [],
+   "top_similarity": 0.2179,
+   "vector": [
+    "en:e350i",
+    "en:e962",
+    "en:e501ii",
+    "en:e329",
+    "en:e585"
+   ],
+   "keyword": [
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e493",
+    "en:acidity-regulator",
+    "en:modified-potato-starch",
+    "en:modified-corn-starch"
+   ],
+   "hybrid": [
+    "en:e350i",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e962",
+    "en:e493",
+    "en:e501ii"
+   ]
+  },
+  {
+   "id": "no_answer-08",
+   "kind": "no_answer",
+   "query": "When did the first moon landing happen?",
+   "relevant": [],
+   "top_similarity": 0.1167,
+   "vector": [
+    "en:e939",
+    "en:e905b",
+    "en:e905c",
+    "en:whole-milk",
+    "en:monterey-jack"
+   ],
+   "keyword": [
+    "en:vitamin-d",
+    "en:wheat-gluten",
+    "en:e503ii",
+    "en:oil",
+    "en:e503"
+   ],
+   "hybrid": [
+    "en:mozzarella",
+    "en:spring-water",
+    "en:e503ii",
+    "en:e503i",
+    "en:e503"
+   ]
+  },
+  {
+   "id": "no_answer-09",
+   "kind": "no_answer",
+   "query": "What is the offside rule in football?",
+   "relevant": [],
+   "top_similarity": 0.1718,
+   "vector": [
+    "en:beef",
+    "en:spring-onion",
+    "en:chicken",
+    "en:chicken-meat",
+    "en:crust"
+   ],
+   "keyword": [
+    "en:banana",
+    "en:e958",
+    "en:cottonseed",
+    "en:tea",
+    "en:coconut"
+   ],
+   "hybrid": [
+    "en:chicken",
+    "en:chicken-meat",
+    "en:crust",
+    "en:onion",
+    "en:wheat-bran"
+   ]
+  },
+  {
+   "id": "no_answer-10",
+   "kind": "no_answer",
+   "query": "How many planets are in the solar system?",
+   "relevant": [],
+   "top_similarity": 0.2215,
+   "vector": [
+    "en:sunflower",
+    "en:sunflower-seed",
+    "en:vitamins",
+    "en:soya-bean",
+    "en:pea"
+   ],
+   "keyword": [
+    "en:e490",
+    "en:beans",
+    "en:chicken-breast",
+    "en:green-pepper",
+    "en:wheat-flour"
+   ],
+   "hybrid": [
+    "en:beans",
+    "en:pea",
+    "en:green-pepper",
+    "en:grape",
+    "en:peach"
+   ]
+  }
+ ]
+}
