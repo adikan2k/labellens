@@ -20,7 +20,7 @@ const tree = (path: string) => `${REPO_URL}/tree/main/${path}`;
 export default function HowItsBuiltPage() {
   return (
     <article className="type-body mx-auto w-full max-w-page px-4 pt-8 pb-16">
-      <h1 className="type-title pb-4">How LabelLens is built</h1>
+      <h1 className="type-page pb-6">How LabelLens is built</h1>
       <Rule weight="heavy" />
       <div className="max-w-measure">
         <p className="pt-4">

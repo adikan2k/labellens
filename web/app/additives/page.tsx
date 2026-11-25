@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function AdditivesPage() {
   return (
     <div className="mx-auto w-full max-w-page px-4 pt-8 pb-16">
-      <h1 className="type-title pb-4">{ADDITIVES.title}</h1>
+      <h1 className="type-page pb-6">{ADDITIVES.title}</h1>
       <Rule weight="heavy" />
       <Suspense fallback={<p className="type-body pt-4 text-ink-muted">Reading the list…</p>}>
         <AdditivesList />

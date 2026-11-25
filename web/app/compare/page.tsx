@@ -37,7 +37,7 @@ export async function generateMetadata({ searchParams }: PageProps<"/compare">):
 export default function ComparePage({ searchParams }: PageProps<"/compare">) {
   return (
     <div className="mx-auto w-full max-w-page px-4 pt-8 pb-16">
-      <h1 className="type-title pb-2">Compare</h1>
+      <h1 className="type-page pb-4">Compare</h1>
       <p className="type-body max-w-measure pb-8 text-ink-muted">{COMPARE_INTRO}</p>
       <Suspense fallback={<p className="type-body min-h-dvh text-ink-muted">Reading the labels…</p>}>
         {searchParams.then(({ codes }) => (

@@ -47,8 +47,9 @@ One family: **Archivo** (variable, with weight and width axes), from Google Font
 | Role | Size / line height | Weight | Width | Notes |
 | --- | --- | --- | --- | --- |
 | Poster | 20.5% of its container / 0.86 | 900 | 62 | The home headline only. Fills the page width: about 70 px on a phone, 230 px at 1280 px |
-| Display | 60 / 60 | 900 | 75 | Product name on the product page; home headline on phones and tablets |
-| Title | 36 / 40 | 800 | 85 | Page titles, "Nutrition Facts" panel heading |
+| Page | 52 / 52 on phones, 72 / 68 from `md`, 88 / 80 from `lg` | 900 | 62 | Every page's title, so each page opens like the home page does: the poster's narrow width at a size that still fits a long title. Not the home poster, and not product or additive names (Display) |
+| Display | 60 / 60 | 900 | 75 | Product and additive names on their pages; home headline on phones and tablets |
+| Title | 36 / 40 | 800 | 85 | Section titles on the home page and long pages, "Nutrition Facts" panel heading |
 | Heading | 21 / 26 | 700 | 100 | Section headings |
 | Body | 16 / 24 | 400 | 100 | Paragraphs, explainers |
 | Data row | 16 / 22 | 500 (label) and 700 (value) | 85 | Label rows; tabular figures on |

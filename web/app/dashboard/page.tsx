@@ -23,7 +23,7 @@ export const metadata: Metadata = { title: "Dashboard" };
 export default function DashboardPage() {
   return (
     <div className="mx-auto w-full max-w-page px-4 pt-8 pb-16">
-      <h1 className="type-title">The US label landscape</h1>
+      <h1 className="type-page">The US label landscape</h1>
       <Suspense fallback={<p className="type-body pt-4 text-ink-muted">Counting products…</p>}>
         <Dashboard />
       </Suspense>

@@ -192,7 +192,7 @@ function ProductSkeleton() {
 function Unavailable({ code }: { code: string }) {
   return (
     <div className="mx-auto w-full max-w-measure px-4 pt-16 pb-16">
-      <h1 className="type-title pb-4">This label is not ready</h1>
+      <h1 className="type-page pb-6">This label is not ready</h1>
       <p className="type-body">{WAKING_UP}</p>
       <p className="type-body pt-4">
         <Link href={`/product/${code}`}>Try again</Link> or <Link href="/">search again</Link>.
