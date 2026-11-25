@@ -7,6 +7,8 @@ import { BUILT_HREF, BUILT_LABEL, HOME_INTRO, HOME_WAYS_IN, MEASURED, repoFileUr
 import { additiveFinding, largestFinding, novaFinding, nutriscoreFinding } from "@/lib/findings";
 import { formatCount } from "@/lib/format";
 
+import { GrowBar, WipeIn } from "./reveal";
+
 /**
  * The dashboard's findings as one line: what the ticker scrolls. `guideCount` is how many
  * additives the additive guide lists (those a product lists), so the two pages agree; the
@@ -63,30 +65,32 @@ export function GradeStrip({ stats }: { stats: StatsOverview }) {
         {SHELF.caption(formatCount(total))}
       </p>
 
-      {/* Wide screens: one strip, each grade as wide as its share. */}
-      <ol aria-label={SHELF.listLabel} className="hidden h-[16rem] sm:flex">
-        {shares.map(({ grade, count, share }) => (
-          <li
-            key={grade}
-            data-grade={grade}
-            style={{ flexGrow: count, flexBasis: 0 }}
-            className={`flex min-w-16 flex-col justify-between p-3 ${CHIP_CLASSES[grade]}`}
-          >
-            <span className="type-display" aria-hidden="true">
-              {grade.toUpperCase()}
-            </span>
-            <span>
-              <span className="sr-only">Nutri-Score {grade.toUpperCase()}: </span>
-              <span className="type-title block">{percent(share)}</span>
-              <span className="type-small block">{formatCount(count)}</span>
-            </span>
-          </li>
-        ))}
-      </ol>
+      {/* Wide screens: one strip, each grade as wide as its share. It wipes in once, in view. */}
+      <WipeIn className="hidden sm:block">
+        <ol aria-label={SHELF.listLabel} className="flex h-[16rem]">
+          {shares.map(({ grade, count, share }) => (
+            <li
+              key={grade}
+              data-grade={grade}
+              style={{ flexGrow: count, flexBasis: 0 }}
+              className={`flex min-w-16 flex-col justify-between p-3 ${CHIP_CLASSES[grade]}`}
+            >
+              <span className="type-display" aria-hidden="true">
+                {grade.toUpperCase()}
+              </span>
+              <span>
+                <span className="sr-only">Nutri-Score {grade.toUpperCase()}: </span>
+                <span className="type-title block">{percent(share)}</span>
+                <span className="type-small block">{formatCount(count)}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </WipeIn>
 
-      {/* Phones: a row per grade, its bar as long as its share. */}
+      {/* Phones: a row per grade, its bar as long as its share. Bars grow once, in view. */}
       <ol aria-label={SHELF.listLabel} className="sm:hidden">
-        {shares.map(({ grade, count, share }) => (
+        {shares.map(({ grade, count, share }, i) => (
           <li key={grade} className="flex items-center gap-3 py-1">
             <span
               aria-hidden="true"
@@ -95,8 +99,8 @@ export function GradeStrip({ stats }: { stats: StatsOverview }) {
               {grade.toUpperCase()}
             </span>
             <span className="h-12 min-w-0 flex-1">
-              <span
-                aria-hidden="true"
+              <GrowBar
+                order={i}
                 className={`block h-full ${CHIP_CLASSES[grade]}`}
                 style={{ width: `${Math.max(2, (share / largest) * 100)}%` }}
               />

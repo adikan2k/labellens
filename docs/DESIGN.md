@@ -479,6 +479,7 @@ The whole sequence takes under 900 ms. It runs once per page view, never on scro
 - Additive rows expand on click with a height animation (`dur-base`).
 - Graph: nothing moves. Selecting a row changes weights and tones at once.
 - Dashboard bars grow from zero once, the first time each chart enters the viewport.
+- The home page's grade strip does the same, once, when it scrolls into view. On wide screens the whole strip wipes in from the left (`clip-path`, `dur-slow`, `ease-out`), the label's print move, so its letters are never stretched. On phones each grade's bar grows from the left (`scaleX`, 60 ms apart). Both keep their final size from the start, so nothing shifts, and the numbers are in the page before anything moves. The "How it's measured" numbers do not move (no counters, below).
 
 **Never**
 
