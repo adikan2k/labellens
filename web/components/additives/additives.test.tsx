@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
-import { additiveHref, filterAdditives } from "@/lib/additives";
+import { additiveHref, filterAdditives, hasFunction, TOP } from "@/lib/additives";
 import type { AdditiveListItem } from "@/lib/api";
 
 import { AdditiveFinder } from "./additive-finder";
@@ -76,6 +76,55 @@ describe("AdditiveFinder", () => {
     expect(screen.getByRole("status").textContent).toBe("2 of 4 additives");
     fireEvent.click(screen.getByRole("checkbox", { name: /Flagged/ }));
     expect(screen.getByText(/No additive matches/)).toBeTruthy();
+  });
+});
+
+describe("the long list", () => {
+  const many = Array.from({ length: TOP + 12 }, (_, i) =>
+    item({
+      additive_id: `en:e${100 + i}`,
+      slug: `e${100 + i}`,
+      e_number: `E${100 + i}`,
+      name: `Additive ${i}`,
+      function: i % 3 === 0 ? "Color" : "Stabilizer, thickener",
+      product_count: 1000 - i,
+    }),
+  );
+
+  test("a function in the data is matched as a whole word, any case", () => {
+    expect(hasFunction(item({ function: "Stabilizer, thickener" }), "thickener")).toBe(true);
+    expect(hasFunction(item({ function: "Color" }), "color")).toBe(true);
+    expect(hasFunction(item({ function: null }), "color")).toBe(false);
+    expect(filterAdditives(LIST, "", false, "color")).toEqual([]);
+  });
+
+  test("shows the most common first, then all of them on request", () => {
+    render(<AdditiveFinder additives={many} />);
+    expect(screen.getAllByRole("link")).toHaveLength(TOP);
+    expect(screen.getByRole("status").textContent).toBe(`The ${TOP} most common of ${TOP + 12} additives`);
+    fireEvent.click(screen.getByRole("button", { name: `Show all ${TOP + 12}` }));
+    expect(screen.getAllByRole("link")).toHaveLength(TOP + 12);
+    expect(screen.queryByRole("button", { name: /Show all/ })).toBeNull();
+  });
+
+  test("a function narrows the list, with its count, and shows every match", () => {
+    render(<AdditiveFinder additives={many} />);
+    const colours = screen.getByRole("button", { name: "Colours 21" });
+    expect(colours.getAttribute("aria-pressed")).toBe("false");
+    fireEvent.click(colours);
+    expect(colours.getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getAllByRole("link")).toHaveLength(21);
+    expect(screen.getByRole("status").textContent).toBe(`21 of ${TOP + 12} additives`);
+    fireEvent.click(screen.getByRole("button", { name: `All ${TOP + 12}` }));
+    expect(screen.getAllByRole("link")).toHaveLength(TOP);
+  });
+
+  test("typing searches all of them, not only the most common", () => {
+    render(<AdditiveFinder additives={many} />);
+    fireEvent.change(screen.getByRole("textbox", { name: "Find an additive" }), {
+      target: { value: `E${100 + TOP + 5}` },
+    });
+    expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 });
 

@@ -358,11 +358,16 @@ The steps stay open after the answer arrives, because they are the evidence for 
 │ ████████████████████████████████████████████ rule-heavy    │
 │ 515 additives on US labels, most common first.   (body)    │
 │ [ Find an additive: name or E number ]  ☐ Flagged only     │
+│ What they do: [All 515] [Colours 50] [Preservatives 45] …   │
+│ The 50 most common of 515 additives          (small)       │
 │ E330  Citric acid · acidity regulator      100,764         │
 │ ─────────────────────────────────────────── rule-hair      │
 │ E322  Lecithins · emulsifier                38,120         │
 │ ...                                                        │
+│ [ Show all 515 ]                                           │
 └────────────────────────────────────────────────────────────┘
+
+The list starts with the 50 most common, then "Show all 515". "What they do" filters by Open Food Facts' function, as toggle chips (Small, 1 px `ink` border, `rounded-control`; the chosen one `paper` on `ink`), each with its count; one at a time, "All" clears it. Typing, a chip or the flagged box shows every match, not only the first 50.
 
 ┌────────────────────────────────────────────────────────────┐
 │ E330                                       (type-data)     │

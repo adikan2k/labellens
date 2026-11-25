@@ -3,19 +3,27 @@
 import Link from "next/link";
 import { useDeferredValue, useId, useState } from "react";
 
-import { additiveHref, filterAdditives } from "@/lib/additives";
+import { additiveHref, filterAdditives, FUNCTIONS, type FunctionKey, hasFunction, TOP } from "@/lib/additives";
 import type { AdditiveListItem } from "@/lib/api";
 import { ADDITIVES } from "@/lib/copy";
 import { formatCount } from "@/lib/format";
 
-/** The guide's list: filters by name or E number as you type, and to flagged ones. */
+/**
+ * The guide's list, most common first. Untouched, it shows the TOP most common and offers
+ * the rest; typing, a function or the flagged box narrows it, and then every match shows.
+ */
 export function AdditiveFinder({ additives }: { additives: AdditiveListItem[] }) {
   const [query, setQuery] = useState("");
   const [flaggedOnly, setFlaggedOnly] = useState(false);
+  const [fn, setFn] = useState<FunctionKey | null>(null);
+  const [all, setAll] = useState(false);
   const deferred = useDeferredValue(query);
   const inputId = useId();
   const statusId = useId();
-  const shown = filterAdditives(additives, deferred, flaggedOnly);
+  const matches = filterAdditives(additives, deferred, flaggedOnly, fn);
+  const narrowed = deferred.trim() !== "" || flaggedOnly || fn !== null;
+  const capped = !narrowed && !all && matches.length > TOP;
+  const shown = capped ? matches.slice(0, TOP) : matches;
 
   return (
     <div className="pt-6">
@@ -45,8 +53,33 @@ export function AdditiveFinder({ additives }: { additives: AdditiveListItem[] })
           {ADDITIVES.flaggedOnly}
         </label>
       </div>
-      <p id={statusId} role="status" className="type-small pt-3 pb-2 text-ink-muted">
-        {ADDITIVES.shown(shown.length, additives.length)}
+      <fieldset className="mt-6">
+        <legend className="type-data-label pb-2">{ADDITIVES.whatTheyDo}</legend>
+        <ul className="flex flex-wrap gap-2">
+          {[{ key: null, label: ADDITIVES.allFunctions }, ...FUNCTIONS].map((f) => {
+            const count = f.key
+              ? additives.filter((a) => hasFunction(a, f.key)).length
+              : additives.length;
+            const on = fn === f.key;
+            return (
+              <li key={f.label}>
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setFn(f.key)}
+                  className={`type-small cursor-pointer rounded-control border border-ink px-3 py-1 ${on ? "bg-ink text-paper" : "bg-paper"}`}
+                >
+                  {f.label} <span className={on ? "" : "text-ink-muted"}>{count}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
+      <p id={statusId} role="status" className="type-small pt-4 pb-2 text-ink-muted">
+        {capped
+          ? ADDITIVES.topShown(shown.length, additives.length)
+          : ADDITIVES.shown(shown.length, additives.length)}
       </p>
       {shown.length === 0 ? (
         <p className="type-body pt-3">{ADDITIVES.none}</p>
@@ -78,6 +111,17 @@ export function AdditiveFinder({ additives }: { additives: AdditiveListItem[] })
             </li>
           ))}
         </ol>
+      )}
+      {capped && (
+        <p className="pt-6">
+          <button
+            type="button"
+            onClick={() => setAll(true)}
+            className="type-data-value cursor-pointer rounded-control border-2 border-ink bg-paper px-4 py-2"
+          >
+            {ADDITIVES.showAll(matches.length)}
+          </button>
+        </p>
       )}
     </div>
   );
