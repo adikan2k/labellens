@@ -36,7 +36,7 @@ export const M = {
   graphP95: { value: "406 ms", file: GRAPH, evidence: "**406.0**" },
   swapsP95: { value: "233 ms", file: GRAPH, evidence: "**233.2**" },
   lighthouseHome: { value: "100", file: LIGHTHOUSE, evidence: "| Home | 100 |" },
-  lighthouseProduct: { value: "98", file: LIGHTHOUSE, evidence: "| Product | 98 |" },
+  lighthouseProduct: { value: "90", file: LIGHTHOUSE, evidence: "| Product | 90 |" },
   lighthouseDashboard: { value: "100", file: LIGHTHOUSE, evidence: "| Dashboard | 100 |" },
   coldBefore: { value: "22.6 s", file: COLD, evidence: "22.64 s" },
   coldLow: { value: "7 s", file: COLD, evidence: "| 7.07 s |" },
