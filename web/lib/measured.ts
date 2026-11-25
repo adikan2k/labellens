@@ -43,10 +43,10 @@ export const M = {
   coldHigh: { value: "10 s", file: COLD, evidence: "| 10.07 s |" },
   warmPing: { value: "5 minutes", file: COLD, evidence: "a ping every 5 minutes" },
   cachingSaving: { value: "64%", file: CACHING, evidence: "| -64% |" },
-  retrievalTop5: { value: "74%", file: RETRIEVAL, evidence: "| Right explainer in the top 5 | 74% (66–81%)" },
+  retrievalTop5: { value: "98%", file: RETRIEVAL, evidence: "| Right explainer in the top 5 | 98% (93–99%)" },
+  retrievalVectorAlone: { value: "74%", file: RETRIEVAL, evidence: "| 98% (93–99%) | 74% (66–81%)" },
   retrievalKeyword: { value: "58%", file: RETRIEVAL, evidence: "| 74% (66–81%) | 58% (50–67%)" },
-  retrievalNames: { value: "100%", file: RETRIEVAL, evidence: "| Name | 40 | 100% (91–100%)" },
-  retrievalENumbers: { value: "3%", file: RETRIEVAL, evidence: "| E-number | 30 | 3% (1–17%)" },
+  retrievalENumbersBefore: { value: "3%", file: RETRIEVAL, evidence: "| E-number | 30 | 100% (89–100%) | 3% (1–17%)" },
 } as const satisfies Record<string, Measure>;
 
 /** The four numbers on the home page, each linked to its report. */
@@ -90,7 +90,7 @@ export const EVAL_RESULTS: EvalResult[] = [
   },
   {
     name: "Explainer search",
-    headline: `The ask agent's search put the right explainer in its top 5 for ${M.retrievalTop5.value} of 125 questions, against ${M.retrievalKeyword.value} for keyword search: ${M.retrievalNames.value} of names, but ${M.retrievalENumbers.value} of E-numbers, which the searched text leaves out.`,
+    headline: `The ask agent's search puts the right explainer in its top 5 for ${M.retrievalTop5.value} of 125 questions. Vector search alone managed ${M.retrievalVectorAlone.value}: it found ${M.retrievalENumbersBefore.value} of E-numbers, which are now looked up exactly. Keyword search: ${M.retrievalKeyword.value}.`,
     file: RETRIEVAL,
   },
   {

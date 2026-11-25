@@ -10,6 +10,7 @@ from typing import Any
 import pytest
 from psycopg.rows import dict_row
 
+from api.app.ask import tools as tools_module
 from api.app.ask.tools import (
     ROW_LIMIT,
     Citations,
@@ -190,10 +191,52 @@ def test_explainer_search_finds_the_closest_text(connect: Connect) -> None:
     assert "AI-written" in data["note"]
 
 
+def test_an_e_number_in_the_question_is_looked_up_exactly_first(connect: Connect) -> None:
+    tools = _tools(connect, voyage=FakeVoyageServer().client())
+    data, result = _run(tools, "search_explainers", query="What does E330 do in food?")
+    assert not result.is_error
+    first = data["results"][0]
+    assert first["id"] == "en:e330" and first["match"] == "E-number"
+    assert first["cite"] == "E1" and "distance" not in first
+    ids = [r["id"] for r in data["results"]]
+    assert len(ids) == len(set(ids)) <= 5  # the vector results fill the rest, no repeats
+
+
+def test_an_e_number_is_found_even_without_voyage(connect: Connect) -> None:
+    tools = _tools(connect, voyage=FakeVoyageServer().client(key=None))
+    data, result = _run(tools, "search_explainers", query="what is e330")
+    assert not result.is_error and result.embedding_tokens == 0
+    assert [r["id"] for r in data["results"]] == ["en:e330"]
+
+
 def test_explainer_search_without_voyage_points_to_sql(connect: Connect) -> None:
     tools = _tools(connect, voyage=FakeVoyageServer().client(key=None))
     data, result = _run(tools, "search_explainers", query="what is lecithin")
     assert result.is_error and "query_sql" in data["error"]
+
+
+def test_e_numbers_are_read_out_of_a_question() -> None:
+    assert tools_module.e_number_ids("What is E412?") == ["en:e412"]
+    assert tools_module.e_number_ids("is e330 or E322i in it, and E330 again") == [
+        "en:e330",
+        "en:e322i",
+    ]
+    assert tools_module.e_number_ids("E-322 and E339(iii) and E160b") == [
+        "en:e322",
+        "en:e339iii",
+        "en:e160b",
+    ]
+    # A dose is not an E-number, nor is a code inside a word.
+    assert tools_module.e_number_ids("vitamin E 400 IU") == []
+    assert tools_module.e_number_ids("TE412 or E41") == []
+
+
+def test_an_e_number_picks_its_own_explainer_else_a_narrower_one() -> None:
+    pick = tools_module.pick_exact
+    assert pick(["en:e322"], ["en:e322i", "en:e3220"]) == ["en:e322i"]  # not E3220
+    assert pick(["en:e160b"], ["en:e160", "en:e160b", "en:e160bi"]) == ["en:e160b"]
+    assert pick(["en:e999"], ["en:e330"]) == []
+    assert pick(["en:e330", "en:e330"], ["en:e330"]) == ["en:e330"]
 
 
 # --- query_graph ---------------------------------------------------------------------------

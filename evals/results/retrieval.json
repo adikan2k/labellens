@@ -1,8 +1,28 @@
 {
- "measured": "2026-11-25T20:17:09+00:00",
+ "measured": "2026-11-25T21:28:09+00:00",
  "model": "voyage-4-lite",
  "summary": {
   "overall": {
+   "agent": {
+    "n": 125,
+    "hit1": 109,
+    "hit1_ci": [
+     0.8022,
+     0.9197
+    ],
+    "hit5": 122,
+    "hit5_ci": [
+     0.9318,
+     0.9918
+    ],
+    "mrr": {
+     "mean": 0.9112,
+     "ci": [
+      0.8684,
+      0.9505
+     ]
+    }
+   },
    "vector": {
     "n": 125,
     "hit1": 80,
@@ -66,6 +86,26 @@
   },
   "by_kind": {
    "name": {
+    "agent": {
+     "n": 40,
+     "hit1": 38,
+     "hit1_ci": [
+      0.835,
+      0.9862
+     ],
+     "hit5": 40,
+     "hit5_ci": [
+      0.9124,
+      1.0
+     ],
+     "mrr": {
+      "mean": 0.9688,
+      "ci": [
+       0.9187,
+       1.0
+      ]
+     }
+    },
     "vector": {
      "n": 40,
      "hit1": 38,
@@ -128,6 +168,26 @@
     }
    },
    "e_number": {
+    "agent": {
+     "n": 30,
+     "hit1": 30,
+     "hit1_ci": [
+      0.8865,
+      1.0
+     ],
+     "hit5": 30,
+     "hit5_ci": [
+      0.8865,
+      1.0
+     ],
+     "mrr": {
+      "mean": 1.0,
+      "ci": [
+       1.0,
+       1.0
+      ]
+     }
+    },
     "vector": {
      "n": 30,
      "hit1": 1,
@@ -190,6 +250,26 @@
     }
    },
    "misspelling": {
+    "agent": {
+     "n": 30,
+     "hit1": 26,
+     "hit1_ci": [
+      0.7032,
+      0.9469
+     ],
+     "hit5": 29,
+     "hit5_ci": [
+      0.8333,
+      0.9941
+     ],
+     "mrr": {
+      "mean": 0.9056,
+      "ci": [
+       0.8111,
+       0.9833
+      ]
+     }
+    },
     "vector": {
      "n": 30,
      "hit1": 26,
@@ -252,6 +332,26 @@
     }
    },
    "descriptive": {
+    "agent": {
+     "n": 25,
+     "hit1": 15,
+     "hit1_ci": [
+      0.4074,
+      0.766
+     ],
+     "hit5": 23,
+     "hit5_ci": [
+      0.7503,
+      0.9778
+     ],
+     "mrr": {
+      "mean": 0.7193,
+      "ci": [
+       0.574,
+       0.8533
+      ]
+     }
+    },
     "vector": {
      "n": 25,
      "hit1": 15,
@@ -321,6 +421,7 @@
      "query": "an additive that colours food",
      "cls": "en:colour",
      "base_rate": 0.0491,
+     "agent": 0.0,
      "vector": 0.0,
      "keyword": 0.2,
      "hybrid": 0.4
@@ -330,6 +431,7 @@
      "query": "something that keeps oil and water mixed",
      "cls": "en:emulsifier",
      "base_rate": 0.1246,
+     "agent": 1.0,
      "vector": 1.0,
      "keyword": 0.6,
      "hybrid": 0.8
@@ -339,6 +441,7 @@
      "query": "what thickens sauces and desserts",
      "cls": "en:thickener",
      "base_rate": 0.1138,
+     "agent": 0.8,
      "vector": 0.8,
      "keyword": 0.0,
      "hybrid": 0.6
@@ -348,6 +451,7 @@
      "query": "an additive that keeps a texture stable",
      "cls": "en:stabiliser",
      "base_rate": 0.1433,
+     "agent": 0.8,
      "vector": 0.8,
      "keyword": 0.6,
      "hybrid": 0.6
@@ -357,6 +461,7 @@
      "query": "an additive that stops food going off",
      "cls": "en:preservative",
      "base_rate": 0.0451,
+     "agent": 0.2,
      "vector": 0.2,
      "keyword": 0.0,
      "hybrid": 0.0
@@ -366,6 +471,7 @@
      "query": "what stops fats from going rancid",
      "cls": "en:antioxidant",
      "base_rate": 0.0353,
+     "agent": 0.6,
      "vector": 0.6,
      "keyword": 0.4,
      "hybrid": 0.4
@@ -375,6 +481,7 @@
      "query": "a sugar substitute",
      "cls": "en:sweetener",
      "base_rate": 0.0275,
+     "agent": 0.6,
      "vector": 0.6,
      "keyword": 0.4,
      "hybrid": 0.8
@@ -384,6 +491,7 @@
      "query": "something that keeps food moist",
      "cls": "en:humectant",
      "base_rate": 0.0599,
+     "agent": 1.0,
      "vector": 1.0,
      "keyword": 0.2,
      "hybrid": 0.6
@@ -393,6 +501,7 @@
      "query": "an additive that binds metals in food",
      "cls": "en:sequestrant",
      "base_rate": 0.0638,
+     "agent": 0.6,
      "vector": 0.6,
      "keyword": 0.4,
      "hybrid": 0.8
@@ -402,12 +511,20 @@
      "query": "a substance used to carry flavours or colours",
      "cls": "en:carrier",
      "base_rate": 0.0285,
+     "agent": 0.4,
      "vector": 0.4,
      "keyword": 0.2,
      "hybrid": 0.4
     }
    ],
    "mean": {
+    "agent": {
+     "mean": 0.6,
+     "ci": [
+      0.4,
+      0.78
+     ]
+    },
     "vector": {
      "mean": 0.6,
      "ci": [
@@ -454,6 +571,13 @@
     "en:e330"
    ],
    "top_similarity": 0.6661,
+   "agent": [
+    "en:e330",
+    "en:organic-acids",
+    "en:e331ii",
+    "en:e331i",
+    "en:e331iii"
+   ],
    "vector": [
     "en:e330",
     "en:organic-acids",
@@ -484,6 +608,13 @@
     "en:e428"
    ],
    "top_similarity": 0.5948,
+   "agent": [
+    "en:e428",
+    "en:e418",
+    "en:e404",
+    "en:e407",
+    "en:e401"
+   ],
    "vector": [
     "en:e428",
     "en:e418",
@@ -515,6 +646,13 @@
     "en:e262ii"
    ],
    "top_similarity": 0.6153,
+   "agent": [
+    "en:e262ii",
+    "en:e266",
+    "en:e262",
+    "en:e237",
+    "en:e262i"
+   ],
    "vector": [
     "en:e262ii",
     "en:e266",
@@ -549,6 +687,13 @@
     "en:e150d"
    ],
    "top_similarity": 0.5347,
+   "agent": [
+    "en:e150",
+    "en:e150a",
+    "en:e150b",
+    "en:e150c",
+    "en:coconut-sugar"
+   ],
    "vector": [
     "en:e150",
     "en:e150a",
@@ -579,6 +724,13 @@
     "en:e901"
    ],
    "top_similarity": 0.6834,
+   "agent": [
+    "en:e901",
+    "en:e905c",
+    "en:e902",
+    "en:e905ci",
+    "en:e905cii"
+   ],
    "vector": [
     "en:e901",
     "en:e905c",
@@ -609,6 +761,13 @@
     "en:e475"
    ],
    "top_similarity": 0.6741,
+   "agent": [
+    "en:e475",
+    "en:e472a",
+    "en:e477",
+    "en:e472e",
+    "en:e476"
+   ],
    "vector": [
     "en:e475",
     "en:e472a",
@@ -639,6 +798,13 @@
     "en:e1100"
    ],
    "top_similarity": 0.6336,
+   "agent": [
+    "en:e1100",
+    "en:enzyme",
+    "en:e1105",
+    "en:e1101",
+    "en:e457"
+   ],
    "vector": [
     "en:e1100",
     "en:enzyme",
@@ -669,6 +835,13 @@
     "en:e161b"
    ],
    "top_similarity": 0.585,
+   "agent": [
+    "en:e161b",
+    "en:e322",
+    "en:e322i",
+    "en:e160aii",
+    "en:e161h"
+   ],
    "vector": [
     "en:e161b",
     "en:e322",
@@ -699,6 +872,13 @@
     "en:e487"
    ],
    "top_similarity": 0.6371,
+   "agent": [
+    "en:e487",
+    "en:e514",
+    "en:e514i",
+    "en:e312",
+    "en:e514ii"
+   ],
    "vector": [
     "en:e487",
     "en:e514",
@@ -729,6 +909,13 @@
     "en:e163"
    ],
    "top_similarity": 0.6627,
+   "agent": [
+    "en:e163",
+    "en:e130",
+    "en:e103",
+    "en:e161g",
+    "en:e162"
+   ],
    "vector": [
     "en:e163",
     "en:e130",
@@ -759,6 +946,13 @@
     "en:e964"
    ],
    "top_similarity": 0.6625,
+   "agent": [
+    "en:e964",
+    "en:e1200",
+    "en:e420ii",
+    "en:e1520",
+    "en:e965ii"
+   ],
    "vector": [
     "en:e964",
     "en:e1200",
@@ -790,6 +984,13 @@
     "en:e350ii"
    ],
    "top_similarity": 0.6213,
+   "agent": [
+    "en:e350ii",
+    "en:e350i",
+    "en:e350",
+    "en:e514ii",
+    "en:e539"
+   ],
    "vector": [
     "en:e350ii",
     "en:e350i",
@@ -822,6 +1023,13 @@
     "en:e262ii"
    ],
    "top_similarity": 0.6716,
+   "agent": [
+    "en:e262",
+    "en:e262i",
+    "en:e262ii",
+    "en:e364",
+    "en:e266"
+   ],
    "vector": [
     "en:e262",
     "en:e262i",
@@ -852,6 +1060,13 @@
     "en:e267"
    ],
    "top_similarity": 0.688,
+   "agent": [
+    "en:e267",
+    "en:vinegar",
+    "en:white-vinegar",
+    "en:white-distilled-vinegar",
+    "en:distilled-vinegar"
+   ],
    "vector": [
     "en:e267",
     "en:vinegar",
@@ -882,6 +1097,13 @@
     "en:e1401"
    ],
    "top_similarity": 0.6702,
+   "agent": [
+    "en:e1401",
+    "en:modified-starch",
+    "en:e14xx",
+    "en:modified-corn-starch",
+    "en:modified-wheat-starch"
+   ],
    "vector": [
     "en:e1401",
     "en:modified-starch",
@@ -912,6 +1134,13 @@
     "en:e236"
    ],
    "top_similarity": 0.555,
+   "agent": [
+    "en:e236",
+    "en:e238",
+    "en:e237",
+    "en:e240",
+    "en:e239"
+   ],
    "vector": [
     "en:e236",
     "en:e238",
@@ -944,6 +1173,13 @@
     "en:e160bii"
    ],
    "top_similarity": 0.4724,
+   "agent": [
+    "en:e160bii",
+    "en:e160bi",
+    "en:e160b",
+    "en:e323",
+    "en:e906"
+   ],
    "vector": [
     "en:e160bii",
     "en:e160bi",
@@ -974,6 +1210,13 @@
     "en:e941"
    ],
    "top_similarity": 0.5341,
+   "agent": [
+    "en:e941",
+    "en:e919",
+    "en:e252",
+    "en:e942",
+    "en:e249"
+   ],
    "vector": [
     "en:e941",
     "en:e919",
@@ -1005,6 +1248,13 @@
     "en:e261ii"
    ],
    "top_similarity": 0.6546,
+   "agent": [
+    "en:e261ii",
+    "en:e261",
+    "en:e577",
+    "en:e283",
+    "en:e336ii"
+   ],
    "vector": [
     "en:e261ii",
     "en:e261",
@@ -1038,6 +1288,13 @@
     "en:e470aiii"
    ],
    "top_similarity": 0.6634,
+   "agent": [
+    "en:e470a",
+    "en:e470aiii",
+    "en:e470ai",
+    "en:e470",
+    "en:e470b"
+   ],
    "vector": [
     "en:e470a",
     "en:e470aiii",
@@ -1068,6 +1325,13 @@
     "en:salt"
    ],
    "top_similarity": 0.6113,
+   "agent": [
+    "en:salt",
+    "en:sea-salt",
+    "en:sodium-chloride",
+    "en:sodium",
+    "en:iodised-salt"
+   ],
    "vector": [
     "en:salt",
     "en:sea-salt",
@@ -1098,6 +1362,13 @@
     "en:colour"
    ],
    "top_similarity": 0.6098,
+   "agent": [
+    "en:colour",
+    "en:natural-colours",
+    "en:e165",
+    "en:vegetable-pigment",
+    "en:e162"
+   ],
    "vector": [
     "en:colour",
     "en:natural-colours",
@@ -1128,6 +1399,13 @@
     "en:molasses"
    ],
    "top_similarity": 0.6007,
+   "agent": [
+    "en:molasses",
+    "en:corn-syrup",
+    "en:malt-syrup",
+    "en:e965",
+    "en:brown-sugar"
+   ],
    "vector": [
     "en:molasses",
     "en:corn-syrup",
@@ -1158,6 +1436,13 @@
     "en:buttermilk"
    ],
    "top_similarity": 0.6158,
+   "agent": [
+    "en:buttermilk",
+    "en:buttermilk-solids",
+    "en:soured-milk",
+    "en:cultured-pasteurized-milk",
+    "en:whole-milk"
+   ],
    "vector": [
     "en:buttermilk",
     "en:buttermilk-solids",
@@ -1188,6 +1473,13 @@
     "en:celery"
    ],
    "top_similarity": 0.3852,
+   "agent": [
+    "en:celery-juice",
+    "en:celery-powder",
+    "en:celery-seed",
+    "en:celery",
+    "en:e469"
+   ],
    "vector": [
     "en:celery-juice",
     "en:celery-powder",
@@ -1218,6 +1510,13 @@
     "en:sesame-seeds"
    ],
    "top_similarity": 0.5719,
+   "agent": [
+    "en:sesame-seeds",
+    "en:sesame",
+    "en:poppyseed",
+    "en:mustard-seed",
+    "en:celery-seed"
+   ],
    "vector": [
     "en:sesame-seeds",
     "en:sesame",
@@ -1248,6 +1547,13 @@
     "en:fruit"
    ],
    "top_similarity": 0.6314,
+   "agent": [
+    "en:fruit",
+    "en:apple",
+    "en:pear",
+    "en:fruit-pectin",
+    "en:papaya"
+   ],
    "vector": [
     "en:fruit",
     "en:apple",
@@ -1278,6 +1584,13 @@
     "en:natural-smoke-flavouring"
    ],
    "top_similarity": 0.6863,
+   "agent": [
+    "en:natural-smoke-flavouring",
+    "en:smoke-flavouring",
+    "en:natural-flavouring",
+    "en:natural-and-artificial-flavouring",
+    "en:butter-natural-flavouring"
+   ],
    "vector": [
     "en:natural-smoke-flavouring",
     "en:smoke-flavouring",
@@ -1308,6 +1621,13 @@
     "en:sesame-oil"
    ],
    "top_similarity": 0.7002,
+   "agent": [
+    "en:sesame-oil",
+    "en:sesame",
+    "en:safflower-oil",
+    "en:cottonseed-oil",
+    "en:rapeseed-oil"
+   ],
    "vector": [
     "en:sesame-oil",
     "en:sesame",
@@ -1338,6 +1658,13 @@
     "en:raspberry"
    ],
    "top_similarity": 0.6293,
+   "agent": [
+    "en:raspberry",
+    "en:raspberry-puree",
+    "en:cranberry",
+    "en:strawberry",
+    "en:blackberry"
+   ],
    "vector": [
     "en:raspberry",
     "en:raspberry-puree",
@@ -1368,6 +1695,13 @@
     "en:soluble-corn-fiber"
    ],
    "top_similarity": 0.703,
+   "agent": [
+    "en:soluble-corn-fiber",
+    "en:inulin",
+    "en:oat-fibre",
+    "en:chicory-fibre",
+    "en:e425ii"
+   ],
    "vector": [
     "en:soluble-corn-fiber",
     "en:inulin",
@@ -1398,6 +1732,13 @@
     "en:icing-sugar"
    ],
    "top_similarity": 0.6671,
+   "agent": [
+    "en:icing-sugar",
+    "en:invert-sugar",
+    "en:invert-sugar-syrup",
+    "en:sugar",
+    "en:e953"
+   ],
    "vector": [
     "en:icing-sugar",
     "en:invert-sugar",
@@ -1428,6 +1769,13 @@
     "en:whey-protein-isolate"
    ],
    "top_similarity": 0.721,
+   "agent": [
+    "en:whey-protein-isolate",
+    "en:whey-protein",
+    "en:milk-protein-isolate",
+    "en:soy-protein-isolate",
+    "en:whey-powder"
+   ],
    "vector": [
     "en:whey-protein-isolate",
     "en:whey-protein",
@@ -1458,6 +1806,13 @@
     "en:white-vinegar"
    ],
    "top_similarity": 0.7057,
+   "agent": [
+    "en:white-vinegar",
+    "en:white-distilled-vinegar",
+    "en:distilled-vinegar",
+    "en:red-wine-vinegar",
+    "en:vinegar"
+   ],
    "vector": [
     "en:white-vinegar",
     "en:white-distilled-vinegar",
@@ -1488,6 +1843,13 @@
     "en:malted-barley"
    ],
    "top_similarity": 0.6561,
+   "agent": [
+    "en:barley-malt-flour",
+    "en:malted-barley",
+    "en:malt",
+    "en:barley",
+    "en:malt-syrup"
+   ],
    "vector": [
     "en:barley-malt-flour",
     "en:malted-barley",
@@ -1518,6 +1880,13 @@
     "en:habanero-chili"
    ],
    "top_similarity": 0.6713,
+   "agent": [
+    "en:habanero-chili",
+    "en:jalapeno-pepper",
+    "en:red-chili-pepper",
+    "en:chipotle",
+    "en:cayenne-pepper"
+   ],
    "vector": [
     "en:habanero-chili",
     "en:jalapeno-pepper",
@@ -1548,6 +1917,13 @@
     "en:rye-flour"
    ],
    "top_similarity": 0.6972,
+   "agent": [
+    "en:rye-flour",
+    "en:brown-rice-flour",
+    "en:rice-flour",
+    "en:barley-malt-flour",
+    "en:wholemeal-oat-flour"
+   ],
    "vector": [
     "en:rye-flour",
     "en:brown-rice-flour",
@@ -1578,6 +1954,13 @@
     "en:tamari"
    ],
    "top_similarity": 0.7164,
+   "agent": [
+    "en:tamari",
+    "en:soy-sauce",
+    "en:worcestershire-sauce",
+    "en:rice-vinegar",
+    "en:tahini"
+   ],
    "vector": [
     "en:tamari",
     "en:soy-sauce",
@@ -1608,6 +1991,13 @@
     "en:malt-syrup"
    ],
    "top_similarity": 0.6512,
+   "agent": [
+    "en:malt-syrup",
+    "en:malt-extract",
+    "en:e965ii",
+    "en:barley-malt-extract",
+    "en:corn-syrup"
+   ],
    "vector": [
     "en:malt-syrup",
     "en:malt-extract",
@@ -1638,6 +2028,13 @@
     "en:juice"
    ],
    "top_similarity": 0.5559,
+   "agent": [
+    "en:juice",
+    "en:fruit-juice",
+    "en:vegetable-juice",
+    "en:tomato-juice",
+    "en:orange-juice"
+   ],
    "vector": [
     "en:juice",
     "en:fruit-juice",
@@ -1668,6 +2065,13 @@
     "en:e412"
    ],
    "top_similarity": 0.4911,
+   "agent": [
+    "en:e412",
+    "en:e411",
+    "en:e440a",
+    "en:e1402",
+    "en:e470iii"
+   ],
    "vector": [
     "en:e411",
     "en:e440a",
@@ -1701,6 +2105,13 @@
     "en:e160bii"
    ],
    "top_similarity": 0.253,
+   "agent": [
+    "en:e160b",
+    "en:e15x",
+    "en:e386",
+    "en:e101a",
+    "en:e411"
+   ],
    "vector": [
     "en:e15x",
     "en:e386",
@@ -1732,6 +2143,13 @@
     "en:e160c"
    ],
    "top_similarity": 0.4763,
+   "agent": [
+    "en:e160c",
+    "en:e100i",
+    "en:e440a",
+    "en:e160f",
+    "en:e1402"
+   ],
    "vector": [
     "en:e100i",
     "en:e440a",
@@ -1765,6 +2183,13 @@
     "en:e960d"
    ],
    "top_similarity": 0.3903,
+   "agent": [
+    "en:e960",
+    "en:e490",
+    "en:e160f",
+    "xx:e364",
+    "en:e386"
+   ],
    "vector": [
     "en:e490",
     "en:e160f",
@@ -1798,6 +2223,13 @@
     "en:e341iii"
    ],
    "top_similarity": 0.3641,
+   "agent": [
+    "en:e341",
+    "en:e411",
+    "en:e386",
+    "xx:e364",
+    "en:e15x"
+   ],
    "vector": [
     "en:e411",
     "en:e386",
@@ -1828,6 +2260,13 @@
     "en:e320"
    ],
    "top_similarity": 0.5016,
+   "agent": [
+    "en:e320",
+    "en:e440a",
+    "en:e386",
+    "en:e160f",
+    "en:e470iii"
+   ],
    "vector": [
     "en:e440a",
     "en:e386",
@@ -1858,6 +2297,13 @@
     "en:e920"
    ],
    "top_similarity": 0.4148,
+   "agent": [
+    "en:e920",
+    "en:e490",
+    "en:e440a",
+    "en:e386",
+    "en:e1402"
+   ],
    "vector": [
     "en:e490",
     "en:e440a",
@@ -1888,6 +2334,13 @@
     "en:e575"
    ],
    "top_similarity": 0.3012,
+   "agent": [
+    "en:e575",
+    "en:e15x",
+    "en:e386",
+    "en:e490",
+    "xx:e386"
+   ],
    "vector": [
     "en:e15x",
     "en:e386",
@@ -1918,6 +2371,13 @@
     "en:e443"
    ],
    "top_similarity": 0.5194,
+   "agent": [
+    "en:e443",
+    "en:e440a",
+    "en:e411",
+    "en:e470iii",
+    "en:e1402"
+   ],
    "vector": [
     "en:e440a",
     "en:e411",
@@ -1948,6 +2408,13 @@
     "en:e444"
    ],
    "top_similarity": 0.4022,
+   "agent": [
+    "en:e444",
+    "en:e440a",
+    "xx:e364",
+    "en:e411",
+    "en:e490"
+   ],
    "vector": [
     "en:e440a",
     "xx:e364",
@@ -1978,6 +2445,13 @@
     "en:e953"
    ],
    "top_similarity": 0.3053,
+   "agent": [
+    "en:e953",
+    "en:e490",
+    "en:e15x",
+    "en:e386",
+    "en:e411"
+   ],
    "vector": [
     "en:e490",
     "en:e15x",
@@ -2008,6 +2482,13 @@
     "en:e1519"
    ],
    "top_similarity": 0.4962,
+   "agent": [
+    "en:e1519",
+    "en:e15x",
+    "en:e101a",
+    "en:e411",
+    "en:e440a"
+   ],
    "vector": [
     "en:e15x",
     "en:e101a",
@@ -2038,6 +2519,13 @@
     "en:e1521"
    ],
    "top_similarity": 0.3365,
+   "agent": [
+    "en:e1521",
+    "en:e15x",
+    "en:e121",
+    "en:e411",
+    "en:e1402"
+   ],
    "vector": [
     "en:e15x",
     "en:e121",
@@ -2068,6 +2556,13 @@
     "en:e635"
    ],
    "top_similarity": 0.3662,
+   "agent": [
+    "en:e635",
+    "en:e386",
+    "en:e15x",
+    "xx:e364",
+    "xx:e386"
+   ],
    "vector": [
     "en:e386",
     "en:e15x",
@@ -2098,6 +2593,13 @@
     "en:e942"
    ],
    "top_similarity": 0.5534,
+   "agent": [
+    "en:e942",
+    "en:e1402",
+    "en:e440a",
+    "en:e490",
+    "en:e407a"
+   ],
    "vector": [
     "en:e1402",
     "en:e440a",
@@ -2128,6 +2630,13 @@
     "en:e404"
    ],
    "top_similarity": 0.4033,
+   "agent": [
+    "en:e404",
+    "en:e440a",
+    "xx:e364",
+    "en:e411",
+    "en:e1402"
+   ],
    "vector": [
     "en:e440a",
     "xx:e364",
@@ -2158,6 +2667,13 @@
     "en:e928"
    ],
    "top_similarity": 0.3283,
+   "agent": [
+    "en:e928",
+    "en:e386",
+    "en:e490",
+    "en:e152",
+    "en:e15x"
+   ],
    "vector": [
     "en:e386",
     "en:e490",
@@ -2189,6 +2705,13 @@
     "en:e550ii"
    ],
    "top_similarity": 0.4909,
+   "agent": [
+    "en:e550",
+    "en:e490",
+    "en:e440a",
+    "en:e386",
+    "en:e1520"
+   ],
    "vector": [
     "en:e490",
     "en:e440a",
@@ -2219,6 +2742,13 @@
     "en:e246"
    ],
    "top_similarity": 0.4232,
+   "agent": [
+    "en:e246",
+    "en:e386",
+    "xx:e386",
+    "xx:e364",
+    "en:e440a"
+   ],
    "vector": [
     "en:e386",
     "xx:e386",
@@ -2249,6 +2779,13 @@
     "en:e409"
    ],
    "top_similarity": 0.3256,
+   "agent": [
+    "en:e409",
+    "en:e411",
+    "en:e490",
+    "en:e386",
+    "en:e440a"
+   ],
    "vector": [
     "en:e411",
     "en:e490",
@@ -2280,6 +2817,13 @@
     "en:e440ii"
    ],
    "top_similarity": 0.5487,
+   "agent": [
+    "en:e440ii",
+    "en:e440a",
+    "en:e411",
+    "en:e470iii",
+    "en:e1402"
+   ],
    "vector": [
     "en:e440a",
     "en:e411",
@@ -2310,6 +2854,13 @@
     "en:e175"
    ],
    "top_similarity": 0.4258,
+   "agent": [
+    "en:e175",
+    "en:e15x",
+    "en:e490",
+    "en:e386",
+    "xx:e364"
+   ],
    "vector": [
     "en:e15x",
     "en:e490",
@@ -2340,6 +2891,13 @@
     "en:e166"
    ],
    "top_similarity": 0.3472,
+   "agent": [
+    "en:e166",
+    "en:e386",
+    "en:e15x",
+    "en:e411",
+    "xx:e386"
+   ],
    "vector": [
     "en:e386",
     "en:e15x",
@@ -2370,6 +2928,13 @@
     "en:e536"
    ],
    "top_similarity": 0.5467,
+   "agent": [
+    "en:e536",
+    "en:e386",
+    "xx:e386",
+    "xx:e364",
+    "en:e440a"
+   ],
    "vector": [
     "en:e386",
     "xx:e386",
@@ -2400,6 +2965,13 @@
     "en:e225"
    ],
    "top_similarity": 0.3983,
+   "agent": [
+    "en:e225",
+    "xx:e386",
+    "en:e1402",
+    "en:e15x",
+    "en:e128"
+   ],
    "vector": [
     "xx:e386",
     "en:e1402",
@@ -2430,6 +3002,13 @@
     "en:e921"
    ],
    "top_similarity": 0.3078,
+   "agent": [
+    "en:e921",
+    "en:e411",
+    "en:e490",
+    "en:e386",
+    "en:e15x"
+   ],
    "vector": [
     "en:e411",
     "en:e490",
@@ -2460,6 +3039,13 @@
     "en:e15x"
    ],
    "top_similarity": 0.6098,
+   "agent": [
+    "en:e15x",
+    "en:e1402",
+    "en:e470b",
+    "en:e440a",
+    "en:e470iii"
+   ],
    "vector": [
     "en:e15x",
     "en:e1402",
@@ -2490,6 +3076,13 @@
     "en:e312"
    ],
    "top_similarity": 0.3654,
+   "agent": [
+    "en:e312",
+    "xx:e364",
+    "en:e386",
+    "en:e121",
+    "en:e128"
+   ],
    "vector": [
     "xx:e364",
     "en:e386",
@@ -2520,6 +3113,13 @@
     "en:e441"
    ],
    "top_similarity": 0.4015,
+   "agent": [
+    "en:e441",
+    "en:e411",
+    "en:e386",
+    "en:e440a",
+    "en:e490"
+   ],
    "vector": [
     "en:e411",
     "en:e386",
@@ -2551,6 +3151,13 @@
     "en:e550ii"
    ],
    "top_similarity": 0.4735,
+   "agent": [
+    "en:e550ii",
+    "en:e470iii",
+    "en:e411",
+    "en:e1402",
+    "en:e100i"
+   ],
    "vector": [
     "en:e470iii",
     "en:e411",
@@ -2581,6 +3188,13 @@
     "en:e375"
    ],
    "top_similarity": 0.5565,
+   "agent": [
+    "en:e375",
+    "en:e635",
+    "en:e355",
+    "en:e952",
+    "en:e363"
+   ],
    "vector": [
     "en:e375",
     "en:e635",
@@ -2611,6 +3225,13 @@
     "en:e316"
    ],
    "top_similarity": 0.5293,
+   "agent": [
+    "en:e316",
+    "en:sodium-selenite",
+    "en:e285",
+    "en:e500iii",
+    "en:e201"
+   ],
    "vector": [
     "en:e316",
     "en:sodium-selenite",
@@ -2641,6 +3262,13 @@
     "en:e301"
    ],
    "top_similarity": 0.5267,
+   "agent": [
+    "en:e301",
+    "en:e364",
+    "en:e262i",
+    "en:e262",
+    "en:e237"
+   ],
    "vector": [
     "en:e301",
     "en:e364",
@@ -2672,6 +3300,13 @@
     "en:e339iii"
    ],
    "top_similarity": 0.5632,
+   "agent": [
+    "en:e339iii",
+    "en:e450ii",
+    "en:e339",
+    "en:e452vi",
+    "en:di-and-triphosphates"
+   ],
    "vector": [
     "en:e339iii",
     "en:e450ii",
@@ -2702,6 +3337,13 @@
     "en:e251"
    ],
    "top_similarity": 0.4981,
+   "agent": [
+    "en:sodium-selenite",
+    "en:sodium",
+    "en:e550ii",
+    "en:e514",
+    "en:e500iii"
+   ],
    "vector": [
     "en:sodium-selenite",
     "en:sodium",
@@ -2738,6 +3380,13 @@
     "en:e450vii"
    ],
    "top_similarity": 0.3585,
+   "agent": [
+    "en:e450",
+    "en:di-and-triphosphates",
+    "en:e450vi",
+    "en:diphosphates-and-sodium-carbonates",
+    "en:e450vii"
+   ],
    "vector": [
     "en:e450",
     "en:di-and-triphosphates",
@@ -2769,6 +3418,13 @@
     "en:e482i"
    ],
    "top_similarity": 0.7001,
+   "agent": [
+    "en:e482",
+    "en:e482i",
+    "en:e486",
+    "en:e481",
+    "en:e327"
+   ],
    "vector": [
     "en:e482",
     "en:e482i",
@@ -2800,6 +3456,13 @@
     "en:e451i"
    ],
    "top_similarity": 0.481,
+   "agent": [
+    "en:e451i",
+    "en:e451ii",
+    "en:e450iii",
+    "en:e450ii",
+    "en:e452vi"
+   ],
    "vector": [
     "en:e451i",
     "en:e451ii",
@@ -2830,6 +3493,13 @@
     "en:e944"
    ],
    "top_similarity": 0.2973,
+   "agent": [
+    "en:e944",
+    "en:e281",
+    "en:e310",
+    "en:provolone",
+    "en:e405"
+   ],
    "vector": [
     "en:e944",
     "en:e281",
@@ -2861,6 +3531,13 @@
     "en:e482i"
    ],
    "top_similarity": 0.6832,
+   "agent": [
+    "en:e482",
+    "en:e482i",
+    "en:e486",
+    "en:e481",
+    "en:e327"
+   ],
    "vector": [
     "en:e482",
     "en:e482i",
@@ -2892,6 +3569,13 @@
     "en:e472c"
    ],
    "top_similarity": 0.6094,
+   "agent": [
+    "en:e472c",
+    "en:e484",
+    "en:e472d",
+    "en:e472",
+    "en:e472a"
+   ],
    "vector": [
     "en:e472c",
     "en:e484",
@@ -2922,6 +3606,13 @@
     "en:e201"
    ],
    "top_similarity": 0.3571,
+   "agent": [
+    "en:e201",
+    "en:e316",
+    "en:e281",
+    "en:e550",
+    "en:e539"
+   ],
    "vector": [
     "en:e201",
     "en:e316",
@@ -2952,6 +3643,13 @@
     "en:e238"
    ],
    "top_similarity": 0.5169,
+   "agent": [
+    "en:e238",
+    "en:e333",
+    "en:e916",
+    "en:e529",
+    "en:e282"
+   ],
    "vector": [
     "en:e238",
     "en:e333",
@@ -2984,6 +3682,13 @@
     "en:e160aii"
    ],
    "top_similarity": 0.3611,
+   "agent": [
+    "en:e160aii",
+    "en:cottonseed",
+    "en:canola",
+    "en:poppyseed",
+    "en:cranberry"
+   ],
    "vector": [
     "en:e160aii",
     "en:cottonseed",
@@ -3014,6 +3719,13 @@
     "en:e457"
    ],
    "top_similarity": 0.5561,
+   "agent": [
+    "en:e457",
+    "en:e952",
+    "en:inositol",
+    "en:e405",
+    "en:e400"
+   ],
    "vector": [
     "en:e457",
     "en:e952",
@@ -3044,6 +3756,13 @@
     "en:corn-syrup"
    ],
    "top_similarity": 0.4731,
+   "agent": [
+    "en:corn",
+    "en:corn-syrup-solids",
+    "en:corn-syrup",
+    "en:yellow-corn-flour",
+    "en:cornmeal"
+   ],
    "vector": [
     "en:corn",
     "en:corn-syrup-solids",
@@ -3074,6 +3793,13 @@
     "en:fortified-wheat-flour"
    ],
    "top_similarity": 0.6443,
+   "agent": [
+    "en:fortified-wheat-flour",
+    "en:whole-wheat-flour",
+    "en:wheat-flour",
+    "en:barley-malt-flour",
+    "en:wholemeal-oat-flour"
+   ],
    "vector": [
     "en:fortified-wheat-flour",
     "en:whole-wheat-flour",
@@ -3104,6 +3830,13 @@
     "en:jalapeno-pepper"
    ],
    "top_similarity": 0.5965,
+   "agent": [
+    "en:jalapeno-pepper",
+    "en:chipotle",
+    "en:habanero-chili",
+    "en:green-chili-pepper",
+    "en:red-chili-pepper"
+   ],
    "vector": [
     "en:jalapeno-pepper",
     "en:chipotle",
@@ -3134,6 +3867,13 @@
     "en:cranberry"
    ],
    "top_similarity": 0.4053,
+   "agent": [
+    "en:cranberry",
+    "en:blackberry",
+    "en:breadcrumbs",
+    "en:wheat-bran",
+    "en:raspberry"
+   ],
    "vector": [
     "en:cranberry",
     "en:blackberry",
@@ -3164,6 +3904,13 @@
     "en:vitamin-b6"
    ],
    "top_similarity": 0.6157,
+   "agent": [
+    "en:vitamin-b6",
+    "en:pyridoxine-hydrochloride",
+    "en:vitamin-b12",
+    "en:thiamin",
+    "en:biotin"
+   ],
    "vector": [
     "en:vitamin-b6",
     "en:pyridoxine-hydrochloride",
@@ -3194,6 +3941,13 @@
     "en:sour-cream"
    ],
    "top_similarity": 0.2449,
+   "agent": [
+    "en:sour-cream",
+    "en:rennet",
+    "en:e203",
+    "en:tamarind",
+    "en:rice-vinegar"
+   ],
    "vector": [
     "en:sour-cream",
     "en:rennet",
@@ -3224,6 +3978,13 @@
     "en:cayenne-pepper"
    ],
    "top_similarity": 0.3441,
+   "agent": [
+    "en:cayenne-pepper",
+    "en:e160f",
+    "en:e902",
+    "en:celery-powder",
+    "en:e150b"
+   ],
    "vector": [
     "en:cayenne-pepper",
     "en:e160f",
@@ -3254,6 +4015,13 @@
     "en:mushroom"
    ],
    "top_similarity": 0.211,
+   "agent": [
+    "en:mushroom",
+    "en:barley-malt-flour",
+    "en:mustard-seed",
+    "en:mustard",
+    "en:muesli"
+   ],
    "vector": [
     "en:mushroom",
     "en:barley-malt-flour",
@@ -3284,6 +4052,13 @@
     "en:modified-tapioca-starch"
    ],
    "top_similarity": 0.6238,
+   "agent": [
+    "en:modified-tapioca-starch",
+    "en:modified-potato-starch",
+    "en:e14xx",
+    "en:modified-wheat-starch",
+    "en:tapioca"
+   ],
    "vector": [
     "en:modified-tapioca-starch",
     "en:modified-potato-starch",
@@ -3314,6 +4089,13 @@
     "en:turkey-breast"
    ],
    "top_similarity": 0.4966,
+   "agent": [
+    "en:turkey",
+    "en:turkey-breast",
+    "en:chicken",
+    "en:chicken-breast",
+    "en:chicken-meat"
+   ],
    "vector": [
     "en:turkey",
     "en:turkey-breast",
@@ -3344,6 +4126,13 @@
     "en:white-beans"
    ],
    "top_similarity": 0.3388,
+   "agent": [
+    "en:white-wine",
+    "en:e901",
+    "en:white-beans",
+    "en:egg-white",
+    "en:white-chocolate"
+   ],
    "vector": [
     "en:white-wine",
     "en:e901",
@@ -3374,6 +4163,13 @@
     "en:ricotta"
    ],
    "top_similarity": 0.6336,
+   "agent": [
+    "en:ricotta",
+    "en:asiago",
+    "en:romano-cheese",
+    "en:provolone",
+    "en:cream-cheese"
+   ],
    "vector": [
     "en:ricotta",
     "en:asiago",
@@ -3404,6 +4200,13 @@
     "en:sodium-chloride"
    ],
    "top_similarity": 0.5718,
+   "agent": [
+    "en:sodium-chloride",
+    "en:sodium",
+    "en:iodised-salt",
+    "en:e550ii",
+    "en:salt"
+   ],
    "vector": [
     "en:sodium-chloride",
     "en:sodium",
@@ -3434,6 +4237,13 @@
     "en:dijon-mustard"
    ],
    "top_similarity": 0.2712,
+   "agent": [
+    "en:dijon-mustard",
+    "en:e627",
+    "en:e631",
+    "en:e632",
+    "en:e940"
+   ],
    "vector": [
     "en:dijon-mustard",
     "en:e627",
@@ -3464,6 +4274,13 @@
     "en:feta"
    ],
    "top_similarity": 0.6214,
+   "agent": [
+    "en:feta",
+    "en:ricotta",
+    "en:cream-cheese",
+    "en:asiago",
+    "en:romano-cheese"
+   ],
    "vector": [
     "en:feta",
     "en:ricotta",
@@ -3543,6 +4360,13 @@
     "en:e181"
    ],
    "top_similarity": 0.6896,
+   "agent": [
+    "en:colour",
+    "en:e105",
+    "en:e125",
+    "en:e180",
+    "en:e111"
+   ],
    "vector": [
     "en:colour",
     "en:e105",
@@ -3699,6 +4523,13 @@
     "en:e999"
    ],
    "top_similarity": 0.524,
+   "agent": [
+    "en:e479b",
+    "en:e436",
+    "en:e492",
+    "en:e435",
+    "en:e472b"
+   ],
    "vector": [
     "en:e479b",
     "en:e436",
@@ -3844,6 +4675,13 @@
     "en:e967"
    ],
    "top_similarity": 0.5486,
+   "agent": [
+    "en:e405",
+    "en:modified-starch",
+    "en:e413",
+    "en:e1413",
+    "en:e1420"
+   ],
    "vector": [
     "en:e405",
     "en:modified-starch",
@@ -4019,6 +4857,13 @@
     "xx:e386"
    ],
    "top_similarity": 0.3304,
+   "agent": [
+    "en:stabiliser",
+    "en:e407a",
+    "en:e464",
+    "en:e340ii",
+    "en:e341"
+   ],
    "vector": [
     "en:stabiliser",
     "en:e407a",
@@ -4094,6 +4939,13 @@
     "xx:e386"
    ],
    "top_similarity": 0.5999,
+   "agent": [
+    "en:preservative",
+    "en:antioxidant",
+    "en:e320",
+    "en:e200",
+    "en:e324"
+   ],
    "vector": [
     "en:preservative",
     "en:antioxidant",
@@ -4159,6 +5011,13 @@
     "xx:e386"
    ],
    "top_similarity": 0.5274,
+   "agent": [
+    "en:e306",
+    "en:e310",
+    "en:e307a",
+    "en:e320",
+    "en:e309"
+   ],
    "vector": [
     "en:e306",
     "en:e310",
@@ -4216,6 +5075,13 @@
     "en:e969"
    ],
    "top_similarity": 0.5672,
+   "agent": [
+    "en:e952",
+    "en:e964",
+    "en:e965ii",
+    "en:sugar",
+    "en:cane-sugar"
+   ],
    "vector": [
     "en:e952",
     "en:e964",
@@ -4306,6 +5172,13 @@
     "en:e968"
    ],
    "top_similarity": 0.553,
+   "agent": [
+    "en:e350i",
+    "en:e406",
+    "en:e350ii",
+    "en:e1520",
+    "en:e422"
+   ],
    "vector": [
     "en:e350i",
     "en:e406",
@@ -4400,6 +5273,13 @@
     "xx:e386"
    ],
    "top_similarity": 0.5935,
+   "agent": [
+    "en:e385",
+    "en:zinc",
+    "en:e391",
+    "en:e577",
+    "en:e539"
+   ],
    "vector": [
     "en:e385",
     "en:zinc",
@@ -4458,6 +5338,13 @@
     "en:e903"
    ],
    "top_similarity": 0.6599,
+   "agent": [
+    "en:e462",
+    "en:colour",
+    "en:e127",
+    "en:e1504",
+    "en:e160bi"
+   ],
    "vector": [
     "en:e462",
     "en:colour",
@@ -4489,6 +5376,13 @@
     "en:e500ii"
    ],
    "top_similarity": 0.6148,
+   "agent": [
+    "en:e500ii",
+    "en:e501ii",
+    "ca:carbonat-acid-de-sodi-i-difosfat-de-disodi",
+    "en:e541",
+    "en:diphosphates-and-sodium-carbonates"
+   ],
    "vector": [
     "en:e500ii",
     "en:e501ii",
@@ -4520,6 +5414,13 @@
     "en:vitamin-c"
    ],
    "top_similarity": 0.6117,
+   "agent": [
+    "en:vitamin-c",
+    "en:e301",
+    "en:e300",
+    "en:e303",
+    "en:e316"
+   ],
    "vector": [
     "en:vitamin-c",
     "en:e301",
@@ -4550,6 +5451,13 @@
     "en:e621"
    ],
    "top_similarity": 0.2335,
+   "agent": [
+    "en:e621",
+    "en:e343i",
+    "en:e624",
+    "en:methylsulfonylmethane",
+    "en:e625"
+   ],
    "vector": [
     "en:e621",
     "en:e343i",
@@ -4584,6 +5492,13 @@
     "en:e122"
    ],
    "top_similarity": 0.6053,
+   "agent": [
+    "en:e127",
+    "en:e123",
+    "en:e125",
+    "en:e124",
+    "en:e120"
+   ],
    "vector": [
     "en:e127",
     "en:e123",
@@ -4622,6 +5537,13 @@
     "en:e160aii"
    ],
    "top_similarity": 0.6275,
+   "agent": [
+    "en:e107",
+    "en:e105",
+    "en:e104",
+    "en:e110",
+    "en:e172iii"
+   ],
    "vector": [
     "en:e107",
     "en:e105",
@@ -4654,6 +5576,13 @@
     "en:e955"
    ],
    "top_similarity": 0.6458,
+   "agent": [
+    "en:e951",
+    "en:e954",
+    "en:e962",
+    "en:e952",
+    "en:e969"
+   ],
    "vector": [
     "en:e951",
     "en:e954",
@@ -4685,6 +5614,13 @@
     "en:e202"
    ],
    "top_similarity": 0.6029,
+   "agent": [
+    "en:e242",
+    "en:e216",
+    "en:e214",
+    "en:e210",
+    "en:e218"
+   ],
    "vector": [
     "en:e242",
     "en:e216",
@@ -4718,6 +5654,13 @@
     "en:e401"
    ],
    "top_similarity": 0.6747,
+   "agent": [
+    "en:e407a",
+    "en:e405",
+    "en:seaweed",
+    "en:e401",
+    "en:e400"
+   ],
    "vector": [
     "en:e407a",
     "en:e405",
@@ -4748,6 +5691,13 @@
     "en:e508"
    ],
    "top_similarity": 0.4544,
+   "agent": [
+    "en:salt",
+    "en:sea-salt",
+    "en:e508",
+    "en:iodised-salt",
+    "en:sodium-chloride"
+   ],
    "vector": [
     "en:salt",
     "en:sea-salt",
@@ -4778,6 +5728,13 @@
     "en:e290"
    ],
    "top_similarity": 0.6033,
+   "agent": [
+    "en:carbonated-water",
+    "en:e290",
+    "en:e942",
+    "de:gärungskohlensäure",
+    "en:e940"
+   ],
    "vector": [
     "en:carbonated-water",
     "en:e290",
@@ -4812,6 +5769,13 @@
     "en:e307c"
    ],
    "top_similarity": 0.6683,
+   "agent": [
+    "en:e307",
+    "en:e307a",
+    "en:e307c",
+    "en:dl-alpha-tocopheryl-acetate",
+    "en:e309"
+   ],
    "vector": [
     "en:e307",
     "en:e307a",
@@ -4844,6 +5808,13 @@
     "en:e150a"
    ],
    "top_similarity": 0.6211,
+   "agent": [
+    "en:e150",
+    "en:e150b",
+    "en:e150c",
+    "en:e150a",
+    "en:e150d"
+   ],
    "vector": [
     "en:e150",
     "en:e150b",
@@ -4874,6 +5845,13 @@
     "en:e338"
    ],
    "top_similarity": 0.4853,
+   "agent": [
+    "en:e338",
+    "en:acid",
+    "en:e507",
+    "en:e296",
+    "en:e574"
+   ],
    "vector": [
     "en:e338",
     "en:acid",
@@ -4906,6 +5884,13 @@
     "en:e322ii"
    ],
    "top_similarity": 0.6097,
+   "agent": [
+    "en:soya-lecithin",
+    "en:e322i",
+    "en:e322",
+    "en:e322ii",
+    "en:soya"
+   ],
    "vector": [
     "en:soya-lecithin",
     "en:e322i",
@@ -4937,6 +5922,13 @@
     "en:e410"
    ],
    "top_similarity": 0.5492,
+   "agent": [
+    "en:e410",
+    "en:white-beans",
+    "en:beans",
+    "en:e412",
+    "en:pinto-beans"
+   ],
    "vector": [
     "en:e410",
     "en:white-beans",
@@ -4969,6 +5961,13 @@
     "en:e252"
    ],
    "top_similarity": 0.5831,
+   "agent": [
+    "en:e249",
+    "en:e250",
+    "en:e252",
+    "en:e251",
+    "en:e919"
+   ],
    "vector": [
     "en:e249",
     "en:e250",
@@ -5002,6 +6001,13 @@
     "en:e228"
    ],
    "top_similarity": 0.5745,
+   "agent": [
+    "en:e226",
+    "en:e225",
+    "en:e221",
+    "en:e222",
+    "en:e228"
+   ],
    "vector": [
     "en:e226",
     "en:e225",
@@ -5032,6 +6038,13 @@
     "en:e524"
    ],
    "top_similarity": 0.4517,
+   "agent": [
+    "en:e921",
+    "en:e920",
+    "en:e1105",
+    "en:e924a",
+    "en:e283"
+   ],
    "vector": [
     "en:e921",
     "en:e920",
@@ -5063,6 +6076,13 @@
     "en:e900a"
    ],
    "top_similarity": 0.5605,
+   "agent": [
+    "en:e900",
+    "en:e479b",
+    "en:e435",
+    "en:e487",
+    "en:e433"
+   ],
    "vector": [
     "en:e900",
     "en:e479b",
@@ -5095,6 +6115,13 @@
     "en:e460ii"
    ],
    "top_similarity": 0.4936,
+   "agent": [
+    "en:e460ii",
+    "en:e460",
+    "en:e464",
+    "en:e460i",
+    "en:e469"
+   ],
    "vector": [
     "en:e460ii",
     "en:e460",
@@ -5132,6 +6159,13 @@
     "en:e953"
    ],
    "top_similarity": 0.5843,
+   "agent": [
+    "en:e953",
+    "en:e964",
+    "en:e420",
+    "en:e965ii",
+    "en:e421"
+   ],
    "vector": [
     "en:e953",
     "en:e964",
@@ -5163,6 +6197,13 @@
     "en:corn-syrup"
    ],
    "top_similarity": 0.6805,
+   "agent": [
+    "en:high-fructose-corn-syrup",
+    "en:glucose-fructose-syrup",
+    "en:fructose",
+    "en:corn-syrup",
+    "en:corn-syrup-solids"
+   ],
    "vector": [
     "en:high-fructose-corn-syrup",
     "en:glucose-fructose-syrup",
@@ -5193,6 +6234,13 @@
     "en:caffeine"
    ],
    "top_similarity": 0.6595,
+   "agent": [
+    "en:caffeine",
+    "en:coffee",
+    "en:taurine",
+    "en:e960a",
+    "en:e960c"
+   ],
    "vector": [
     "en:caffeine",
     "en:coffee",
@@ -5225,6 +6273,13 @@
     "en:whey"
    ],
    "top_similarity": 0.6757,
+   "agent": [
+    "en:milk-proteins",
+    "en:milk-protein-isolate",
+    "en:milk-protein-concentrate",
+    "en:calcium-caseinate",
+    "en:whey-protein"
+   ],
    "vector": [
     "en:milk-proteins",
     "en:milk-protein-isolate",
@@ -5258,6 +6313,13 @@
     "en:e170ii"
    ],
    "top_similarity": 0.5219,
+   "agent": [
+    "en:e901",
+    "en:white-chocolate",
+    "en:icing-sugar",
+    "en:e170i",
+    "en:e171"
+   ],
    "vector": [
     "en:e901",
     "en:white-chocolate",
@@ -5286,6 +6348,13 @@
    "query": "What is the capital of France?",
    "relevant": [],
    "top_similarity": 0.2167,
+   "agent": [
+    "en:dijon-mustard",
+    "en:e938",
+    "en:e939",
+    "en:e940",
+    "en:e941"
+   ],
    "vector": [
     "en:dijon-mustard",
     "en:e938",
@@ -5314,6 +6383,13 @@
    "query": "How do I fix a flat bicycle tyre?",
    "relevant": [],
    "top_similarity": 0.2008,
+   "agent": [
+    "en:crust",
+    "en:e927",
+    "en:potato-flour",
+    "en:e410",
+    "en:filling"
+   ],
    "vector": [
     "en:crust",
     "en:e927",
@@ -5342,6 +6418,13 @@
    "query": "What is a blockchain?",
    "relevant": [],
    "top_similarity": 0.2892,
+   "agent": [
+    "en:e460",
+    "en:amino-acids",
+    "en:beef",
+    "en:tapioca",
+    "en:coconut-oil"
+   ],
    "vector": [
     "en:e460",
     "en:amino-acids",
@@ -5370,6 +6453,13 @@
    "query": "Who wrote Hamlet?",
    "relevant": [],
    "top_similarity": 0.2561,
+   "agent": [
+    "en:ham",
+    "en:e239",
+    "en:alcohol",
+    "en:e939",
+    "en:e231"
+   ],
    "vector": [
     "en:ham",
     "en:e239",
@@ -5398,6 +6488,13 @@
    "query": "How tall is Mount Everest?",
    "relevant": [],
    "top_similarity": 0.238,
+   "agent": [
+    "en:himalayan-pink-salt",
+    "en:fresh-cream",
+    "en:monk-fruit-extract",
+    "en:whole-milk",
+    "en:pepper"
+   ],
    "vector": [
     "en:himalayan-pink-salt",
     "en:fresh-cream",
@@ -5426,6 +6523,13 @@
    "query": "What is the best laptop for students?",
    "relevant": [],
    "top_similarity": 0.193,
+   "agent": [
+    "en:romaine-lettuce",
+    "en:pineapple",
+    "en:apple",
+    "en:peach",
+    "en:e133"
+   ],
    "vector": [
     "en:romaine-lettuce",
     "en:pineapple",
@@ -5454,6 +6558,13 @@
    "query": "How do I reset my email password?",
    "relevant": [],
    "top_similarity": 0.2179,
+   "agent": [
+    "en:e350i",
+    "en:e962",
+    "en:e501ii",
+    "en:e329",
+    "en:e585"
+   ],
    "vector": [
     "en:e350i",
     "en:e962",
@@ -5482,6 +6593,13 @@
    "query": "When did the first moon landing happen?",
    "relevant": [],
    "top_similarity": 0.1167,
+   "agent": [
+    "en:e939",
+    "en:e905b",
+    "en:e905c",
+    "en:whole-milk",
+    "en:monterey-jack"
+   ],
    "vector": [
     "en:e939",
     "en:e905b",
@@ -5510,6 +6628,13 @@
    "query": "What is the offside rule in football?",
    "relevant": [],
    "top_similarity": 0.1718,
+   "agent": [
+    "en:beef",
+    "en:spring-onion",
+    "en:chicken",
+    "en:chicken-meat",
+    "en:crust"
+   ],
    "vector": [
     "en:beef",
     "en:spring-onion",
@@ -5538,6 +6663,13 @@
    "query": "How many planets are in the solar system?",
    "relevant": [],
    "top_similarity": 0.2215,
+   "agent": [
+    "en:sunflower",
+    "en:sunflower-seed",
+    "en:vitamins",
+    "en:soya-bean",
+    "en:pea"
+   ],
    "vector": [
     "en:sunflower",
     "en:sunflower-seed",

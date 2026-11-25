@@ -4,8 +4,10 @@
   read-only transaction with a 3-second statement timeout, wrapped so at most 50 rows return.
 - query_graph: fixed, parameterised Cypher templates on the Neo4j graph. No free-form Cypher.
   `swaps` runs the product page's own swap rule (Postgres), so the agent and the page agree.
-- search_explainers: the question embedded by Voyage (input_type=query), then the five
-  nearest explainers by cosine distance in pgvector.
+- search_explainers: an E-number in the question ("E412") is looked up exactly first, since
+  the embedded texts rarely contain one and vector search found 1 in 30
+  (evals/results/retrieval.md). Then the question embedded by Voyage (input_type=query),
+  and the nearest explainers by cosine distance in pgvector, five in all.
 
 Every row, node or explainer a tool returns gets a citation id (R1, N1, E1...). The model
 cites those ids; the agent maps them to links and drops any id no tool handed out.
@@ -20,7 +22,7 @@ from __future__ import annotations
 import json
 import re
 import time
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -39,6 +41,11 @@ STATEMENT_TIMEOUT = "3s"
 MAX_TEXT = 300
 MAX_LIST = 12
 EXPLAINER_TOP = 5
+# "E412", "e330", "E-322", "E160b", "E322i", "E339(iii)". No space after the E, so
+# "vitamin E 400 IU" is not read as E400.
+_E_NUMBER_IN_TEXT = re.compile(
+    r"(?<![A-Za-z0-9])[Ee]-?(\d{3,4})([a-hA-H]?)(?:\(?([ivxIVX]{1,4})\)?)?(?![A-Za-z0-9])"
+)
 GRAPH_LIMIT = 15
 SWAP_LIMIT = 5
 
@@ -443,30 +450,85 @@ class Tools:
         query = query.strip()
         if len(query) < 3:
             raise ToolError("Give a query of a few words, like 'what is carrageenan'.")
-        try:
-            embedded = self.voyage.embed([query[:500]], input_type="query")
-        except EmbeddingsUnavailable:
-            raise ToolError(
-                "Explainer search is not available right now. Use query_sql on "
-                "additives.explainer or ingredients.explainer instead."
-            ) from None
-        with self.connect() as conn, conn.transaction():
-            _readonly_transaction(conn)
-            rows = conn.execute(
-                """select id, kind, name, text,
+        wanted = e_number_ids(query)
+        exact: list[dict[str, Any]] = []
+        if wanted:
+            with self.connect() as conn, conn.transaction():
+                _readonly_transaction(conn)
+                found = conn.execute(
+                    "select id, kind, name, text from serving.explainers where id ~ any(%s)",
+                    [[family_pattern(i) for i in wanted]],
+                ).fetchall()
+            by_id = {row["id"]: row for row in found}
+            exact = [by_id[i] for i in pick_exact(wanted, by_id)][:EXPLAINER_TOP]
+        tokens = 0
+        nearest: list[dict[str, Any]] = []
+        if len(exact) < EXPLAINER_TOP:
+            try:
+                embedded = self.voyage.embed([query[:500]], input_type="query")
+            except EmbeddingsUnavailable:
+                if not exact:
+                    raise ToolError(
+                        "Explainer search is not available right now. Use query_sql on "
+                        "additives.explainer or ingredients.explainer instead."
+                    ) from None
+            else:
+                tokens = embedded.tokens
+                with self.connect() as conn, conn.transaction():
+                    _readonly_transaction(conn)
+                    nearest = conn.execute(
+                        """select id, kind, name, text,
                               embedding operator(public.<=>) %s::public.vector as distance
-                       from serving.explainers order by distance limit %s""",
-                [vector_literal(embedded.vectors[0]), EXPLAINER_TOP],
-            ).fetchall()
+                           from serving.explainers order by distance limit %s""",
+                        [vector_literal(embedded.vectors[0]), EXPLAINER_TOP + len(exact)],
+                    ).fetchall()
+        taken = {row["id"] for row in exact}
         results = []
-        for row in rows:
+        for row in exact:
+            cite = self.citations.add("explainer", row["id"], row["name"], None)
+            results.append({
+                "id": row["id"], "kind": row["kind"], "name": row["name"], "text": row["text"],
+                "match": "E-number", "cite": cite,
+            })  # fmt: skip
+        for row in nearest:
+            if row["id"] in taken or len(results) >= EXPLAINER_TOP:
+                continue
             cite = self.citations.add("explainer", row["id"], row["name"], None)
             results.append({
                 "id": row["id"], "kind": row["kind"], "name": row["name"], "text": row["text"],
                 "distance": round(float(row["distance"]), 3), "cite": cite,
             })  # fmt: skip
         note = "Explainers are AI-written summaries; say so when you use one."
-        return {"results": results, "note": note}, len(results), embedded.tokens
+        return {"results": results, "note": note}, len(results), tokens
+
+
+def e_number_ids(text: str) -> list[str]:
+    """The explainer ids of the E-numbers in a question, in order: 'Is E330 or e322i…' ->
+    ['en:e330', 'en:e322i']."""
+    out: list[str] = []
+    for digits, letter, roman in _E_NUMBER_IN_TEXT.findall(text):
+        i = f"en:e{digits}{letter.lower()}{roman.lower()}"
+        if i not in out:
+            out.append(i)
+    return out
+
+
+def family_pattern(explainer_id: str) -> str:
+    """A regex for an E-number and its narrower forms: en:e322 -> en:e322i, not en:e3220."""
+    return "^" + re.escape(explainer_id) + "[a-z]*$"
+
+
+def pick_exact(wanted: list[str], available: Iterable[str]) -> list[str]:
+    """For each wanted E-number, its own explainer, else the closest narrower one that exists
+    (E322 asked, only E322i written: E322i). Shared with evals/runners/retrieval_eval.py."""
+    ids = sorted(set(available), key=lambda i: (len(i), i))
+    picked: list[str] = []
+    for want in wanted:
+        family = [i for i in ids if re.match(family_pattern(want), i)]
+        choice = want if want in family else (family[0] if family else None)
+        if choice and choice not in picked:
+            picked.append(choice)
+    return picked
 
 
 def _ms(started: float) -> int:
