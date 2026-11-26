@@ -35,4 +35,5 @@ The home hero (#45) was fixed in the same round: a line saying what LabelLens is
 
 - `uv run python scripts/check.py` on every pull request; CI on main after each merge.
 - The production smoke test after the merges: 23 of 23.
-- Lighthouse on production after the five merges: home 100 in every category; product 91 on performance and SEO; dashboard 96 on performance, 100 on a rerun. `evals/results/lighthouse.md` is remeasured once the description fix is live.
+- Lighthouse on production after the five merges: home 100 in every category; product 91 on performance and SEO; dashboard 96 on performance, 100 on a rerun.
+- Lighthouse on production with the description fix live (`evals/results/lighthouse.md`, 2026-11-25): 100 in every category on home and the dashboard; the product page 100 except performance at 90, exactly the target, with its largest paint (the photo) at 3.6 s.

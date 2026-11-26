@@ -159,7 +159,7 @@ Every AI feature is measured against a baseline before it ships, and the misses 
 | [Category accuracy](evals/results/category_accuracy_claude-haiku-5-5-full-silver.md) | AI category on 200 products, against labels from a larger model (Claude Opus) | 90% | Haiku **90.0% (85.1–93.4%)**, Sonnet 92.0%. Open Food Facts' own tags: 87.5% |
 | [Search latency](evals/results/search_latency_public.md) | 200 searches against the live API | p95 under 300 ms | **p95 175 ms**, p50 98 ms |
 | [Graph and swaps](evals/results/graph_latency_public.md) | 100 products, live API | Under 1 s | p95 406 ms (graph), 233 ms (swaps) |
-| [Lighthouse](evals/results/lighthouse.md) | Home, product and dashboard pages on mobile | 90 in every category | 98 to 100 in every category |
+| [Lighthouse](evals/results/lighthouse.md) | Home, product and dashboard pages on mobile | 90 in every category | 100 in every category, except the product page's performance at 90: its pack photo, loaded from Open Food Facts, is the slowest thing on the page ([decision 0018](docs/decisions/0018-award-site-review.md)) |
 | [Prompt caching](evals/results/ask_caching.md) | 10 agent runs with and without a cached prompt | Cheaper, same answers | **64% cheaper per run** |
 | [Cold start](evals/results/cold_start.md) | First request after the API sits idle, from Cloud Run's own log | Timed and noted | **7 to 10 s** from zero, down from 22.6 s after app startup was cut from 16 s to about 1 s; then under 0.1 s per request. The database wakes in about 1 s |
 
